@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אולטראס ביתר - קרב המגרש</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: radial-gradient(circle at 50% 30%, #1c1c1c, #000);
+    font-family: "Segoe UI", Arial, sans-serif;
+    overflow: hidden;
+    color: #ffd200;
+  }
+  #wrap {
+    display: flex; flex-direction: column; align-items: center;
+    height: 100%; justify-content: center; gap: 8px;
+  }
+  h1 { font-size: 20px; letter-spacing: 1px; text-shadow: 0 2px 0 #000; }
+  #hud { display: flex; gap: 14px; font-size: 15px; font-weight: bold; flex-wrap:wrap; justify-content:center; }
+  #hud span { background:#000; padding:6px 12px; border-radius:8px; border:2px solid #ffd200; }
+  #hud .lives { border-color:#ff4141; color:#ff6b6b; }
+  canvas {
+    background:#0d0d0d;
+    border: 4px solid #ffd200; border-radius: 10px;
+    box-shadow: 0 0 30px rgba(255,210,0,0.3);
+    max-width: 96vw; max-height: 72vh; touch-action: none;
+  }
+  #help { font-size: 13px; color:#ccc; text-align:center; }
+  #msg {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.85); text-align: center; z-index: 10;
+  }
+  #msg .box { background:#000; border:4px solid #ffd200; border-radius:14px; padding: 28px 40px; max-width:90vw; }
+  #msg h2 { font-size: 28px; margin-bottom: 10px; }
+  #msg p { color:#fff; margin-bottom: 16px; font-size:16px; }
+  button { background:#ffd200; color:#000; border:none; font-weight:bold; padding:12px 26px; border-radius:8px; font-size:16px; cursor:pointer; }
+  button:hover { background:#fff; }
+  #msg .box { z-index: 12; }
+
+  /* ---- פקדי מגע ---- */
+  #touch { position: fixed; inset: 0; pointer-events: none; z-index: 8; display: none; }
+  #joy {
+    position: absolute; left: 20px; bottom: 24px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,210,0,0.12); border: 3px solid rgba(255,210,0,0.5);
+    pointer-events: auto; touch-action: none;
+  }
+  #knob {
+    position: absolute; left: 40px; top: 40px;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: #ffd200; border: 3px solid #000; box-shadow: 0 3px 8px rgba(0,0,0,.5);
+  }
+  #throwBtn {
+    position: absolute; right: 24px; bottom: 34px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #ff9d00, #c0392b);
+    border: 4px solid #ffd200; color: #fff; font-weight: bold; font-size: 20px;
+    pointer-events: auto; touch-action: none; box-shadow: 0 3px 10px rgba(0,0,0,.5);
+  }
+  #throwBtn:active { transform: scale(0.94); }
+  /* הצג פקדי מגע במסכי מגע */
+  @media (pointer: coarse) { #touch { display: block; } #help { display:none; } }
+
+  /* מסך פתיחה */
+  #start {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(circle at 50% 35%, rgba(40,40,40,.97), rgba(0,0,0,.98));
+  }
+  #start .box { max-width: 92vw; padding: 10px 20px; }
+  #start h2 { font-size: 30px; margin-bottom: 6px; text-shadow: 0 2px 0 #000; }
+  #start .crest { font-size: 54px; margin-bottom: 6px; }
+  #start ul { list-style: none; color:#fff; font-size:14px; margin: 14px auto 20px; max-width: 360px; text-align: right; line-height: 1.7; }
+  #start li b { color:#ffd200; }
+  #start button { padding: 16px 40px; font-size: 20px; }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 16px; text-align:center; padding:0 6px; }
+    #hud { font-size: 13px; gap: 8px; }
+    #hud span { padding: 5px 9px; }
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>🟡⚫ אולטראס ביתר ירושלים — קרב המגרש ⚫🟡</h1>
+  <div id="hud">
+    <span>אבוקות בדשא: <b id="thrown">0</b>/5</span>
+    <span>שלב: <b id="level">1</b>/5</span>
+    <span id="statebox">אסוף אבוקות מהיציע!</span>
+    <span class="lives">חיים: <b id="lives">❤❤❤</b></span>
+    <span id="fsBtn" style="cursor:pointer;user-select:none;">⛶ מסך מלא</span>
+  </div>
+  <canvas id="game" width="900" height="600"></canvas>
+  <div id="help">חיצים / WASD לתנועה • אסוף אבוקות מהיציעים (נדלקות מיד) • היכנס לדשא ולחץ <b>רווח</b> לזרוק • התחמק מהשוטרים הכחולים! 🚓</div>
+</div>
+
+<!-- פקדי מגע -->
+<div id="touch">
+  <div id="joy"><div id="knob"></div></div>
+  <button id="throwBtn">זרוק 🔥</button>
+</div>
+
+<!-- מסך פתיחה -->
+<div id="start">
+  <div class="box">
+    <div class="crest">🟡⚫</div>
+    <h2>אולטראס ביתר — קרב המגרש</h2>
+    <ul>
+      <li>🏃 זוז עם <b>החיצים</b> (או הג'ויסטיק בטלפון)</li>
+      <li>🔥 אסוף <b>אבוקות</b> מהיציעים — הן נדלקות מיד</li>
+      <li>🟩 היכנס ל<b>דשא</b> ולחץ <b>רווח</b> (או "זרוק") להשליך</li>
+      <li>🚓 התחמק מה<b>שוטרים</b> — 3 חיים בלבד!</li>
+      <li>🏆 5 אבוקות בוערות על הדשא = ניצחון</li>
+    </ul>
+    <button onclick="startGame()">▶ התחל משחק</button>
+  </div>
+</div>
+
+<div id="msg">
+  <div class="box">
+    <h2 id="msgTitle"></h2>
+    <p id="msgText"></p>
+    <button onclick="restart()">שחק שוב</button>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('game');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+
+// ----- פריסת מגרש: דשא במרכז, יציעים מסביב -----
+const pitch = { x: 150, y: 130, w: W - 300, h: H - 260 };  // דשא מרכזי
+const insidePitch = (x,y) => x > pitch.x && x < pitch.x+pitch.w && y > pitch.y && y < pitch.y+pitch.h;
+
+// ----- שחקן -----
+const player = { x: W/2, y: H - 60, r: 16, speed: 3.6, carrying:false, lit:false, inv:0 };
+
+// ----- אבוקות (state: 'stand' | 'dropped' | carried | 'thrown') -----
+let flares = [];
+function makeFlares() {
+  flares = [
+    { x: 70,  y: 70,     state:'stand' },   // יציע שמאל עליון
+    { x: W-70,y: 70,     state:'stand' },   // ימין עליון
+    { x: 70,  y: H-70,   state:'stand' },   // שמאל תחתון
+    { x: W-70,y: H-70,   state:'stand' },   // ימין תחתון
+    { x: W/2, y: 40,     state:'stand' },   // מרכז עליון
+  ];
+}
+let burning = []; // אבוקות בוערות בדשא
+
+// ----- שוטרים -----
+let police = [];
+function makePolice() {
+  police = [
+    { x: 250, y: 300, speed: 1.25, phase: 0 },
+    { x: W-250, y: 300, speed: 1.4,  phase: 2 },
+    { x: W/2, y: 260, speed: 1.1,  phase: 4 },
+  ];
+}
+// שלב: כל אבוקה שנזרקת מעלה שלב ומגבירה מהירות שוטרים
+function speedMul() { return 1 + (level - 1) * 0.22; }
+
+// ----- אוהדים + בועות -----
+const fans = [
+  { name:"אליאור", x:110, y:H-30, color:"#ffd200", say:["קדימה ביתר!","אבוקות באוויר!","הצהובים!"], t:0 },
+  { name:"ליאו",    x:330, y:H-30, color:"#ffe45c", say:["מלכת הכנרת!","יאללה יציע!","ביתר לנצח"], t:60 },
+  { name:"בוקבוזה", x:W-330, y:H-30, color:"#ffd200", say:["צהוב שחור!","כל העיר ביתר","בואו נדליק!"], t:120 },
+  { name:"שחר",     x:W-110, y:H-30, color:"#fff", say:["רק לא ביבי!","רק לא ביבי!","רק לא ביבי!"], t:30, always:true },
+  { name:"עומרי",   x:280,   y:78,   color:"#ffd200", say:["חי חי חי!","ביתר ירושלים!","נר-ל-לה-לה!"], t:15 },
+  { name:"מתן",     x:W/2,   y:100,  color:"#ffe45c", say:["תשרפו את היציע!","ירושלים של זהב!","קדימה צהובים!"], t:90 },
+  { name:"אורון",   x:620,   y:78,   color:"#ffd200", say:["המזרחי בוער!","אלופה שלי!","עוד אבוקה!"], t:150 },
+];
+
+let thrown = 0, lives = 3, gameOver = false, flash = 0, started = false, level = 1;
+const keys = {};
+const touchMove = { x: 0, y: 0 };
+document.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if (e.key === ' ') { e.preventDefault(); tryThrow(); }
+  if (["arrowup","arrowdown","arrowleft","arrowright"].includes(e.key.toLowerCase())) e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+function tryThrow() {
+  if (gameOver) return;
+  if (player.carrying && player.lit && insidePitch(player.x, player.y)) {
+    burning.push({ x: player.x, y: player.y, spark: 0 });
+    player.carrying = false; player.lit = false;
+    thrown++;
+    document.getElementById('thrown').textContent = thrown;
+    if (thrown >= 5) { win(); return; }
+    level = thrown + 1; // עולה שלב -> השוטרים מהירים יותר
+    document.getElementById('level').textContent = level;
+  }
+}
+
+function caught() {
+  lives--;
+  document.getElementById('lives').textContent = "❤".repeat(Math.max(0,lives)) || "—";
+  flash = 20;
+  player.inv = 90; // חסינות זמנית
+  // מפיל אבוקה נישאת (כבויה, אפשר לאסוף שוב)
+  if (player.carrying) {
+    flares.push({ x: player.x + 30, y: player.y, state:'dropped' });
+    player.carrying = false; player.lit = false;
+  }
+  // דחיפה חזרה למטה
+  player.x = W/2; player.y = H - 60;
+  if (lives <= 0) lose();
+}
+
+function update() {
+  if (gameOver || !started) return;
+
+  if (keys['arrowleft'] || keys['a'])  player.x -= player.speed;
+  if (keys['arrowright']|| keys['d'])  player.x += player.speed;
+  if (keys['arrowup']   || keys['w'])  player.y -= player.speed;
+  if (keys['arrowdown'] || keys['s'])  player.y += player.speed;
+  // מגע (ג'ויסטיק)
+  player.x += touchMove.x * player.speed;
+  player.y += touchMove.y * player.speed;
+  player.x = Math.max(player.r, Math.min(W - player.r, player.x));
+  player.y = Math.max(player.r, Math.min(H - player.r, player.y));
+
+  if (player.inv > 0) player.inv--;
+  if (flash > 0) flash--;
+
+  // איסוף אבוקות
+  if (!player.carrying) {
+    for (const f of flares) {
+      if ((f.state==='stand' || f.state==='dropped') &&
+          Math.hypot(f.x - player.x, f.y - player.y) < 28) {
+        f.state = 'gone';
+        player.carrying = true; player.lit = true;
+        break;
+      }
+    }
+    flares = flares.filter(f => f.state !== 'gone');
+  }
+
+  // תנועת שוטרים — רודפים את השחקן
+  const mul = speedMul();
+  for (const p of police) {
+    p.phase += 0.03;
+    const dx = player.x - p.x, dy = player.y - p.y;
+    const d = Math.hypot(dx, dy) || 1;
+    // רדיפה + ריחוף קל כדי שיהיה חמקמק
+    p.x += (dx/d) * p.speed * mul + Math.cos(p.phase)*0.5;
+    p.y += (dy/d) * p.speed * mul + Math.sin(p.phase)*0.5;
+    p.x = Math.max(20, Math.min(W-20, p.x));
+    p.y = Math.max(20, Math.min(H-20, p.y));
+    if (player.inv <= 0 && Math.hypot(p.x-player.x, p.y-player.y) < p_r + player.r) {
+      caught();
+      break;
+    }
+  }
+
+  for (const b of burning) b.spark++;
+
+  const sb = document.getElementById('statebox');
+  if (player.carrying) sb.textContent = "🔥 היכנס לדשא וזרוק (רווח)!";
+  else sb.textContent = "אסוף אבוקות מהיציע!";
+}
+
+/* ---------------- ציור ---------------- */
+const p_r = 15;
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+
+  // יציעים מסביב (מסגרת צהוב-שחור עם מושבים)
+  drawStands();
+
+  // דשא מרכזי + סימוני מגרש
+  drawPitch();
+
+  // אבוקות ביציע/על הקרקע
+  for (const f of flares) {
+    if (f.state==='stand') drawFlare(f.x, f.y, false);
+    else if (f.state==='dropped') drawFlare(f.x, f.y, false, 0, true);
+  }
+  // אבוקות בוערות בדשא
+  for (const b of burning) drawFlare(b.x, b.y, true, b.spark);
+
+  // אוהדים
+  for (const fan of fans) {
+    drawFan(fan);
+    fan.t++;
+    const period = fan.always ? 90 : 260;
+    const showFor = fan.always ? 70 : 120;
+    if (fan.t % period < showFor) {
+      const idx = Math.floor(fan.t / period) % fan.say.length;
+      drawBubble(fan.x, fan.y - 42, fan.say[idx]);
+    }
+  }
+
+  // שוטרים
+  for (const p of police) drawPolice(p);
+
+  // שחקן
+  drawPlayer();
+
+  // הבזק כשנתפסים
+  if (flash > 0) {
+    ctx.fillStyle = `rgba(255,0,0,${flash/40})`;
+    ctx.fillRect(0,0,W,H);
+  }
+}
+
+function drawStands() {
+  // רקע היציע
+  ctx.fillStyle = "#2b2b2b";
+  ctx.fillRect(0,0,W,H);
+  // מושבים בצבעי הקבוצה
+  for (let y=10; y<H; y+=22) {
+    for (let x=10; x<W; x+=22) {
+      // רק מחוץ לדשא (כולל שוליים)
+      if (insidePitch(x, y)) continue;
+      ctx.fillStyle = ((x+y) % 44 === 0) ? "#000" : "#ffd200";
+      ctx.globalAlpha = 0.55;
+      ctx.fillRect(x, y, 14, 14);
+      ctx.globalAlpha = 1;
+    }
+  }
+  // מסלול ריצה (טבעת כתומה מסביב לדשא)
+  ctx.strokeStyle = "#a8471f";
+  ctx.lineWidth = 26;
+  ctx.strokeRect(pitch.x-18, pitch.y-18, pitch.w+36, pitch.h+36);
+}
+
+function drawPitch() {
+  const {x,y,w,h} = pitch;
+  // פסי דשא
+  const stripes = 8, sw = w/stripes;
+  for (let i=0;i<stripes;i++){
+    ctx.fillStyle = i%2===0 ? "#2f9e33" : "#28892c";
+    ctx.fillRect(x + i*sw, y, sw, h);
+  }
+  // סימונים לבנים
+  ctx.strokeStyle = "rgba(255,255,255,0.85)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, y, w, h);                        // גבול
+  ctx.beginPath(); ctx.moveTo(x+w/2, y); ctx.lineTo(x+w/2, y+h); ctx.stroke(); // קו אמצע
+  ctx.beginPath(); ctx.arc(x+w/2, y+h/2, 52, 0, Math.PI*2); ctx.stroke();      // מעגל מרכז
+  ctx.beginPath(); ctx.arc(x+w/2, y+h/2, 4, 0, Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
+  // רחבות
+  const boxH = 120, boxW = 55;
+  ctx.strokeRect(x, y+h/2-boxH/2, boxW, boxH);
+  ctx.strokeRect(x+w-boxW, y+h/2-boxH/2, boxW, boxH);
+}
+
+function drawFlare(x, y, lit, spark=0, dropped=false) {
+  ctx.strokeStyle = "#222"; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y+20); ctx.stroke();
+  if (lit) {
+    const flicker = 6 + Math.sin(spark*0.4)*3;
+    const g = ctx.createRadialGradient(x, y-6, 2, x, y-6, 26+flicker);
+    g.addColorStop(0,"#fff"); g.addColorStop(0.3,"#ffd200");
+    g.addColorStop(0.6,"#ff7b00"); g.addColorStop(1,"rgba(255,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y-6, 26+flicker, 0, Math.PI*2); ctx.fill();
+    for (let i=0;i<3;i++){
+      ctx.fillStyle="rgba(255,200,80,0.7)";
+      ctx.beginPath();
+      ctx.arc(x + Math.sin(spark*0.3+i)*8, y-20-(spark%20)-i*6, 2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  } else {
+    ctx.fillStyle = dropped ? "#7a7a7a" : "#c0392b";
+    ctx.beginPath(); ctx.arc(x, y-2, 7, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#ffd200"; ctx.lineWidth=2; ctx.stroke();
+    if (dropped) { // סמן "אסוף אותי"
+      ctx.fillStyle="#fff"; ctx.font="10px Arial"; ctx.textAlign="center";
+      ctx.fillText("↑", x, y-14);
+    }
+  }
+}
+
+function drawFan(fan) {
+  const x = fan.x, y = fan.y;
+  ctx.fillStyle = fan.color; ctx.fillRect(x-10, y-8, 20, 22);
+  ctx.fillStyle = "#000"; ctx.fillRect(x-10, y-8, 20, 5);
+  ctx.fillStyle = "#f1c27d"; ctx.beginPath(); ctx.arc(x, y-14, 8, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(x-12, y-24); ctx.lineTo(x+12, y-24); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.font = "bold 11px Arial"; ctx.textAlign="center";
+  ctx.fillText(fan.name, x, y+26);
+}
+
+function drawPolice(p) {
+  const x=p.x, y=p.y;
+  ctx.fillStyle="rgba(0,0,0,0.3)"; ctx.beginPath(); ctx.ellipse(x,y+15,13,4,0,0,Math.PI*2); ctx.fill();
+  // גוף כחול
+  ctx.fillStyle="#1e3a8a"; ctx.fillRect(x-11, y-8, 22, 24);
+  // אפוד זוהר
+  ctx.fillStyle="#eaff00"; ctx.fillRect(x-11, y-2, 22, 6);
+  // ראש + כובע
+  ctx.fillStyle="#f1c27d"; ctx.beginPath(); ctx.arc(x, y-16, 8, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle="#12245c"; ctx.fillRect(x-9, y-24, 18, 6);
+  ctx.fillStyle="#fff"; ctx.font="bold 10px Arial"; ctx.textAlign="center";
+  ctx.fillText("שוטר", x, y+28);
+}
+
+function drawPlayer() {
+  const x = player.x, y = player.y;
+  const blink = player.inv>0 && Math.floor(player.inv/6)%2===0;
+  ctx.globalAlpha = blink ? 0.4 : 1;
+  ctx.fillStyle = "rgba(0,0,0,0.35)"; ctx.beginPath(); ctx.ellipse(x,y+15,13,4,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "#ffd200"; ctx.fillRect(x-11, y-10, 22, 26);
+  ctx.fillStyle = "#000"; ctx.fillRect(x-11, y-10, 22, 6);
+  ctx.fillStyle = "#f1c27d"; ctx.beginPath(); ctx.arc(x, y-18, 9, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font="bold 11px Arial"; ctx.textAlign="center"; ctx.fillText("אתה", x, y+28);
+  if (player.carrying) drawFlare(x+15, y-12, player.lit, performance_spark());
+  ctx.globalAlpha = 1;
+}
+let _sp=0; function performance_spark(){ return (_sp+=1); }
+
+function drawBubble(x, y, text) {
+  ctx.font = "bold 13px Arial";
+  const w = ctx.measureText(text).width + 20, h = 26;
+  const bx = Math.max(w/2, Math.min(W - w/2, x));
+  ctx.fillStyle = "#fff"; roundRect(bx - w/2, y - h, w, h, 8); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x-6, y); ctx.lineTo(x+6, y); ctx.lineTo(x, y+8); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.fillText(text, bx, y - h/2 + 5);
+}
+function roundRect(x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+
+function win() {
+  gameOver = true;
+  document.getElementById('msgTitle').textContent = "🔥 יאללה ביתר! 🔥";
+  document.getElementById('msgText').textContent =
+    "כל 5 האבוקות בוערות על הדשא והתחמקת מכל השוטרים! היציע רועד — צהוב ושחור עד הסוף. (שחר עדיין צועק: רק לא ביבי!)";
+  document.getElementById('msg').style.display = "flex";
+}
+function lose() {
+  gameOver = true;
+  document.getElementById('msgTitle').textContent = "🚓 נתפסת!";
+  document.getElementById('msgText').textContent =
+    "השוטרים תפסו אותך. אבל אולטראס אמיתי לא מוותר — נסה שוב!";
+  document.getElementById('msg').style.display = "flex";
+}
+
+function restart() {
+  thrown = 0; lives = 3; gameOver = false; flash = 0; started = true; level = 1;
+  touchMove.x = 0; touchMove.y = 0;
+  document.getElementById('level').textContent = 1;
+  player.x = W/2; player.y = H - 60; player.carrying=false; player.lit=false; player.inv=0;
+  burning = [];
+  makeFlares(); makePolice();
+  document.getElementById('thrown').textContent = 0;
+  document.getElementById('lives').textContent = "❤❤❤";
+  document.getElementById('msg').style.display = "none";
+}
+
+function startGame() {
+  document.getElementById('start').style.display = 'none';
+  started = true;
+  restart();
+  started = true; // restart מאפס דגלים; נשאר במצב משחק
+}
+
+/* ---------------- פקדי מגע ---------------- */
+const joy = document.getElementById('joy');
+const knob = document.getElementById('knob');
+let joyId = null, joyCx = 0, joyCy = 0;
+const JOY_R = 40;
+
+function setKnob(dx, dy) {
+  knob.style.left = (40 + dx) + 'px';
+  knob.style.top  = (40 + dy) + 'px';
+}
+function joyStart(e) {
+  const t = e.changedTouches ? e.changedTouches[0] : e;
+  joyId = e.changedTouches ? t.identifier : 'mouse';
+  const r = joy.getBoundingClientRect();
+  joyCx = r.left + r.width/2; joyCy = r.top + r.height/2;
+  joyMove(e);
+}
+function joyMove(e) {
+  if (joyId === null) return;
+  let t;
+  if (e.changedTouches) {
+    for (const c of e.changedTouches) if (c.identifier === joyId) t = c;
+    if (!t) return;
+  } else t = e;
+  let dx = t.clientX - joyCx, dy = t.clientY - joyCy;
+  const d = Math.hypot(dx, dy);
+  if (d > JOY_R) { dx = dx/d*JOY_R; dy = dy/d*JOY_R; }
+  setKnob(dx, dy);
+  touchMove.x = dx / JOY_R;
+  touchMove.y = dy / JOY_R;
+  e.preventDefault();
+}
+function joyEnd(e) {
+  joyId = null; touchMove.x = 0; touchMove.y = 0; setKnob(0,0);
+}
+joy.addEventListener('touchstart', joyStart, {passive:false});
+joy.addEventListener('touchmove',  joyMove,  {passive:false});
+joy.addEventListener('touchend',   joyEnd);
+joy.addEventListener('touchcancel',joyEnd);
+// תמיכה גם בעכבר (לבדיקה במחשב)
+joy.addEventListener('mousedown', joyStart);
+window.addEventListener('mousemove', e => { if (joyId==='mouse') joyMove(e); });
+window.addEventListener('mouseup',   e => { if (joyId==='mouse') joyEnd(e); });
+
+const throwBtn = document.getElementById('throwBtn');
+throwBtn.addEventListener('touchstart', e => { e.preventDefault(); tryThrow(); }, {passive:false});
+throwBtn.addEventListener('mousedown',  e => { e.preventDefault(); tryThrow(); });
+
+// מניעת גלילה/זום בזמן משחק בטלפון
+document.body.addEventListener('touchmove', e => { if (started) e.preventDefault(); }, {passive:false});
+
+/* ---------------- מסך מלא ---------------- */
+const fsBtn = document.getElementById('fsBtn');
+function toggleFullscreen() {
+  const el = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen || (()=>{})).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || (()=>{})).call(document);
+  }
+}
+fsBtn.addEventListener('click', toggleFullscreen);
+fsBtn.addEventListener('touchstart', e => { e.preventDefault(); toggleFullscreen(); }, {passive:false});
+
+function loop() { update(); draw(); requestAnimationFrame(loop); }
+makeFlares(); makePolice(); loop();
+</script>
+</body>
+</html>
