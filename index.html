@@ -157,9 +157,9 @@ let burning = []; // אבוקות בוערות בדשא
 let police = [];
 function makePolice() {
   police = [
-    { x: 250, y: 300, speed: 1.25, phase: 0 },
-    { x: W-250, y: 300, speed: 1.4,  phase: 2 },
-    { x: W/2, y: 260, speed: 1.1,  phase: 4 },
+    { x: 250, y: 300, speed: 0.95, phase: 0 },
+    { x: W-250, y: 300, speed: 1.1,  phase: 2 },
+    { x: W/2, y: 260, speed: 0.8,  phase: 4 },
   ];
 }
 // שלב: כל אבוקה שנזרקת מעלה שלב ומגבירה מהירות שוטרים
@@ -214,21 +214,22 @@ function caught() {
   if (lives <= 0) lose();
 }
 
-function update() {
+function update(dt) {
   if (gameOver || !started) return;
 
-  if (keys['arrowleft'] || keys['a'])  player.x -= player.speed;
-  if (keys['arrowright']|| keys['d'])  player.x += player.speed;
-  if (keys['arrowup']   || keys['w'])  player.y -= player.speed;
-  if (keys['arrowdown'] || keys['s'])  player.y += player.speed;
+  const spd = player.speed * dt;
+  if (keys['arrowleft'] || keys['a'])  player.x -= spd;
+  if (keys['arrowright']|| keys['d'])  player.x += spd;
+  if (keys['arrowup']   || keys['w'])  player.y -= spd;
+  if (keys['arrowdown'] || keys['s'])  player.y += spd;
   // מגע (ג'ויסטיק)
-  player.x += touchMove.x * player.speed;
-  player.y += touchMove.y * player.speed;
+  player.x += touchMove.x * spd;
+  player.y += touchMove.y * spd;
   player.x = Math.max(player.r, Math.min(W - player.r, player.x));
   player.y = Math.max(player.r, Math.min(H - player.r, player.y));
 
-  if (player.inv > 0) player.inv--;
-  if (flash > 0) flash--;
+  if (player.inv > 0) player.inv -= dt;
+  if (flash > 0) flash -= dt;
 
   // איסוף אבוקות
   if (!player.carrying) {
@@ -246,12 +247,12 @@ function update() {
   // תנועת שוטרים — רודפים את השחקן
   const mul = speedMul();
   for (const p of police) {
-    p.phase += 0.03;
+    p.phase += 0.03 * dt;
     const dx = player.x - p.x, dy = player.y - p.y;
     const d = Math.hypot(dx, dy) || 1;
     // רדיפה + ריחוף קל כדי שיהיה חמקמק
-    p.x += (dx/d) * p.speed * mul + Math.cos(p.phase)*0.5;
-    p.y += (dy/d) * p.speed * mul + Math.sin(p.phase)*0.5;
+    p.x += ((dx/d) * p.speed * mul + Math.cos(p.phase)*0.5) * dt;
+    p.y += ((dy/d) * p.speed * mul + Math.sin(p.phase)*0.5) * dt;
     p.x = Math.max(20, Math.min(W-20, p.x));
     p.y = Math.max(20, Math.min(H-20, p.y));
     if (player.inv <= 0 && Math.hypot(p.x-player.x, p.y-player.y) < p_r + player.r) {
@@ -260,7 +261,7 @@ function update() {
     }
   }
 
-  for (const b of burning) b.spark++;
+  for (const b of burning) b.spark += dt;
 
   const sb = document.getElementById('statebox');
   if (player.carrying) sb.textContent = "🔥 היכנס לדשא וזרוק (רווח)!";
@@ -532,8 +533,17 @@ function toggleFullscreen() {
 fsBtn.addEventListener('click', toggleFullscreen);
 fsBtn.addEventListener('touchstart', e => { e.preventDefault(); toggleFullscreen(); }, {passive:false});
 
-function loop() { update(); draw(); requestAnimationFrame(loop); }
-makeFlares(); makePolice(); loop();
+// לולאה מבוססת זמן-אמת — מהירות זהה בכל מכשיר (60/90/120Hz)
+let lastT = 0;
+function loop(now) {
+  let dt = lastT ? (now - lastT) / 16.667 : 1;   // 1.0 = קצב 60fps
+  if (dt > 3) dt = 3;                             // הגנה מקפיצות (טאב ברקע)
+  lastT = now;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+makeFlares(); makePolice(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
