@@ -389,8 +389,10 @@ function drawFan(fan) {
   ctx.fillStyle = "#f1c27d"; ctx.beginPath(); ctx.arc(x, y-14, 8, 0, Math.PI*2); ctx.fill();
   ctx.strokeStyle = "#000"; ctx.lineWidth = 4;
   ctx.beginPath(); ctx.moveTo(x-12, y-24); ctx.lineTo(x+12, y-24); ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.font = "bold 11px Arial"; ctx.textAlign="center";
-  ctx.fillText(fan.name, x, y+26);
+  // שם האוהד — גדול וברור עם קו מתאר
+  ctx.font = "bold 17px Arial"; ctx.textAlign = "center";
+  ctx.lineWidth = 4; ctx.strokeStyle = "#000"; ctx.strokeText(fan.name, x, y+30);
+  ctx.fillStyle = "#ffd200"; ctx.fillText(fan.name, x, y+30);
 }
 
 function drawPolice(p) {
@@ -422,12 +424,13 @@ function drawPlayer() {
 let _sp=0; function performance_spark(){ return (_sp+=1); }
 
 function drawBubble(x, y, text) {
-  ctx.font = "bold 13px Arial";
-  const w = ctx.measureText(text).width + 20, h = 26;
+  ctx.font = "bold 19px Arial";
+  const w = ctx.measureText(text).width + 28, h = 36;
   const bx = Math.max(w/2, Math.min(W - w/2, x));
-  ctx.fillStyle = "#fff"; roundRect(bx - w/2, y - h, w, h, 8); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(x-6, y); ctx.lineTo(x+6, y); ctx.lineTo(x, y+8); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.fillText(text, bx, y - h/2 + 5);
+  ctx.fillStyle = "#fff"; roundRect(bx - w/2, y - h, w, h, 10); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 2; roundRect(bx - w/2, y - h, w, h, 10); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.moveTo(x-8, y-2); ctx.lineTo(x+8, y-2); ctx.lineTo(x, y+9); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#000"; ctx.textAlign = "center"; ctx.fillText(text, bx, y - h/2 + 7);
 }
 function roundRect(x,y,w,h,r){
   ctx.beginPath(); ctx.moveTo(x+r,y);
