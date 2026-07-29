@@ -23,9 +23,9 @@
   #hud .lives { border-color:#ff4141; color:#ff6b6b; }
   canvas {
     background:#0d0d0d;
-    border: 4px solid #ffd200; border-radius: 10px;
+    border: 3px solid #ffd200; border-radius: 10px;
     box-shadow: 0 0 30px rgba(255,210,0,0.3);
-    max-width: 96vw; max-height: 72vh; touch-action: none;
+    max-width: 98vw; max-height: 82vh; touch-action: none;
   }
   #help { font-size: 13px; color:#ccc; text-align:center; }
   #msg {
@@ -94,7 +94,7 @@
     <span class="lives">חיים: <b id="lives">❤❤❤</b></span>
     <span id="fsBtn" style="cursor:pointer;user-select:none;">⛶ מסך מלא</span>
   </div>
-  <canvas id="game" width="900" height="600"></canvas>
+  <canvas id="game" width="620" height="880"></canvas>
   <div id="help">חיצים / WASD לתנועה • אסוף אבוקות מהיציעים (נדלקות מיד) • היכנס לדשא ולחץ <b>רווח</b> לזרוק • התחמק מהשוטרים הכחולים! 🚓</div>
 </div>
 
@@ -134,7 +134,7 @@ const ctx = cv.getContext('2d');
 const W = cv.width, H = cv.height;
 
 // ----- פריסת מגרש: דשא במרכז, יציעים מסביב -----
-const pitch = { x: 150, y: 130, w: W - 300, h: H - 260 };  // דשא מרכזי
+const pitch = { x: 70, y: 210, w: W - 140, h: H - 430 };  // דשא מרכזי (אנכי)
 const insidePitch = (x,y) => x > pitch.x && x < pitch.x+pitch.w && y > pitch.y && y < pitch.y+pitch.h;
 
 // ----- שחקן -----
@@ -144,11 +144,11 @@ const player = { x: W/2, y: H - 60, r: 16, speed: 3.6, carrying:false, lit:false
 let flares = [];
 function makeFlares() {
   flares = [
-    { x: 70,  y: 70,     state:'stand' },   // יציע שמאל עליון
-    { x: W-70,y: 70,     state:'stand' },   // ימין עליון
-    { x: 70,  y: H-70,   state:'stand' },   // שמאל תחתון
-    { x: W-70,y: H-70,   state:'stand' },   // ימין תחתון
-    { x: W/2, y: 40,     state:'stand' },   // מרכז עליון
+    { x: 70,   y: 95,   state:'stand' },   // יציע שמאל עליון
+    { x: W-70, y: 95,   state:'stand' },   // ימין עליון
+    { x: W/2,  y: 45,   state:'stand' },   // מרכז עליון
+    { x: 130,  y: H-120,state:'stand' },   // שמאל תחתון
+    { x: W-130,y: H-120,state:'stand' },   // ימין תחתון
   ];
 }
 let burning = []; // אבוקות בוערות בדשא
@@ -167,13 +167,15 @@ function speedMul() { return 1 + (level - 1) * 0.22; }
 
 // ----- אוהדים + בועות -----
 const fans = [
-  { name:"אליאור", x:110, y:H-30, color:"#ffd200", say:["קדימה ביתר!","אבוקות באוויר!","הצהובים!"], t:0 },
-  { name:"ליאו",    x:330, y:H-30, color:"#ffe45c", say:["מלכת הכנרת!","יאללה יציע!","ביתר לנצח"], t:60 },
-  { name:"בוקבוזה", x:W-330, y:H-30, color:"#ffd200", say:["צהוב שחור!","כל העיר ביתר","בואו נדליק!"], t:120 },
-  { name:"שחר",     x:W-110, y:H-30, color:"#fff", say:["רק לא ביבי!","רק לא ביבי!","רק לא ביבי!"], t:30, always:true },
-  { name:"עומרי",   x:280,   y:78,   color:"#ffd200", say:["חי חי חי!","ביתר ירושלים!","נר-ל-לה-לה!"], t:15 },
-  { name:"מתן",     x:W/2,   y:100,  color:"#ffe45c", say:["תשרפו את היציע!","ירושלים של זהב!","קדימה צהובים!"], t:90 },
-  { name:"אורון",   x:620,   y:78,   color:"#ffd200", say:["המזרחי בוער!","אלופה שלי!","עוד אבוקה!"], t:150 },
+  // יציע תחתון
+  { name:"אליאור", x:80,    y:H-40, color:"#ffd200", say:["קדימה ביתר!","אבוקות באוויר!","הצהובים!"], t:0 },
+  { name:"ליאו",    x:235,  y:H-40, color:"#ffe45c", say:["מלכת הכנרת!","יאללה יציע!","ביתר לנצח"], t:60 },
+  { name:"בוקבוזה", x:385,  y:H-40, color:"#ffd200", say:["צהוב שחור!","כל העיר ביתר","בואו נדליק!"], t:120 },
+  { name:"שחר",     x:540,  y:H-40, color:"#fff",    say:["רק לא ביבי!","רק לא ביבי!","רק לא ביבי!"], t:30, always:true },
+  // יציע עליון
+  { name:"עומרי",   x:110,  y:150,  color:"#ffd200", say:["חי חי חי!","ביתר ירושלים!","נר-ל-לה-לה!"], t:15 },
+  { name:"מתן",     x:W/2,  y:165,  color:"#ffe45c", say:["תשרפו את היציע!","ירושלים של זהב!","קדימה צהובים!"], t:90 },
+  { name:"אורון",   x:W-110,y:150,  color:"#ffd200", say:["המזרחי בוער!","אלופה שלי!","עוד אבוקה!"], t:150 },
 ];
 
 let thrown = 0, lives = 3, gameOver = false, flash = 0, started = false, level = 1;
@@ -336,23 +338,28 @@ function drawStands() {
 
 function drawPitch() {
   const {x,y,w,h} = pitch;
-  // פסי דשא
-  const stripes = 8, sw = w/stripes;
+  // פסי דשא (אופקיים — מגרש אנכי)
+  const stripes = 10, sh = h/stripes;
   for (let i=0;i<stripes;i++){
     ctx.fillStyle = i%2===0 ? "#2f9e33" : "#28892c";
-    ctx.fillRect(x + i*sw, y, sw, h);
+    ctx.fillRect(x, y + i*sh, w, sh);
   }
   // סימונים לבנים
   ctx.strokeStyle = "rgba(255,255,255,0.85)";
   ctx.lineWidth = 3;
-  ctx.strokeRect(x, y, w, h);                        // גבול
-  ctx.beginPath(); ctx.moveTo(x+w/2, y); ctx.lineTo(x+w/2, y+h); ctx.stroke(); // קו אמצע
-  ctx.beginPath(); ctx.arc(x+w/2, y+h/2, 52, 0, Math.PI*2); ctx.stroke();      // מעגל מרכז
+  ctx.strokeRect(x, y, w, h);                                   // גבול
+  ctx.beginPath(); ctx.moveTo(x, y+h/2); ctx.lineTo(x+w, y+h/2); ctx.stroke(); // קו אמצע אופקי
+  ctx.beginPath(); ctx.arc(x+w/2, y+h/2, 58, 0, Math.PI*2); ctx.stroke();      // מעגל מרכז
   ctx.beginPath(); ctx.arc(x+w/2, y+h/2, 4, 0, Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
-  // רחבות
-  const boxH = 120, boxW = 55;
-  ctx.strokeRect(x, y+h/2-boxH/2, boxW, boxH);
-  ctx.strokeRect(x+w-boxW, y+h/2-boxH/2, boxW, boxH);
+  // רחבות עליונה ותחתונה
+  const boxW = 190, boxH = 70;
+  ctx.strokeRect(x+w/2-boxW/2, y, boxW, boxH);
+  ctx.strokeRect(x+w/2-boxW/2, y+h-boxH, boxW, boxH);
+  // שערים
+  const goalW = 90;
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(x+w/2-goalW/2, y);   ctx.lineTo(x+w/2+goalW/2, y);   ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w/2-goalW/2, y+h); ctx.lineTo(x+w/2+goalW/2, y+h); ctx.stroke();
 }
 
 function drawFlare(x, y, lit, spark=0, dropped=false) {
