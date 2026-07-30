@@ -217,7 +217,7 @@
         <div class="diff" data-diff="hard"><div class="emo">🥵</div><div class="t">קטלני</div><div class="d">בלי רחמים</div></div>
       </div>
 
-      <div class="hint">לחיצה על דמות = השחקן שלך · לחיצה על דמות שנייה = היריב<br>📱 בנייד: מזיזים את המחבט עם האצבע · כפתור "הגש" למטה<br>💻 במחשב: חצים ← → להזזה · מקש רווח להגשה</div>
+      <div class="hint">לחיצה על דמות = השחקן שלך · לחיצה על דמות שנייה = היריב<br>📱 בנייד: מזיזים את המחבט חופשי בכל חצי המגרש (עד הרשת) · כפתור "הגש" למטה<br>💻 במחשב: חצים ← → ↑ ↓ להזזה · מקש רווח להגשה<br>💥 מכה חזקה = לזוז מהר לתוך הכדור (סמאש) · הכיוון נקבע לפי איפה שפגעת · תנועה הצידה = סיבוב שמעקם</div>
     </div>
     <div class="foot">
       <button class="btn btn-main" id="btn-start" disabled>בחר שחקן ויריב כדי להתחיל</button>
@@ -391,11 +391,14 @@ document.querySelectorAll('#diffs .diff').forEach(d=>{
    ===================================================================== */
 const cv=$('#cv'); const ctx=cv.getContext('2d');
 let W=0,H=0, DPR=Math.min(window.devicePixelRatio||1,2);
-let paddleW, paddleH, ballR;
-let youX, botX, ball, botTargetX, rafId=null;
+let paddleR, ballR;                           // bat radius (free-moving disc)
+let youX, youY, botX, botY, ball, rafId=null; // paddle CENTER coords (2D, free within own half)
 let faceYou=null, faceBot=null;               // player photos drawn on the table
-const keys={left:false,right:false};          // desktop keyboard state
+const keys={left:false,right:false,up:false,down:false};  // desktop keyboard state
 let trail=[];                                 // ball motion trail
+let prevYouX=0, prevYouY=0, prevBotX=0, prevBotY=0, youVX=0, youVY=0, botVX=0, botVY=0; // paddle velocities
+let hitFx=null;                               // impact flash effect
+let lastHitter=null;                          // 'you' | 'bot' — enforces single-touch (no double hits)
 
 function loadFace(ch){ if(!ch||!ch.img) return null; const im=new Image(); im.src=ch.img; return im; }
 
@@ -404,9 +407,12 @@ function resize(){
   W=r.width; H=r.height;
   cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  paddleW=Math.max(66, W*0.22); paddleH=Math.max(13,H*0.018); ballR=Math.max(8,W*0.026);
-  if(youX===undefined){ youX=W/2; botX=W/2; }
+  paddleR=Math.max(16, W*0.055); ballR=Math.max(8,W*0.026);
+  if(youX===undefined){ youX=W/2; youY=H*0.80; botX=W/2; botY=H*0.20; }
 }
+// keep a paddle center inside its own half of the table
+function clampYou(){ youX=Math.max(paddleR, Math.min(W-paddleR, youX)); youY=Math.max(H/2+paddleR+2, Math.min(H-paddleR-2, youY)); }
+function clampBot(){ botX=Math.max(paddleR, Math.min(W-paddleR, botX)); botY=Math.max(paddleR+2, Math.min(H/2-paddleR-2, botY)); }
 window.addEventListener('resize', ()=>{ if(state.running){resize();} });
 
 function startGame(){
@@ -417,14 +423,16 @@ function startGame(){
   $('#g-target').textContent=DIFF[state.diff].label;
   updateScore();
   show('#screen-game');
-  requestAnimationFrame(()=>{ resize(); youX=W/2; botX=W/2; state.firstServer='you'; lastTs=0; prepareServe(currentServer()); rafId=requestAnimationFrame(loop); });
+  requestAnimationFrame(()=>{ resize(); youX=W/2; youY=H*0.80; botX=W/2; botY=H*0.20; state.firstServer='you'; lastTs=0; prepareServe(currentServer()); rafId=requestAnimationFrame(loop); });
 }
 function updateScore(){ $('#g-you-score').textContent=state.youScore; $('#g-bot-score').textContent=state.botScore; }
 
 function prepareServe(server){
-  state.serving=true; state.lastServer=server; trail=[];
-  ball={ x:W/2, y: server==='you'? H-paddleH-ballR-30 : paddleH+ballR+30, vx:0, vy:0, speed:baseBallSpeed() };
-  botX=W/2; botTargetX=W/2;
+  state.serving=true; state.lastServer=server; trail=[]; hitFx=null;
+  // the ball rests just in front of the serving bat (toward the opponent)
+  const gap=ballR+paddleR+2;
+  ball={ x: server==='you'?youX:botX, y: server==='you'? youY-gap : botY+gap, vx:0, vy:0, speed:baseBallSpeed(), spin:0, rot:0 };
+  prevYouX=youX; prevYouY=youY; prevBotX=botX; prevBotY=botY; youVX=youVY=botVX=botVY=0; lastHitter=null;
   const btn=$('#serve-btn'), msg=$('#serve-msg');
   if(server==='you'){
     msg.textContent='התור שלך להגיש 🎯'; btn.style.display=''; btn.textContent='הגש 🏓';
@@ -440,79 +448,119 @@ function doServe(){
   const angle=(Math.random()*0.5-0.25);
   ball.vx=ball.speed*Math.sin(angle);
   ball.vy=dir*ball.speed*Math.cos(angle);
+  lastHitter=state.lastServer;   // the serve counts as that player's touch
 }
 $('#serve-btn').onclick=()=>{ if(state.serving && state.lastServer==='you') doServe(); };
 
-/* ---------- input ---------- */
-function pointerX(e){
+/* ---------- input: drag the bat anywhere in your half (2D) ---------- */
+function onMove(e){
+  if(!state.running) return; e.preventDefault();
   const r=cv.getBoundingClientRect();
-  const cx=(e.touches? e.touches[0].clientX : e.clientX)-r.left;
-  return Math.max(paddleW/2, Math.min(W-paddleW/2, cx));
+  const t=e.touches? e.touches[0] : e;
+  youX=t.clientX-r.left; youY=t.clientY-r.top; clampYou();
 }
-function onMove(e){ if(!state.running) return; e.preventDefault(); youX=pointerX(e); if(state.serving && state.lastServer==='you'){ ball.x=youX; } }
 cv.addEventListener('touchstart', onMove, {passive:false});
 cv.addEventListener('touchmove', onMove, {passive:false});
 cv.addEventListener('mousedown', e=>{cv._down=true; onMove(e);});
 cv.addEventListener('mousemove', e=>{ if(cv._down) onMove(e); });
 window.addEventListener('mouseup', ()=>cv._down=false);
 
-/* keyboard (desktop): arrows to move, space to serve */
+/* keyboard (desktop): arrows to move in 2D, space to serve */
 window.addEventListener('keydown', e=>{
   if(!state.running) return;
   if(e.key==='ArrowLeft'){ keys.left=true; e.preventDefault(); }
   else if(e.key==='ArrowRight'){ keys.right=true; e.preventDefault(); }
+  else if(e.key==='ArrowUp'){ keys.up=true; e.preventDefault(); }
+  else if(e.key==='ArrowDown'){ keys.down=true; e.preventDefault(); }
   else if(e.key===' '||e.code==='Space'){ if(state.serving && state.lastServer==='you') doServe(); e.preventDefault(); }
 });
 window.addEventListener('keyup', e=>{
   if(e.key==='ArrowLeft') keys.left=false;
   else if(e.key==='ArrowRight') keys.right=false;
+  else if(e.key==='ArrowUp') keys.up=false;
+  else if(e.key==='ArrowDown') keys.down=false;
 });
 function applyKeys(dt){
-  if(!keys.left && !keys.right) return;
-  const spd=1.15*W*dt;                 // full width in ~0.9s
+  if(!(keys.left||keys.right||keys.up||keys.down)) return;
+  const spd=1.15*W*dt;
   if(keys.left) youX-=spd;
   if(keys.right) youX+=spd;
-  youX=Math.max(paddleW/2, Math.min(W-paddleW/2, youX));
-  if(ball && state.serving && state.lastServer==='you') ball.x=youX;
+  if(keys.up) youY-=spd;
+  if(keys.down) youY+=spd;
+  clampYou();
 }
 
-/* ---------- bot AI ---------- */
+/* ---------- bot AI: moves in 2D within its half, intercepts and drives the ball down ---------- */
 function botThink(dt){
   const d=DIFF[state.diff];
   const err=d.errFrac*W;
-  if(ball.vy<0){ botTargetX = ball.x + (Math.random()*2-1)*err; }
-  else { botTargetX = W/2 + (ball.x-W/2)*0.3; }
-  const dx=botTargetX-botX;
-  const maxStep=baseBallSpeed()*d.botK*dt;
-  botX += Math.max(-maxStep, Math.min(maxStep, dx));
-  botX=Math.max(paddleW/2, Math.min(W-paddleW/2, botX));
+  let tx, ty;
+  if(ball.vy<0 || ball.y<H/2){                 // ball coming / in bot's half -> attack it
+    tx = ball.x + (Math.random()*2-1)*err;
+    ty = ball.y - (ballR+paddleR)*0.75;          // sit just above the ball to hit it downward
+  } else {                                      // ball going away -> return to ready spot
+    tx = W/2 + (ball.x-W/2)*0.4;
+    ty = H*0.16;
+  }
+  const dx=tx-botX, dy=ty-botY, dm=Math.hypot(dx,dy)||1;
+  const step=baseBallSpeed()*d.botK*dt;
+  if(dm<=step){ botX=tx; botY=ty; } else { botX+=dx/dm*step; botY+=dy/dm*step; }
+  clampBot();
 }
 
 /* ---------- physics (delta-time based: same speed at 60Hz / 120Hz / any screen) ---------- */
 function step(dt){
-  if(state.serving){ if(state.lastServer==='bot'){ ball.x=botX; } return; }
-  const mx=ball.vx*dt, my=ball.vy*dt;   // this frame's displacement
+  if(state.serving){ // ball sits in front of the serving bat and follows it
+    const gap=ballR+paddleR+2;
+    if(state.lastServer==='you'){ ball.x=youX; ball.y=youY-gap; }
+    else { ball.x=botX; ball.y=botY+gap; }
+    return;
+  }
+  // --- spin curves the flight (Magnus): rotate the velocity vector, keep its length ---
+  if(ball.spin){
+    const a=ball.spin*dt, c=Math.cos(a), s=Math.sin(a);
+    const vx=ball.vx*c-ball.vy*s, vy=ball.vx*s+ball.vy*c;
+    ball.vx=vx; ball.vy=vy;
+    ball.spin *= Math.pow(0.30, dt);
+    if(Math.abs(ball.spin)<0.03) ball.spin=0;
+    const minVy=0.30*ball.speed;
+    if(Math.abs(ball.vy)<minVy){ ball.vy=(ball.vy<0?-1:1)*minVy; const sp=Math.hypot(ball.vx,ball.vy)||1; ball.vx*=ball.speed/sp; ball.vy*=ball.speed/sp; }
+  }
+  ball.rot += (5 + ball.spin*5)*dt;        // visual roll, dominated by spin
+  if(hitFx){ hitFx.t+=dt; if(hitFx.t>0.18) hitFx=null; }
+  const mx=ball.vx*dt, my=ball.vy*dt;
   ball.x+=mx; ball.y+=my;
   trail.push({x:ball.x,y:ball.y}); if(trail.length>7) trail.shift();
-  if(ball.x-ballR<0){ ball.x=ballR; ball.vx*=-1; }
-  if(ball.x+ballR>W){ ball.x=W-ballR; ball.vx*=-1; }
-  const youY=H-paddleH-6, botY=6;
-  if(ball.vy>0 && ball.y+ballR>=youY && ball.y+ballR<=youY+paddleH+Math.abs(my) &&
-     ball.x>youX-paddleW/2-ballR && ball.x<youX+paddleW/2+ballR){
-    ball.y=youY-ballR; reflect((ball.x-youX)/(paddleW/2),-1);
-  }
-  if(ball.vy<0 && ball.y-ballR<=botY+paddleH && ball.y-ballR>=botY-Math.abs(my) &&
-     ball.x>botX-paddleW/2-ballR && ball.x<botX+paddleW/2+ballR){
-    ball.y=botY+paddleH+ballR; reflect((ball.x-botX)/(paddleW/2),1);
-  }
+  if(ball.x-ballR<0){ ball.x=ballR; ball.vx*=-1; ball.spin*=-1; }
+  if(ball.x+ballR>W){ ball.x=W-ballR; ball.vx*=-1; ball.spin*=-1; }
+  // bat collisions (moving discs) — single touch enforced inside batHit
+  batHit(youX,youY,youVX,youVY,-1,'you');   // player drives the ball up
+  batHit(botX,botY,botVX,botVY, 1,'bot');   // bot drives the ball down
   if(ball.y-ballR>H){ point('bot'); }
   else if(ball.y+ballR<0){ point('you'); }
 }
-function reflect(hit, dir){
-  ball.speed=Math.min(ball.speed + 0.03*H, baseBallSpeed()+0.26*H);  // gentle rally acceleration
-  const angle=hit*0.9;
-  ball.vx=ball.speed*Math.sin(angle);
-  ball.vy=dir*ball.speed*Math.abs(Math.cos(angle));
+// ball vs a moving bat (disc). dirY = intended vertical dir (-1 up / +1 down), who = 'you'|'bot'
+function batHit(px,py,pvx,pvy,dirY,who){
+  if(lastHitter===who) return;                 // RULE: no double touch — must alternate hitters
+  const dx=ball.x-px, dy=ball.y-py, dist=Math.hypot(dx,dy)||0.0001;
+  const minDist=ballR+paddleR;
+  if(dist>minDist) return;
+  let nx=dx/dist, ny=dy/dist;                 // contact normal: bat center -> ball
+  ball.x=px+nx*minDist; ball.y=py+ny*minDist;  // separate so they don't overlap
+  const base=baseBallSpeed();
+  const drive=Math.max(0, pvx*nx+pvy*ny);      // how hard the bat pushes into the ball
+  const incoming=Math.abs(ball.vx*nx+ball.vy*ny);
+  // POWER: keep pace with incoming + add smash from the swing
+  let speed=Math.min(Math.max(base*0.72, incoming*0.9) + 0.14*Math.min(drive,3200), base+0.95*H);
+  ball.speed=speed;
+  // force enough travel toward the opponent so shots always clear the net area
+  if(dirY*ny < 0.34){ ny=dirY*0.4; nx=(nx<0?-1:1)*Math.sqrt(Math.max(0,1-ny*ny)); }
+  ball.vx=nx*speed; ball.vy=ny*speed;
+  // SPIN: from the bat's sideways (tangential) motion + a glancing/off-centre hit
+  const tang = (-ny)*pvx + nx*pvy;
+  ball.spin=Math.max(-2.4, Math.min(2.4, tang*0.0008 + nx*0.7));
+  lastHitter=who;                              // this bat has now touched the ball
+  hitFx={ x:ball.x, y:ball.y, t:0, power:Math.min(1, drive/2600) };
 }
 function point(who){
   if(who==='you') state.youScore++; else state.botScore++;
@@ -544,7 +592,7 @@ function sayBubble(who){
 
 /* ---------- draw ---------- */
 function roundRectPath(x,y,w,h,r){
-  r=Math.min(r,w/2,h/2);
+  r=Math.max(0, Math.min(r, Math.abs(w)/2, Math.abs(h)/2));  // never negative (arcTo throws)
   ctx.beginPath(); ctx.moveTo(x+r,y);
   ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
   ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r);
@@ -637,46 +685,35 @@ function drawPost(x,ny,nh){
   ctx.fillStyle='rgba(0,0,0,.15)'; ctx.fillRect(x-w/2,ny-1,w,2);
 }
 
-// a real table-tennis bat (מטקה) seen from above: round rubber blade + wooden handle
-function drawPaddle(cx,y,c){
-  const down = y >= H/2;                          // bottom bat -> handle points down (toward you)
-  const rx = paddleW/2;                           // blade horizontal radius (= hit width)
-  const ry = Math.min(paddleW*0.34, H*0.05);      // blade vertical radius (rounded oval)
-  const bcy = y + paddleH/2 + (down ? -ry*0.45 : ry*0.45);  // pull blade onto the table (less overhang)
-  // --- wooden handle ---
-  const hw=Math.max(15,paddleW*0.19), hh=Math.max(22,ry*1.7);
-  const hy = down ? bcy+ry*0.55 : bcy-ry*0.55-hh;
+// table-tennis racket icon like the 🏓 emoji: round rubber blade + peach handle
+// (cx,cy) = bat center; handleDown = handle points toward the near player
+function drawPaddle(cx,cy,c,handleDown){
+  const R=paddleR, dir=handleDown?1:-1;
+  // --- handle (peach, like the emoji) drawn first so the blade overlaps its top ---
+  const hw=R*0.46, hLen=R*1.4, hy = dir>0 ? cy+R*0.5 : cy-R*0.5-hLen;
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=8; ctx.shadowOffsetY=down?4:-4;
+  ctx.shadowColor='rgba(0,0,0,.3)'; ctx.shadowBlur=5; ctx.shadowOffsetY=dir*3;
   const wg=ctx.createLinearGradient(cx-hw/2,0,cx+hw/2,0);
-  wg.addColorStop(0,'#6d3f18'); wg.addColorStop(.45,'#b3742f'); wg.addColorStop(1,'#5e3512');
-  roundRect(cx-hw/2, hy, hw, hh, hw/2.4, wg);
+  wg.addColorStop(0,'#cf8f60'); wg.addColorStop(.5,'#f4c6a0'); wg.addColorStop(1,'#c8875a');
+  roundRect(cx-hw/2, hy, hw, hLen, hw/2, wg);
   ctx.restore();
-  ctx.strokeStyle='rgba(0,0,0,.22)'; ctx.lineWidth=1;
-  for(let i=0;i<3;i++){ const gy = (down? hy+hh-8-i*6 : hy+8+i*6); ctx.beginPath(); ctx.moveTo(cx-hw/2+4,gy); ctx.lineTo(cx+hw/2-4,gy); ctx.stroke(); }
-  // --- wooden blade edge (slightly larger oval behind the rubber) ---
+  // collar where handle meets blade (centered on the blade edge; always positive height)
+  const colH=R*0.5;
+  roundRect(cx-hw*0.62, cy+dir*R*0.5-colH/2, hw*1.24, colH, hw*0.4, '#e7b184');
+  // --- blade base / edge ---
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=14; ctx.shadowOffsetY=down?6:-6;
-  const wood=ctx.createLinearGradient(0,bcy-ry,0,bcy+ry);
-  wood.addColorStop(0,'#e0a860'); wood.addColorStop(1,'#a06a2c');
-  ellipsePath(cx,bcy,rx+4,ry+4); ctx.fillStyle=wood; ctx.fill();
+  ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=8; ctx.shadowOffsetY=dir*3;
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fillStyle=c.bottom; ctx.fill();
   ctx.restore();
-  // --- rubber blade ---
-  const g=ctx.createRadialGradient(cx-rx*0.25,bcy-ry*0.4,ry*0.2, cx,bcy,rx);
+  // --- rubber face (two-tone, emoji-style) ---
+  const g=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
   g.addColorStop(0,c.top); g.addColorStop(1,c.bottom);
-  ellipsePath(cx,bcy,rx,ry); ctx.fillStyle=g; ctx.fill();
-  // pips + gloss (clipped to the rubber oval)
-  ctx.save(); ellipsePath(cx,bcy,rx,ry); ctx.clip();
-  ctx.fillStyle='rgba(0,0,0,.13)';
-  const step=Math.max(6,ry*0.5);
-  for(let px=cx-rx; px<cx+rx; px+=step) for(let py=bcy-ry; py<bcy+ry; py+=step){ ctx.beginPath(); ctx.arc(px,py,1,0,7); ctx.fill(); }
-  ellipsePath(cx-rx*0.3, bcy-ry*0.45, rx*0.6, ry*0.5);
-  const gl=ctx.createRadialGradient(cx-rx*0.3,bcy-ry*0.45,1, cx-rx*0.3,bcy-ry*0.45,rx*0.7);
-  gl.addColorStop(0,'rgba(255,255,255,.55)'); gl.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=gl; ctx.fill();
-  ctx.restore();
-  // rim
-  ctx.lineWidth=1.5; ctx.strokeStyle=c.rim; ellipsePath(cx,bcy,rx-1,ry-1); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,R*0.9,0,7); ctx.fillStyle=g; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,R*0.9,0,7); ctx.lineWidth=2; ctx.strokeStyle=c.rim; ctx.stroke();
+  // gloss highlight
+  ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R*0.9,0,7); ctx.clip();
+  ctx.beginPath(); ctx.ellipse(cx-R*0.28,cy-R*0.32,R*0.48,R*0.26,-0.6,0,7);
+  ctx.fillStyle='rgba(255,255,255,.4)'; ctx.fill(); ctx.restore();
 }
 function drawFace(im, cy, ring){
   if(!im || !im.complete || !im.naturalWidth) return;
@@ -695,9 +732,8 @@ function draw(){
   // players' photos printed on each side of the table
   drawFace(faceBot, H*0.26, 'rgba(74,163,232,.8)');
   drawFace(faceYou, H*0.74, 'rgba(255,122,26,.85)');
-  const youY=H-paddleH-6, botY=6;
-  drawPaddle(botX,botY,{top:'#5a646d',bottom:'#12171c',rim:'#05070a'});   // bot: black rubber
-  drawPaddle(youX,youY,{top:'#ff6b6b',bottom:'#cf2f2f',rim:'#7f1717'});   // you: red rubber
+  drawPaddle(botX,botY,{top:'#4a525b',bottom:'#12161b',rim:'#05070a'},false);   // bot: black racket, handle up
+  drawPaddle(youX,youY,{top:'#ff4d67',bottom:'#e01e40',rim:'#8a1230'},true);    // you: red racket (emoji-style), handle down
   // ball trail
   for(let i=0;i<trail.length;i++){
     const t=trail[i], a=(i+1)/trail.length*0.35;
@@ -711,9 +747,27 @@ function draw(){
   const bg=ctx.createRadialGradient(ball.x-ballR*0.35,ball.y-ballR*0.35,ballR*0.15,ball.x,ball.y,ballR);
   bg.addColorStop(0,'#fff3e0'); bg.addColorStop(.45,'#ffb057'); bg.addColorStop(1,'#ef6f0c');
   ctx.beginPath(); ctx.arc(ball.x,ball.y,ballR,0,7); ctx.fillStyle=bg; ctx.fill();
+  // spinning markings (clip to the ball so they read as surface rotation)
+  ctx.save();
+  ctx.beginPath(); ctx.arc(ball.x,ball.y,ballR,0,7); ctx.clip();
+  ctx.translate(ball.x,ball.y); ctx.rotate(ball.rot||0);
+  const seam='rgba(150,70,10,.5)';
+  ctx.strokeStyle=seam; ctx.lineWidth=Math.max(1,ballR*0.16);
+  ctx.beginPath(); ctx.ellipse(0,0,ballR*0.95,ballR*0.32,0,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(0,0,ballR*0.32,ballR*0.95,0,0,Math.PI*2); ctx.stroke();
+  // orbiting dot makes the spin direction & speed obvious
+  ctx.beginPath(); ctx.arc(ballR*0.5,0,ballR*0.24,0,7); ctx.fillStyle='rgba(150,70,10,.6)'; ctx.fill();
+  ctx.restore();
   // specular highlight
   ctx.beginPath(); ctx.arc(ball.x-ballR*0.35,ball.y-ballR*0.38,ballR*0.28,0,7);
-  ctx.fillStyle='rgba(255,255,255,.75)'; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fill();
+  // impact flash
+  if(hitFx){
+    const p=hitFx.t/0.18, R=ballR*(1.2+2.4*p);
+    ctx.beginPath(); ctx.arc(hitFx.x,hitFx.y,R,0,7);
+    ctx.strokeStyle='rgba(255,'+(200-80*hitFx.power)+',120,'+(0.6*(1-p))+')';
+    ctx.lineWidth=2+3*hitFx.power; ctx.stroke();
+  }
 }
 let lastTs=0;
 function loop(ts){
@@ -723,6 +777,9 @@ function loop(ts){
   if(dt>0.05) dt=0.05;                 // clamp after tab-switch / slow frame (no tunneling)
   applyKeys(dt);
   if(!state.serving) botThink(dt);
+  // paddle swing velocities (drive hit power + spin), measured after this frame's movement
+  youVX=(youX-prevYouX)/dt; youVY=(youY-prevYouY)/dt; prevYouX=youX; prevYouY=youY;
+  botVX=(botX-prevBotX)/dt; botVY=(botY-prevBotY)/dt; prevBotX=botX; prevBotY=botY;
   step(dt); draw();
   rafId=requestAnimationFrame(loop);
 }
