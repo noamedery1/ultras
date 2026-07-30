@@ -17,55 +17,62 @@
   .step h2{font-size:18px;color:var(--ac);margin-bottom:12px;display:flex;gap:8px;align-items:center;}
   .step h2 .num{background:var(--ac);color:#000;width:26px;height:26px;border-radius:50%;
     display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
-  /* dropzone */
-  #drop{border:3px dashed #444;border-radius:14px;padding:38px 16px;text-align:center;
-    cursor:pointer;transition:.15s;color:#bbb;}
+  #drop{border:3px dashed #444;border-radius:14px;padding:38px 16px;text-align:center;cursor:pointer;transition:.15s;color:#bbb;}
   #drop.hot{border-color:var(--ac);background:rgba(255,210,0,.06);color:#fff;}
   #drop .big{font-size:42px;}
   #drop b{color:var(--ac);}
   .filetag{margin-top:12px;font-size:14px;color:var(--ok);font-weight:700;}
-  /* form grid */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .fld label{display:block;font-size:13px;color:#aaa;margin-bottom:5px;}
-  .fld input[type=text]{width:100%;background:var(--gray);border:1px solid #3a3a3a;border-radius:10px;
+  .fld input[type=text],.fld input[type=date]{width:100%;background:var(--gray);border:1px solid #3a3a3a;border-radius:10px;
     padding:11px;color:#fff;font-size:15px;font-family:inherit;}
   .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
   .sw{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
   .sw.sel{border-color:#fff;}
   input[type=color]{width:44px;height:34px;border:none;background:none;cursor:pointer;vertical-align:middle;}
-  /* name map */
-  .maprow{background:var(--gray);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
-  .maprow .num{font-size:13px;color:#888;}
-  .maprow .samp{font-size:12px;color:#bbb;margin:4px 0;line-height:1.4;font-style:italic;}
-  .maprow input{width:100%;background:#111;border:1px solid #3a3a3a;border-radius:8px;padding:8px;color:#fff;font-family:inherit;}
-  /* review */
+  /* period chips */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px;}
+  .chip{background:var(--gray);border:1px solid #3a3a3a;border-radius:999px;padding:7px 14px;
+    cursor:pointer;font-size:14px;font-weight:700;color:#ccc;}
+  .chip.sel{background:var(--ac);color:#000;border-color:var(--ac);}
+  .rangelbl{font-size:12px;color:#888;margin-bottom:6px;}
+  /* people */
+  .people{max-height:340px;overflow:auto;border:1px solid #2a2a2a;border-radius:10px;padding:8px;margin-top:8px;}
+  .prow{display:flex;gap:8px;align-items:center;background:var(--gray);border-radius:10px;padding:8px 10px;margin-bottom:7px;}
+  .prow .cnt{font-size:12px;color:#888;flex:0 0 66px;}
+  .prow .mid{flex:1;min-width:0;}
+  .prow .snd{font-size:12px;color:#bbb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .prow .samp{font-size:11px;color:#777;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .prow input[type=text]{width:100%;background:#111;border:1px solid #3a3a3a;border-radius:8px;padding:7px;color:#fff;font-family:inherit;margin-top:3px;}
+  .prow .exc{display:flex;flex-direction:column;align-items:center;font-size:10px;color:#888;flex:0 0 46px;}
+  .prow .exc input{transform:scale(1.25);accent-color:var(--bad);margin-bottom:2px;}
+  .prow.excluded{opacity:.4;}
   .rev-group{margin-bottom:16px;}
   .rev-group h3{font-size:15px;color:#ddd;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:6px;}
-  .revitem{display:flex;gap:10px;align-items:flex-start;background:var(--gray);border-radius:10px;
-    padding:10px;margin-bottom:7px;font-size:14px;line-height:1.45;}
+  .revitem{display:flex;gap:10px;align-items:flex-start;background:var(--gray);border-radius:10px;padding:10px;margin-bottom:7px;font-size:14px;line-height:1.45;}
   .revitem input{margin-top:3px;transform:scale(1.3);accent-color:var(--ac);flex:0 0 auto;}
   .revitem .who{color:var(--ac);font-weight:700;}
   .revitem.drop-x{opacity:.4;}
-  /* buttons */
-  .btn{display:block;width:100%;border:none;border-radius:12px;padding:15px;font-size:17px;
-    font-weight:800;font-family:inherit;cursor:pointer;background:var(--ac);color:#000;transition:.1s;}
+  .btn{display:block;width:100%;border:none;border-radius:12px;padding:15px;font-size:17px;font-weight:800;
+    font-family:inherit;cursor:pointer;background:var(--ac);color:#000;transition:.1s;}
   .btn:active{transform:scale(.98);}
   .btn:disabled{background:#444;color:#888;cursor:not-allowed;}
-  .btn.sec{background:var(--gray);color:#fff;border:1px solid #3a3a3a;margin-top:10px;}
   .hint{font-size:12px;color:#777;margin-top:8px;}
   .log{font-size:12px;color:#8a8;margin-top:10px;white-space:pre-wrap;font-family:monospace;}
+  .warn{color:#f0b429;}
   .hidden{display:none!important;}
   a.dl{color:var(--ac);font-weight:800;}
+  small.mut{color:#666;font-weight:400;font-size:12px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>🏭 מחולל משחק הקבוצה</h1>
-    <p>גוררים ייצוא צ'אט (וואטסאפ/טלגרם), עונים על כמה שאלות — ומקבלים משחק HTML מוכן.<br>הכל רץ אצלך בדפדפן. הצ'אט לא נשלח לשום מקום. 🔒</p>
+    <p>גוררים ייצוא צ'אט (וואטסאפ/טלגרם), בוחרים תקופה ואנשים — ומקבלים משחק HTML מוכן.<br>הכל רץ אצלך בדפדפן. הצ'אט לא נשלח לשום מקום. 🔒</p>
   </header>
 
-  <!-- STEP 1: file -->
+  <!-- STEP 1 -->
   <div class="step" id="s1">
     <h2><span class="num">1</span> גררו את קובץ הצ'אט</h2>
     <div id="drop">
@@ -77,38 +84,48 @@
     <div class="log" id="parselog"></div>
   </div>
 
-  <!-- STEP 2: names (whatsapp only) -->
-  <div class="step off hidden" id="s2">
-    <h2><span class="num">2</span> מי זה מי? <span style="font-size:13px;color:#888">(וואטסאפ — לפי מספרים)</span></h2>
-    <p class="hint">כתבו שם לכל מספר. השאירו ריק כדי לדלג על מישהו. יש דוגמאות הודעה לזיהוי.</p>
-    <div id="mapList" style="margin-top:12px"></div>
-    <button class="btn" id="mapDone">המשך לניתוח ➟</button>
+  <!-- STEP 2: period + people -->
+  <div class="step off" id="s2">
+    <h2><span class="num">2</span> תקופה ואנשים</h2>
+    <div class="fld"><label>תקופה לניתוח</label>
+      <div class="rangelbl" id="rangelbl"></div>
+      <div class="chips" id="periodChips"></div>
+      <div class="grid">
+        <div class="fld"><label>מתאריך</label><input type="date" id="pFrom"></div>
+        <div class="fld"><label>עד תאריך</label><input type="date" id="pTo"></div>
+      </div>
+    </div>
+    <div class="fld"><label>סגנון השאלות <small class="mut">— איך לדרג ולבחור את ההודעות</small></label>
+      <div class="chips" id="styleChips"></div>
+    </div>
+    <label style="font-size:13px;color:#aaa;margin-top:10px;display:block">אנשים <small class="mut">— תנו שם, וסמנו "הסר" למי שלא נכנס למשחק (בוטים, אנשים שעזבו…)</small></label>
+    <div class="people" id="people"></div>
+    <button class="btn" id="analyzeBtn" style="margin-top:14px">🔎 נתח וצור שאלות</button>
+    <div class="log" id="anlog"></div>
   </div>
 
-  <!-- STEP 3: settings -->
+  <!-- STEP 3 -->
   <div class="step off" id="s3">
     <h2><span class="num">3</span> עיצוב ופרטים</h2>
     <div class="grid">
       <div class="fld"><label>שם הקבוצה</label><input type="text" id="cGroup" placeholder="למשל: המנחוסים"></div>
       <div class="fld"><label>קבוצת כדורגל</label><input type="text" id="cTeam" placeholder="למשל: ביתר ירושלים"></div>
       <div class="fld"><label>אימוג'י / לוגו</label><input type="text" id="cEmoji" placeholder="🟡⚫" value="⚽"></div>
-      <div class="fld"><label>שם קובץ הפלט</label><input type="text" id="cФile" placeholder="game.html" value="game.html"></div>
+      <div class="fld"><label>שם קובץ הפלט</label><input type="text" id="cFile" placeholder="game.html" value="game.html"></div>
     </div>
-    <div class="fld" style="margin-top:14px">
-      <label>צבע ראשי</label>
+    <div class="fld" style="margin-top:14px"><label>צבע ראשי</label>
       <div class="swatches" id="swatches"></div>
       <div style="margin-top:8px">צבע מותאם: <input type="color" id="cColor" value="#ffd200"></div>
     </div>
   </div>
 
-  <!-- STEP 4: review -->
+  <!-- STEP 4 -->
   <div class="step off" id="s4">
-    <h2><span class="num">4</span> אישור מהיר <span style="font-size:13px;color:#888">(סמנו מה נכנס)</span></h2>
-    <p class="hint">בחרנו אוטומטית את הכי מצחיקים. בטלו סימון להסרה. אפשר פשוט להשאיר הכל.</p>
+    <h2><span class="num">4</span> אישור מהיר <small class="mut">(סמנו מה נכנס — כל משחק יגריל 10 מתוך המאגר)</small></h2>
     <div id="review" style="margin-top:12px"></div>
   </div>
 
-  <!-- STEP 5: generate -->
+  <!-- STEP 5 -->
   <div class="step off" id="s5">
     <h2><span class="num">5</span> יצירת המשחק</h2>
     <button class="btn" id="gen">🎮 צור והורד את המשחק</button>
@@ -116,7 +133,6 @@
   </div>
 </div>
 
-<!-- ===== embedded game template ===== -->
 <script type="text/template" id="gameTpl"><!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -430,21 +446,21 @@
 
   <!-- ============ HOME ============ -->
   <section id="home" class="screen active">
-    <div class="mode-card" onclick="Game.start('who')">
+    <div class="mode-card" data-mode="who" onclick="Game.start('who')">
       <div class="emoji">🕵️</div>
       <div class="info">
         <h3>מי אמר את זה?!</h3>
         <p>ציטוט מהצ'אט — נחשו מי הפה הגדול</p>
       </div>
     </div>
-    <div class="mode-card" onclick="Game.start('toWhom')">
+    <div class="mode-card" data-mode="toWhom" onclick="Game.start('toWhom')">
       <div class="emoji">💬</div>
       <div class="info">
         <h3>מי אמר למי?</h3>
         <p>שיחה מהקבוצה — מי דיבר אל מי</p>
       </div>
     </div>
-    <div class="mode-card" onclick="Game.start('context')">
+    <div class="mode-card" data-mode="context" onclick="Game.start('context')">
       <div class="emoji">🎭</div>
       <div class="info">
         <h3>מה נאמר לפני?!</h3>
@@ -574,7 +590,7 @@ const Game = {
 
   start(mode){
     this.mode = mode;
-    this.questions = shuffle([...DATA[mode]]);
+    this.questions = shuffle([...DATA[mode]]).slice(0,10);
     this.idx = 0;
     this.score = 0;
     Nav.go('game');
@@ -850,6 +866,14 @@ const Awards = {
     Nav.go('awards');
   }
 };
+
+/* hide modes that have no questions (for generated games) */
+['who','toWhom','context'].forEach(function(m){
+  if(!DATA[m]||!DATA[m].length){
+    var el=document.querySelector('.mode-card[data-mode="'+m+'"]');
+    if(el) el.style.display='none';
+  }
+});
 <\/script>
 </body>
 </html>
@@ -861,22 +885,26 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const RTL=['‎','‏','‪','‫','‬','⁦','⁧','⁨','⁩'];
 const clean=s=>{s=s||'';for(const c of RTL)s=s.split(c).join('');return s.trim();};
 const HEMON=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rx=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const isPhone=s=>/^[+\d][\d\s()\-]{5,}$/.test((s||'').trim());  /* sender looks like a phone number */
 
-const state={msgs:[],source:'',names:{},top:[],cfg:{},cand:{who:[],toWhom:[],context:[]},diggers:null,awards:null,activeNames:[]};
+const state={all:[],source:'',names:{},excluded:new Set(),period:{from:0,to:0},style:'fun',
+  cand:{who:[],toWhom:[],context:[]},diggers:null,awards:null,activeNames:[],min:0,max:0};
 
-/* content blocklist: politics / heavy / racism (NOT general profanity — that's the humor) */
+/* content blocklist: politics / heavy / racism (NOT profanity — that's the humor) */
 const BLOCK=["ביבי","נתניהו","בחירות","הצבע","מפלג","ליכוד","סמוטריץ","בן גביר","גנץ","לפיד",
- "חמאס","חטופים","חטוף","עוטף","טבח","מחבל","פיגוע","כושי","מסריח","שמאלן","ימני","מתנחל","גזע"];
+ "חמאס","חטופים","חטוף","עוטף","טבח","מחבל","פיגוע","כושי","מסריח","שמאלן","מתנחל","גזע"];
 const isBlocked=t=>BLOCK.some(b=>t.includes(b));
-
-/* laughter */
-const LA=/(חח+|הה+ה|😂|🤣|😭|😆|💀)/;
-function isLaugh(t){t=(t||'').trim();if(t.length<=14&&LA.test(t))return true;
+const LA=/(חח+|הה+ה|כככ+|לול|פגג|וואלה חח|😂|🤣|😭|😆|💀|😅|🤩)/;
+function isLaugh(t){t=(t||'').trim();if(t.length<=16&&LA.test(t))return true;
   const l=t.replace(/[^\wא-ת]/g,'');return /^[חהכ]+$/.test(l)&&l.length>=3;}
+const LAUGHEMO=/😂|🤣|😭|😆|💀|😅/g;
+/* roast / insult markers (drives "ירידות" style) */
+const CURSE=/(שרמוטה|זונה|מניאק|מפגר|אחושרמוטה|כוסאמק|כוס אמ|פסיכופת|מטומטם|בן זונה|תזדיין|מזיין|יזיין|חרא|זבל|טמבל|דביל|אפס\b|בהמה|יא |סתום)/g;
 const MEDIA=["<המדיה","<Media","הושמט","הודעה זו נמחקה","<ההודעה"];
 function substantive(t){if(!t)return false;if(MEDIA.some(m=>t.includes(m)))return false;
-  if(t.includes('http'))return false;if(isLaugh(t))return false;
-  return t.length>=10&&t.length<=200;}
+  if(t.includes('http'))return false;if(isLaugh(t))return false;return t.length>=8&&t.length<=200;}
 
 /* ---------- file intake ---------- */
 const drop=$('#drop'),fileIn=$('#file');
@@ -886,185 +914,184 @@ drop.onclick=()=>fileIn.click();
 drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)handleFile(f);});
 fileIn.onchange=()=>{if(fileIn.files[0])handleFile(fileIn.files[0]);};
 
-async function inflateRaw(u8){
-  const ds=new DecompressionStream('deflate-raw');
-  const s=new Blob([u8]).stream().pipeThrough(ds);
-  return new Uint8Array(await new Response(s).arrayBuffer());
-}
+async function inflateRaw(u8){const ds=new DecompressionStream('deflate-raw');
+  const s=new Blob([u8]).stream().pipeThrough(ds);return new Uint8Array(await new Response(s).arrayBuffer());}
 async function readZip(buf){
-  const dv=new DataView(buf),u8=new Uint8Array(buf);
-  // find EOCD
-  let eo=-1;for(let i=buf.byteLength-22;i>=0;i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
+  const dv=new DataView(buf),u8=new Uint8Array(buf);let eo=-1;
+  for(let i=buf.byteLength-22;i>=0;i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
   if(eo<0)throw new Error('zip לא תקין');
   let cd=dv.getUint32(eo+16,true),n=dv.getUint16(eo+10,true),p=cd,best=null;
-  for(let k=0;k<n;k++){
-    if(dv.getUint32(p,true)!==0x02014b50)break;
-    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),
-      nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),
-      lho=dv.getUint32(p+42,true),name=new TextDecoder().decode(u8.slice(p+46,p+46+nl));
-    if(/\.txt$/i.test(name)||name.includes('_chat')){best={method,csize,lho,name};}
-    p+=46+nl+el+cl;
-  }
+  for(let k=0;k<n;k++){if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),
+      el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lho=dv.getUint32(p+42,true),
+      name=new TextDecoder().decode(u8.slice(p+46,p+46+nl));
+    if(/\.txt$/i.test(name)||name.includes('_chat'))best={method,csize,lho};p+=46+nl+el+cl;}
   if(!best)throw new Error('לא נמצא קובץ .txt בתוך ה-zip');
   const lnl=dv.getUint16(best.lho+26,true),lel=dv.getUint16(best.lho+28,true),
     ds=best.lho+30+lnl+lel,data=u8.slice(ds,ds+best.csize);
-  const out=best.method===0?data:await inflateRaw(data);
-  return new TextDecoder('utf-8').decode(out);
-}
+  return new TextDecoder('utf-8').decode(best.method===0?data:await inflateRaw(data));}
 
 async function handleFile(f){
   const log=$('#parselog');log.textContent='קורא את הקובץ…';
   try{
     let text,name=f.name.toLowerCase();
-    if(name.endsWith('.zip')) text=await readZip(await f.arrayBuffer());
-    else text=await f.text();
+    if(name.endsWith('.zip'))text=await readZip(await f.arrayBuffer());else text=await f.text();
     if(name.endsWith('.json')||text.trim().startsWith('{')){parseTelegram(text);state.source='telegram';}
     else {parseWhatsApp(text);state.source='whatsapp';}
-    if(!state.msgs.length)throw new Error('לא זוהו הודעות בקובץ');
-    windowFilter();
+    if(!state.all.length)throw new Error('לא זוהו הודעות בקובץ');
+    let mn=Infinity,mx=0;for(const m of state.all){const t=m.dt.getTime();if(t<mn)mn=t;if(t>mx)mx=t;}
+    state.min=mn;state.max=mx;state.period={from:Math.max(mn,mx-365*864e5),to:mx};
     $('#filetag').classList.remove('hidden');
-    $('#filetag').textContent='✅ '+f.name+' — '+state.msgs.length.toLocaleString('he-IL')+' הודעות ('+ (state.source==='telegram'?'טלגרם':'וואטסאפ') +')';
+    $('#filetag').textContent='✅ '+f.name+' — '+state.all.length.toLocaleString('he-IL')+' הודעות ('+(state.source==='telegram'?'טלגרם':'וואטסאפ')+')';
     log.textContent='';
-    afterParse();
-  }catch(e){log.textContent='⚠️ '+e.message+'\nטיפ: אם זה zip של וואטסאפ שנכשל — חלצו וגררו את קובץ ה-.txt.';}
+    buildStep2();
+  }catch(e){log.innerHTML='<span class="warn">⚠️ '+e.message+'</span>\nטיפ: אם זה zip של וואטסאפ שנכשל — חלצו וגררו את קובץ ה-.txt.';}
 }
 
 /* ---------- parsers ---------- */
-function pushMsg(a,dt,sender,txt){a.push({dt,sender:clean(sender),name:null,t:clean(txt)});}
 function parseWhatsApp(text){
   const A=[];
   const reAnd=/^(\d{1,2})\.(\d{1,2})\.(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::\d{2})?\s+-\s+(.*?):\s([\s\S]*)$/;
   const reIos=/^\[(\d{1,2})\.(\d{1,2})\.(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::\d{2})?\]\s+(.*?):\s([\s\S]*)$/;
-  for(let raw of text.split('\n')){
-    raw=raw.replace(/\r$/,'');
-    let m=reAnd.exec(clean(raw))||reIos.exec(clean(raw));
-    if(m){let y=+m[3];if(y<100)y+=2000;
-      const dt=new Date(y,+m[2]-1,+m[1],+m[4],+m[5]);
-      pushMsg(A,dt,m[6],m[7]);
-    }else if(A.length&&raw.trim()){A[A.length-1].t+=' '+clean(raw);}
-  }
-  state.msgs=A;
-}
+  for(let raw of text.split('\n')){raw=raw.replace(/\r$/,'');const c=clean(raw);
+    let m=reAnd.exec(c)||reIos.exec(c);
+    if(m){let y=+m[3];if(y<100)y+=2000;const dt=new Date(y,+m[2]-1,+m[1],+m[4],+m[5]);
+      A.push({dt,sender:clean(m[6]),t:clean(m[7])});}
+    else if(A.length&&raw.trim())A[A.length-1].t+=' '+c;}
+  state.all=A;}
 function parseTelegram(text){
   const j=JSON.parse(text),A=[],ms=j.messages||[];
-  for(const m of ms){
-    if(m.type!=='message')continue;
-    let t='';if(typeof m.text==='string')t=m.text;
+  for(const m of ms){if(m.type!=='message')continue;let t='';
+    if(typeof m.text==='string')t=m.text;
     else if(Array.isArray(m.text))t=m.text.map(x=>typeof x==='string'?x:(x.text||'')).join('');
     const dt=m.date_unixtime?new Date(+m.date_unixtime*1000):new Date(m.date);
-    const who=m.from||'?';
-    A.push({dt,sender:clean(who),name:clean(who),t:clean(t)});
-  }
-  state.msgs=A;
-}
-function windowFilter(){
-  let max=0;for(const m of state.msgs)if(m.dt.getTime()>max)max=m.dt.getTime();
-  const cutoff=max-365*864e5;
-  state.msgs=state.msgs.filter(m=>m.dt.getTime()>=cutoff&&!isNaN(m.dt));
-}
+    A.push({dt,sender:clean(m.from||'?'),t:clean(t)});}
+  state.all=A;}
 
-/* ---------- after parse: names or analyze ---------- */
-function afterParse(){
+/* ---------- step 2 UI ---------- */
+const dstr=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function buildStep2(){
+  $('#rangelbl').textContent='הצ\'אט מכיל הודעות מ־'+dstr(state.min)+' עד '+dstr(state.max);
+  const chips=[["3 חודשים",90],["6 חודשים",180],["שנה",365],["הכל",0]];
+  const box=$('#periodChips');box.innerHTML='';
+  chips.forEach(([lbl,days],i)=>{const c=document.createElement('div');c.className='chip'+(days===365?' sel':'');
+    c.textContent=lbl;c.onclick=()=>{$$('.chip').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
+      const from=days?Math.max(state.min,state.max-days*864e5):state.min;
+      state.period={from,to:state.max};$('#pFrom').value=dstr(from);$('#pTo').value=dstr(state.max);};
+    box.appendChild(c);});
+  $('#pFrom').value=dstr(state.period.from);$('#pTo').value=dstr(state.period.to);
+  $('#pFrom').onchange=$('#pTo').onchange=()=>$$('#periodChips .chip').forEach(x=>x.classList.remove('sel'));
+  // style chips
+  const styles=[["😂 מצחיק יותר","fun"],["🔥 ירידות על אנשים","roast"],["😇 עדין","mild"]];
+  const sbox=$('#styleChips');sbox.innerHTML='';
+  styles.forEach(([lbl,key])=>{const c=document.createElement('div');c.className='chip'+(key===state.style?' sel':'');
+    c.textContent=lbl;c.onclick=()=>{$$('#styleChips .chip').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');state.style=key;};
+    sbox.appendChild(c);});
+  // people
+  const c={},samp={};
+  for(const m of state.all){c[m.sender]=(c[m.sender]||0)+1;
+    if(!samp[m.sender]&&substantive(m.t)&&!m.t.includes('@'))samp[m.sender]=m.t;}
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  const pbox=$('#people');pbox.innerHTML='';
+  top.forEach(([snd,n])=>{
+    const isName=!isPhone(snd);  /* already a real name (telegram / saved contact) → prefill it */
+    const row=document.createElement('div');row.className='prow';
+    row.innerHTML=`<div class="cnt">${n.toLocaleString('he-IL')}</div>
+      <div class="mid"><div class="snd">${esc(snd)}</div>
+        <div class="samp">${esc((samp[snd]||'').slice(0,60))}</div>
+        <input type="text" data-snd="${esc(snd)}" placeholder="שם..." value="${isName?esc(snd):''}"></div>
+      <label class="exc"><input type="checkbox" data-exc="${esc(snd)}">הסר</label>`;
+    pbox.appendChild(row);});
+  pbox.onchange=e=>{if(e.target.dataset.exc!==undefined)e.target.closest('.prow').classList.toggle('excluded',e.target.checked);};
+  $('#s2').classList.remove('off');
   $('#s3').classList.remove('off');
-  if(state.source==='telegram'){for(const m of state.msgs)state.names[m.sender]=m.sender;analyze();showReview();}
-  else buildNameMap();
 }
-function tally(){const c={};for(const m of state.msgs)c[m.sender]=(c[m.sender]||0)+1;return c;}
-function buildNameMap(){
-  const c=tally();
-  state.top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,18).map(x=>x[0]);
-  const box=$('#mapList');box.innerHTML='';
-  state.top.forEach((snd,i)=>{
-    const samples=state.msgs.filter(m=>m.sender===snd&&substantive(m.t)&&!m.t.includes('@')).slice(0,3);
-    const seen=new Set(),uniq=[];for(const s of samples){if(seen.has(s.t.slice(0,15)))continue;seen.add(s.t.slice(0,15));uniq.push(s.t);}
-    const d=document.createElement('div');d.className='maprow';
-    d.innerHTML=`<div class="num">${c[snd].toLocaleString('he-IL')} הודעות · ${snd}</div>`+
-      uniq.map(u=>`<div class="samp">• ${esc(u).slice(0,90)}</div>`).join('')+
-      `<input type="text" data-snd="${esc(snd)}" placeholder="שם...">`;
-    box.appendChild(d);
-  });
-  $('#s2').classList.remove('hidden','off');
-}
-$('#mapDone').onclick=()=>{
-  $$('#mapList input').forEach(inp=>{const v=inp.value.trim();if(v)state.names[inp.dataset.snd]=v;});
-  $('#s2').classList.add('off');analyze();showReview();
+$('#analyzeBtn').onclick=()=>{
+  state.names={};$$('#people input[type=text]').forEach(i=>{const v=i.value.trim();if(v)state.names[i.dataset.snd]=v;});
+  state.excluded=new Set($$('#people input[data-exc]').filter(c=>c.checked).map(c=>c.dataset.exc));
+  const from=new Date($('#pFrom').value+'T00:00:00').getTime(),to=new Date($('#pTo').value+'T23:59:59').getTime();
+  if(!isNaN(from)&&!isNaN(to))state.period={from,to};
+  analyze();
 };
-const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const nameOf=snd=>state.names[snd]||null;
+const nameOf=snd=>state.names[snd]||(isPhone(snd)?null:snd);  /* fall back to the given name if not a phone */
 
 /* ---------- analysis ---------- */
 function analyze(){
-  const M=state.msgs;
+  const from=state.period.from,to=state.period.to;
+  const M=state.all.filter(m=>{const t=m.dt.getTime();return t>=from&&t<=to&&!state.excluded.has(m.sender);});
+  state.msgs=M;
+  if(M.length<20){$('#anlog').innerHTML='<span class="warn">⚠️ מעט מדי הודעות בתקופה/סינון שנבחרו ('+M.length+'). נסו תקופה רחבה יותר.</span>';return;}
   // laughter scoring
-  for(let i=0;i<M.length;i++){
-    const m=M[i];let who=new Set();
-    for(let j=i+1;j<Math.min(i+8,M.length);j++){
-      if(M[j].dt-m.dt>9e5)break;if(M[j].sender===m.sender)continue;
-      if(isLaugh(M[j].t))who.add(M[j].sender);
-    }
-    m.score=who.size*2;m.laughers=who.size;
-  }
-  // active names + counts
+  for(let i=0;i<M.length;i++){const m=M[i];let who=new Set();
+    for(let j=i+1;j<Math.min(i+8,M.length);j++){if(M[j].dt-m.dt>9e5)break;if(M[j].sender===m.sender)continue;
+      if(isLaugh(M[j].t))who.add(M[j].sender);}
+    m.score=who.size*2;m.laughers=who.size;}
+  // active names
   const cnt={};for(const m of M){const n=nameOf(m.sender);if(n)cnt[n]=(cnt[n]||0)+1;}
   state.activeNames=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
   const firsts={};for(const n of state.activeNames)firsts[n.split(' ')[0]]=n;
 
-  // WHO
-  let who=M.filter(m=>nameOf(m.sender)&&substantive(m.t)&&m.score>=4&&!isBlocked(m.t));
-  who.sort((a,b)=>b.score-a.score);
-  const seen=new Set();state.cand.who=[];
-  for(const m of who){const k=m.t.slice(0,15);if(seen.has(k))continue;seen.add(k);
-    state.cand.who.push({quote:m.t,answer:nameOf(m.sender)});if(state.cand.who.length>=15)break;}
+  // per-message style signals + style scoring
+  for(const m of M){const t=m.t;
+    m.self=(t.match(LAUGHEMO)||[]).length+(/!!!/.test(t)?1:0);
+    m.curse=(t.match(CURSE)||[]).length;}
+  const st=state.style;
+  const sInclude=m=>st==='roast'?m.curse>0:(st==='mild'?(m.curse===0&&(m.laughers>=1||m.self>=1)):(m.laughers>=1||m.self>=1));
+  const sRank=m=>st==='roast'?(m.curse*3+m.laughers*2+m.self):(m.laughers*2+m.self);
 
-  // TOWHOM: text starts with known first name, sender!=target
-  const names=Object.keys(firsts).sort((a,b)=>b.length-a.length);
-  const addr=new RegExp('^@?('+names.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?=[\\s,.:!?]|$)');
+  // WHO (ranked by chosen style, cap 30)
+  let who=M.filter(m=>nameOf(m.sender)&&substantive(m.t)&&!isBlocked(m.t)&&sInclude(m)).sort((a,b)=>sRank(b)-sRank(a));
+  const s1=new Set();state.cand.who=[];
+  for(const m of who){const k=m.t.slice(0,15);if(s1.has(k))continue;s1.add(k);
+    state.cand.who.push({quote:m.t,answer:nameOf(m.sender)});if(state.cand.who.length>=30)break;}
+
+  // TOWHOM: start-name (strong) + contains-name (fill), cap 30
+  const startRe=new RegExp('^@?('+Object.keys(firsts).map(rx).join('|')+')(?=[\\s,.:!?]|$)');
+  const fnByLen=Object.keys(firsts).sort((a,b)=>b.length-a.length);
+  function findTarget(t){let mm=startRe.exec(t);
+    if(mm)return{target:firsts[mm[1]],masked:t.replace(startRe,'___'),start:true};
+    for(const fn of fnByLen){const re=new RegExp('(^|[\\s])'+rx(fn)+'(?=[\\s,.:!?]|$)');
+      if(re.test(t))return{target:firsts[fn],masked:t.replace(re,(m,p1)=>p1+'___'),start:false};}
+    return null;}
   let tw=[];
-  for(const m of M){if(!nameOf(m.sender)||!substantive(m.t)||isBlocked(m.t))continue;
-    const mm=addr.exec(m.t);if(!mm)continue;const tgt=firsts[mm[1]];const spk=nameOf(m.sender);
-    if(tgt&&tgt!==spk&&m.t.length<=160){
-      const masked=m.t.replace(addr,'___');
-      tw.push({text:masked,speaker:spk,target:tgt,score:m.score});}}
+  for(const m of M){if(!nameOf(m.sender)||!substantive(m.t)||isBlocked(m.t)||m.t.length>160)continue;
+    const ft=findTarget(m.t);if(!ft)continue;const spk=nameOf(m.sender);
+    if(ft.target&&ft.target!==spk)tw.push({text:ft.masked,speaker:spk,target:ft.target,score:m.score+(ft.start?100:0)+(st==='roast'?m.curse*10:0)});}
   tw.sort((a,b)=>b.score-a.score);
   const s2=new Set();state.cand.toWhom=[];
-  for(const x of tw){const k=x.text.slice(0,18);if(s2.has(k))continue;s2.add(k);state.cand.toWhom.push(x);if(state.cand.toWhom.length>=12)break;}
+  for(const x of tw){const k=x.text.slice(0,18);if(s2.has(k))continue;s2.add(k);state.cand.toWhom.push(x);if(state.cand.toWhom.length>=30)break;}
 
-  // CONTEXT: funny reply + the real previous substantive message
+  // CONTEXT (funny reply score>=2 + real previous short msg), cap 30
   let ctx=[];
   for(let i=1;i<M.length;i++){const m=M[i];
-    if(!nameOf(m.sender)||!substantive(m.t)||m.score<5||isBlocked(m.t))continue;
-    const p=M[i-1];if(!p||!substantive(p.t)||isBlocked(p.t)||p.t.length>120)continue;
-    ctx.push({quote:m.t,prev:p.t,score:m.score});}
+    if(!nameOf(m.sender)||!substantive(m.t)||isBlocked(m.t)||!sInclude(m))continue;
+    const p=M[i-1];if(!p||!substantive(p.t)||isBlocked(p.t)||p.t.length>110)continue;
+    ctx.push({quote:m.t,prev:p.t,score:sRank(m)});}
   ctx.sort((a,b)=>b.score-a.score);
   const s3=new Set();state.cand.context=[];
-  for(const x of ctx){const k=x.quote.slice(0,15);if(s3.has(k))continue;s3.add(k);state.cand.context.push(x);if(state.cand.context.length>=10)break;}
+  for(const x of ctx){const k=x.quote.slice(0,15);if(s3.has(k))continue;s3.add(k);state.cand.context.push(x);if(state.cand.context.length>=30)break;}
 
-  buildDiggers();buildAwards();
+  buildDiggers();buildAwards();showReview();
 }
 
 function buildDiggers(){
   const c={},perM={};
-  for(const m of state.msgs){
-    let n=nameOf(m.sender);if(!n){const d=(m.sender.match(/\d/g)||[]).join('');n=d?('לא ידוע ('+d.slice(-4)+')'):m.sender;}
-    c[n]=(c[n]||0)+1;
-    const key=m.dt.getFullYear()+'-'+(m.dt.getMonth()+1);
-    (perM[key]=perM[key]||{})[n]=(perM[key][n]||0)+1;
-  }
+  for(const m of state.msgs){let n=nameOf(m.sender);
+    if(!n){const d=(m.sender.match(/\d/g)||[]).join('');n=d?('לא ידוע ('+d.slice(-4)+')'):m.sender;}
+    c[n]=(c[n]||0)+1;const key=m.dt.getFullYear()+'-'+(m.dt.getMonth()+1);
+    (perM[key]=perM[key]||{})[n]=(perM[key][n]||0)+1;}
   const overall=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([name,count])=>({name,count}));
   const keys=Object.keys(perM).sort((a,b)=>{const[ay,am]=a.split('-'),[by,bm]=b.split('-');return ay-by||am-bm;});
-  const months=keys.slice(-12).map(k=>{const[y,mo]=k.split('-');
-    const top=Object.entries(perM[k]).sort((a,b)=>b[1]-a[1])[0];
+  const months=keys.slice(-12).map(k=>{const[y,mo]=k.split('-');const top=Object.entries(perM[k]).sort((a,b)=>b[1]-a[1])[0];
     return{label:HEMON[mo-1]+' '+y,champ:top[0],count:top[1]};});
-  state.diggers={overall,months};
-}
+  state.diggers={overall,months};}
 function buildAwards(){
-  const M=state.msgs;
-  const laugh={},night={},dirty={},media={};let scroll=null;
-  const CURSE=/(שרמוטה|זונה|מניאק|מפגר|אחושרמוטה|כוסאמק|כוס אמ|פסיכופת|מטומטם|בן זונה|תזדיין|מזיין|יזיין)/;
-  for(let i=0;i<M.length;i++){const m=M[i],n=nameOf(m.sender);if(!n)continue;
+  const M=state.msgs,laugh={},night={},dirty={},media={};let scroll=null;
+  const C=/(שרמוטה|זונה|מניאק|מפגר|אחושרמוטה|כוסאמק|כוס אמ|פסיכופת|מטומטם|בן זונה|תזדיין|מזיין|יזיין)/g;
+  for(const m of M){const n=nameOf(m.sender);if(!n)continue;
     if(m.laughers&&substantive(m.t))laugh[n]=(laugh[n]||0)+m.laughers;
     if(m.dt.getHours()>=1&&m.dt.getHours()<5)night[n]=(night[n]||0)+1;
-    const cu=(m.t.match(new RegExp(CURSE,'g'))||[]).length;if(cu)dirty[n]=(dirty[n]||0)+cu;
+    const cu=(m.t.match(C)||[]).length;if(cu)dirty[n]=(dirty[n]||0)+cu;
     if(MEDIA.some(x=>m.t.includes(x))||m.t.includes('http'))media[n]=(media[n]||0)+1;
     if(substantive(m.t)&&!isBlocked(m.t)&&(!scroll||m.t.length>scroll.n))scroll={name:n,n:m.t.length,preview:'״'+m.t.slice(0,58)+'…״'};}
   const t3=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([name,n])=>({name,n}));
@@ -1074,76 +1101,63 @@ function buildAwards(){
     {emoji:"🤬",title:"הפה המלוכלך",sub:"אלוף הקללות של הקבוצה",unit:"קללות",top:t3(dirty)},
     {emoji:"📸",title:"מלך הפורוורדים",sub:"הכי הרבה מדיה ולינקים",unit:"פורוורדים",top:t3(media)},
     {emoji:"📜",title:"המגילה",sub:"ההודעה הכי ארוכה שנשלחה",unit:"תווים",winner:scroll||{name:'-',n:0,preview:''}}
-  ].filter(a=>a.winner||a.top.length);
-}
+  ].filter(a=>a.winner||a.top.length);}
 
-/* ---------- review UI ---------- */
+/* ---------- review ---------- */
 function showReview(){
-  const r=$('#review');const g=[];
-  const item=(id,i,html)=>`<label class="revitem"><input type="checkbox" checked data-g="${id}" data-i="${i}"><span>${html}</span></label>`;
-  g.push(`<div class="rev-group"><h3>🕵️ מי אמר את זה? (${state.cand.who.length})</h3>`+
+  const r=$('#review');const item=(id,i,html)=>`<label class="revitem"><input type="checkbox" checked data-g="${id}" data-i="${i}"><span>${html}</span></label>`;
+  const warn=n=>n<20?` <span class="warn">(רק ${n} — מומלץ 20+; נסו תקופה רחבה יותר או פחות סינון)</span>`:'';
+  const g=[];
+  g.push(`<div class="rev-group"><h3>🕵️ מי אמר את זה? (${state.cand.who.length})${warn(state.cand.who.length)}</h3>`+
     state.cand.who.map((x,i)=>item('who',i,`״${esc(x.quote)}״ <span class="who">— ${esc(x.answer)}</span>`)).join('')+`</div>`);
-  g.push(`<div class="rev-group"><h3>💬 מי אמר למי? (${state.cand.toWhom.length})</h3>`+
+  g.push(`<div class="rev-group"><h3>💬 מי אמר למי? (${state.cand.toWhom.length})${warn(state.cand.toWhom.length)}</h3>`+
     state.cand.toWhom.map((x,i)=>item('toWhom',i,`״${esc(x.text)}״ <span class="who">${esc(x.speaker)} ← ${esc(x.target)}</span>`)).join('')+`</div>`);
-  g.push(`<div class="rev-group"><h3>🎭 מה נאמר לפני? (${state.cand.context.length})</h3>`+
+  g.push(`<div class="rev-group"><h3>🎭 מה נאמר לפני? (${state.cand.context.length})${warn(state.cand.context.length)}</h3>`+
     state.cand.context.map((x,i)=>item('context',i,`״${esc(x.quote)}״ <span class="who">← ${esc(x.prev)}</span>`)).join('')+`</div>`);
   r.innerHTML=g.join('');
   r.onchange=e=>{if(e.target.type==='checkbox')e.target.closest('.revitem').classList.toggle('drop-x',!e.target.checked);};
   $('#s4').classList.remove('off');$('#s5').classList.remove('off');
-  const need=$('#cGroup');if(!need.value)need.focus();
-  $('#genlog').textContent='';
-  logCounts();
+  let msg='✅ נותחו '+state.msgs.length.toLocaleString('he-IL')+' הודעות · '+state.activeNames.length+' שחקנים · סגנון: '+
+    ({fun:'😂 מצחיק',roast:'🔥 ירידות',mild:'😇 עדין'}[state.style]);
+  if(state.activeNames.length<5) msg+='\n⚠️ רק '+state.activeNames.length+' אנשים קיבלו שם — מלאו עוד שמות בשלב 2 (מספרים בלי שם לא הופכים לשאלות "מי אמר").';
+  $('#anlog').innerHTML=state.activeNames.length<5?'<span class="warn">'+esc(msg)+'</span>':msg;
+  if(!$('#cGroup').value)$('#cGroup').focus();
 }
-function logCounts(){
-  $('#genlog').textContent=`מוכן: ${state.cand.who.length} + ${state.cand.toWhom.length} + ${state.cand.context.length} שאלות · ${state.activeNames.length} שחקנים`;
-}
-function selected(id){return $$(`#review input[data-g="${id}"]`).filter(c=>c.checked).map(c=>+c.dataset.i);}
+const selected=id=>$$(`#review input[data-g="${id}"]`).filter(c=>c.checked).map(c=>+c.dataset.i);
 
-/* ---------- settings: swatches ---------- */
-const PRESETS=[["#ffd200","צהוב"],["#e63946","אדום"],["#2a9d8f","טורקיז"],["#4361ee","כחול"],
-  ["#38b000","ירוק"],["#ff6d00","כתום"],["#9d4edd","סגול"],["#f72585","ורוד"]];
+/* ---------- settings ---------- */
+const PRESETS=[["#ffd200"],["#e63946"],["#2a9d8f"],["#4361ee"],["#38b000"],["#ff6d00"],["#9d4edd"],["#f72585"]];
 const swBox=$('#swatches');
-PRESETS.forEach(([hex],i)=>{const d=document.createElement('div');d.className='sw'+(i===0?' sel':'');
-  d.style.background=hex;d.onclick=()=>{$$('.sw').forEach(s=>s.classList.remove('sel'));d.classList.add('sel');
-    $('#cColor').value=hex;applyAccent(hex);};swBox.appendChild(d);});
+PRESETS.forEach(([hex],i)=>{const d=document.createElement('div');d.className='sw'+(i===0?' sel':'');d.style.background=hex;
+  d.onclick=()=>{$$('.sw').forEach(s=>s.classList.remove('sel'));d.classList.add('sel');$('#cColor').value=hex;applyAccent(hex);};swBox.appendChild(d);});
 $('#cColor').oninput=e=>{$$('.sw').forEach(s=>s.classList.remove('sel'));applyAccent(e.target.value);};
-function applyAccent(hex){document.documentElement.style.setProperty('--ac',hex);}
-function darken(hex,f){f=f||.88;const n=parseInt(hex.slice(1),16);
-  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.round(r*f);g=Math.round(g*f);b=Math.round(b*f);
-  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+const applyAccent=hex=>document.documentElement.style.setProperty('--ac',hex);
+function darken(hex,f){f=f||.88;const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  return '#'+[r,g,b].map(x=>Math.round(x*f).toString(16).padStart(2,'0')).join('');}
 
 /* ---------- generate ---------- */
-function pick3(pool,exclude){const p=pool.filter(x=>!exclude.includes(x));const out=[];
-  while(out.length<3&&p.length){const k=Math.floor(Math.random()*p.length);out.push(p.splice(k,1)[0]);}
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function pick3(pool,ex){const p=pool.filter(x=>!ex.includes(x)),out=[];
+  while(out.length<3&&p.length)out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);
   while(out.length<3)out.push('—');return out;}
-function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-
 $('#gen').onclick=()=>{
   try{
     const names=state.activeNames;
-    if(names.length<4){$('#genlog').textContent='⚠️ צריך לפחות 4 שחקנים מזוהים.';return;}
-    const cfg={
-      group:$('#cGroup').value.trim()||'הקבוצה',
-      team:$('#cTeam').value.trim()||'',
-      emoji:$('#cEmoji').value.trim()||'⚽',
-      color:$('#cColor').value,
-      file:($('#cФile').value.trim()||'game.html').replace(/[^\w.\-]/g,'_')
-    };
-    const WHO=selected('who').map(i=>state.cand.who[i]).map(x=>({
-      quote:x.quote,answer:x.answer,options:shuf([x.answer,...pick3(names,[x.answer])])}));
-    const TW=selected('toWhom').map(i=>state.cand.toWhom[i]).map(x=>{
-      const correct=x.speaker+' ← '+x.target;
-      const others=[];while(others.length<3){const a=names[Math.floor(Math.random()*names.length)],b=names[Math.floor(Math.random()*names.length)];
-        const s=a+' ← '+b;if(a!==b&&s!==correct&&!others.includes(s))others.push(s);if(names.length<3)break;}
-      return{chat:[{side:'right',who:'❓',text:x.text}],speaker:x.speaker,target:x.target,options:shuf([correct,...others])};});
-    const allShort=state.msgs.filter(m=>substantive(m.t)&&m.t.length<120&&!isBlocked(m.t)).map(m=>m.t);
-    const CTX=selected('context').map(i=>state.cand.context[i]).map(x=>{
-      const opts=[x.prev];while(opts.length<4){const r=allShort[Math.floor(Math.random()*allShort.length)];if(r&&!opts.includes(r))opts.push(r);if(allShort.length<4)break;}
-      return{quote:x.quote,answer:x.prev,options:shuf(opts)};});
-    if(!WHO.length&&!TW.length&&!CTX.length){$('#genlog').textContent='⚠️ לא נבחרו שאלות.';return;}
-
-    let tpl=$('#gameTpl').textContent;
-    tpl=tpl.split('<\\/script>').join('<\/script>');
+    if(names.length<4){$('#genlog').innerHTML='<span class="warn">⚠️ צריך לפחות 4 שחקנים מזוהים.</span>';return;}
+    const cfg={group:$('#cGroup').value.trim()||'הקבוצה',team:$('#cTeam').value.trim()||'',
+      emoji:$('#cEmoji').value.trim()||'⚽',color:$('#cColor').value,
+      file:($('#cFile').value.trim()||'game.html').replace(/[^\w.\-]/g,'_')};
+    const WHO=selected('who').map(i=>state.cand.who[i]).map(x=>({quote:x.quote,answer:x.answer,options:shuf([x.answer,...pick3(names,[x.answer])])}));
+    const TW=selected('toWhom').map(i=>state.cand.toWhom[i]).map(x=>{const correct=x.speaker+' ← '+x.target;const o=[];
+      let guard=0;while(o.length<3&&guard++<200){const a=names[Math.floor(Math.random()*names.length)],b=names[Math.floor(Math.random()*names.length)];
+        const s=a+' ← '+b;if(a!==b&&s!==correct&&!o.includes(s))o.push(s);}
+      return{chat:[{side:'right',who:'❓',text:x.text}],speaker:x.speaker,target:x.target,options:shuf([correct,...o])};});
+    const shortMsgs=state.msgs.filter(m=>substantive(m.t)&&m.t.length<110&&!isBlocked(m.t)).map(m=>m.t);
+    const CTX=selected('context').map(i=>state.cand.context[i]).map(x=>{const o=[x.prev];let guard=0;
+      while(o.length<4&&guard++<300){const r=shortMsgs[Math.floor(Math.random()*shortMsgs.length)];if(r&&!o.includes(r))o.push(r);}
+      return{quote:x.quote,answer:x.prev,options:shuf(o)};});
+    if(!WHO.length&&!TW.length&&!CTX.length){$('#genlog').innerHTML='<span class="warn">⚠️ לא נבחרו שאלות.</span>';return;}
+    let tpl=$('#gameTpl').textContent.split('<\\/script>').join('<\/script>');
     const R=(k,v)=>{tpl=tpl.split(k).join(v);};
     R('__PRIMARY__',cfg.color);R('__PRIMARY_DARK__',darken(cfg.color));
     R('__GROUP__',cfg.group);R('__TEAM__',cfg.team);R('__EMOJI__',cfg.emoji);
@@ -1152,12 +1166,10 @@ $('#gen').onclick=()=>{
     R('__DATA__',JSON.stringify({who:WHO,toWhom:TW,context:CTX}));
     R('__DIGGERS__',JSON.stringify(state.diggers));
     R('__AWARDS__',JSON.stringify(state.awards));
-
-    const blob=new Blob([tpl],{type:'text/html'});
-    const url=URL.createObjectURL(blob);
+    const blob=new Blob([tpl],{type:'text/html'}),url=URL.createObjectURL(blob);
     const a=document.createElement('a');a.href=url;a.download=cfg.file;document.body.appendChild(a);a.click();a.remove();
-    $('#genlog').innerHTML=`✅ נוצר! (${WHO.length}+${TW.length}+${CTX.length} שאלות) · אם ההורדה לא התחילה, <a class="dl" href="${url}" download="${cfg.file}">לחצו כאן</a>`;
-  }catch(e){$('#genlog').textContent='⚠️ שגיאה: '+e.message;}
+    $('#genlog').innerHTML=`✅ נוצר! מאגר של ${WHO.length}+${TW.length}+${CTX.length} שאלות (כל סבב מגריל 10) · <a class="dl" href="${url}" download="${cfg.file}">הורדה ידנית</a>`;
+  }catch(e){$('#genlog').innerHTML='<span class="warn">⚠️ שגיאה: '+e.message+'</span>';}
 };
 </script>
 </body>
