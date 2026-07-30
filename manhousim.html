@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>המנחוסים - משחק הקבוצה 🟡⚫</title>
+<style>
+  :root{
+    --yellow:#ffd200;
+    --yellow-dark:#e6bd00;
+    --black:#111;
+    --black-soft:#1c1c1c;
+    --gray:#2a2a2a;
+    --green:#28c76f;
+    --red:#ea5455;
+    --white:#fff;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#333 0%,var(--black) 60%);
+    color:var(--white);
+    min-height:100%;
+    display:flex;
+    justify-content:center;
+    padding:14px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ===== Header ===== */
+  header{
+    text-align:center;
+    padding:8px 0 14px;
+  }
+  header .logo{
+    font-size:40px;
+    line-height:1;
+  }
+  header h1{
+    font-size:26px;
+    color:var(--yellow);
+    letter-spacing:.5px;
+    margin-top:4px;
+  }
+  header .sub{
+    font-size:14px;
+    color:#bbb;
+    margin-top:2px;
+  }
+
+  /* ===== Screens ===== */
+  .screen{display:none;animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ===== Buttons ===== */
+  .btn{
+    display:block;
+    width:100%;
+    border:none;
+    border-radius:var(--radius);
+    padding:16px;
+    font-size:17px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:transform .08s ease, filter .15s ease;
+    text-align:center;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--yellow);color:var(--black);}
+  .btn-dark{background:var(--gray);color:var(--white);border:2px solid #3a3a3a;}
+  .btn-ghost{background:transparent;color:var(--yellow);border:2px solid var(--yellow);}
+
+  /* ===== Mode cards (home) ===== */
+  .mode-card{
+    background:linear-gradient(135deg,var(--black-soft),var(--gray));
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:transform .08s ease, border-color .15s ease;
+  }
+  .mode-card:active{transform:scale(.98);}
+  .mode-card:hover{border-color:var(--yellow);}
+  .mode-card .emoji{font-size:34px;}
+  .mode-card .info h3{font-size:18px;color:var(--yellow);margin-bottom:3px;}
+  .mode-card .info p{font-size:13px;color:#aaa;}
+
+  .home-foot{margin-top:6px;text-align:center;font-size:12px;color:#666;}
+
+  /* ===== Game top bar ===== */
+  .gamebar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-size:14px;
+  }
+  .gamebar .pill{
+    background:var(--gray);
+    padding:7px 12px;
+    border-radius:999px;
+    font-weight:700;
+  }
+  .gamebar .pill b{color:var(--yellow);}
+  .progress{
+    height:8px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .progress > div{
+    height:100%;
+    background:var(--yellow);
+    width:0%;
+    transition:width .3s ease;
+  }
+
+  /* ===== Timer ===== */
+  .timer{
+    height:6px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .timer > div{
+    height:100%;
+    background:var(--green);
+    width:100%;
+  }
+  .timer.run > div{transition:width linear;}
+
+  /* ===== Question card ===== */
+  .qcard{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .qcard .label{
+    font-size:12px;
+    color:var(--yellow);
+    font-weight:700;
+    margin-bottom:10px;
+    letter-spacing:.5px;
+  }
+  .quote{
+    font-size:20px;
+    line-height:1.5;
+    font-weight:600;
+  }
+  .quote-mark{color:var(--yellow);font-size:26px;}
+
+  /* chat bubbles for mode 2 */
+  .chat{display:flex;flex-direction:column;gap:8px;}
+  .bubble{
+    max-width:85%;
+    padding:10px 14px;
+    border-radius:16px;
+    font-size:15px;
+    line-height:1.4;
+  }
+  .bubble.left{align-self:flex-start;background:var(--gray);border-top-right-radius:4px;}
+  .bubble.right{align-self:flex-end;background:#3a3520;border-top-left-radius:4px;}
+  .bubble .who{font-size:11px;color:var(--yellow);margin-bottom:3px;font-weight:700;}
+
+  /* ===== Options ===== */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{
+    background:var(--gray);
+    border:2px solid #3a3a3a;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:16px;
+    font-weight:600;
+    font-family:inherit;
+    color:var(--white);
+    cursor:pointer;
+    text-align:right;
+    transition:transform .08s ease, background .15s;
+  }
+  .option:active{transform:scale(.98);}
+  .option.correct{background:var(--green);border-color:var(--green);color:#04240f;}
+  .option.wrong{background:var(--red);border-color:var(--red);}
+  .option.disabled{pointer-events:none;opacity:.85;}
+
+  .feedback{
+    text-align:center;
+    margin-top:16px;
+    min-height:52px;
+  }
+  .feedback .msg{font-size:18px;font-weight:700;margin-bottom:4px;}
+  .feedback .stat{font-size:13px;color:#aaa;}
+  .feedback.hide{display:none;}
+
+  /* ===== Results ===== */
+  .result-card{
+    background:linear-gradient(135deg,var(--yellow),var(--yellow-dark));
+    color:var(--black);
+    border-radius:var(--radius);
+    padding:26px 20px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .result-card .big{font-size:52px;font-weight:800;line-height:1;}
+  .result-card .of{font-size:20px;font-weight:700;opacity:.7;}
+  .result-card .title{font-size:22px;font-weight:800;margin:10px 0 4px;}
+  .result-card .rank{font-size:16px;font-weight:700;background:rgba(0,0,0,.12);display:inline-block;padding:6px 14px;border-radius:999px;margin-top:8px;}
+  .result-card .mode-name{font-size:14px;font-weight:700;opacity:.75;margin-top:12px;}
+
+  .stack{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+
+  /* ===== Diggers (מי הכי חופר) ===== */
+  .diggers-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px dashed var(--yellow);
+  }
+  .section-title{
+    font-size:16px;color:var(--yellow);font-weight:800;
+    margin:20px 0 10px;display:flex;align-items:center;gap:8px;
+  }
+  .subtle{font-size:12px;color:#888;margin-bottom:14px;text-align:center;}
+
+  .bar-row{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:14px;
+  }
+  .bar-row .rk{width:24px;text-align:center;font-weight:800;color:#888;flex:0 0 auto;}
+  .bar-row .bar-wrap{flex:1;background:var(--gray);border-radius:8px;overflow:hidden;height:30px;position:relative;}
+  .bar-row .bar{
+    height:100%;background:linear-gradient(90deg,var(--yellow-dark),var(--yellow));
+    display:flex;align-items:center;padding:0 8px;
+    border-radius:8px;min-width:fit-content;
+  }
+  .bar-row .nm{font-weight:700;color:var(--black);font-size:13px;white-space:nowrap;}
+  .bar-row .ct{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+    font-size:12px;font-weight:800;color:#ccc;}
+  .bar-row.top1 .bar{background:linear-gradient(90deg,#d4a017,#ffe14d);}
+
+  .month-tbl{width:100%;border-collapse:collapse;font-size:14px;}
+  .month-tbl th{
+    text-align:right;color:#888;font-weight:700;font-size:12px;
+    padding:6px 8px;border-bottom:1px solid #333;
+  }
+  .month-tbl td{padding:9px 8px;border-bottom:1px solid #262626;}
+  .month-tbl tr:hover td{background:#1e1e1e;}
+  .month-tbl .champ{font-weight:800;color:var(--yellow);}
+  .month-tbl .cnt{color:#bbb;text-align:left;font-variant-numeric:tabular-nums;}
+  .month-tbl .mon{color:#ddd;white-space:nowrap;}
+
+  /* ===== In-game controls ===== */
+  .gamectrl{display:flex;gap:8px;margin-bottom:12px;}
+  .mini-btn{
+    flex:1;background:var(--gray);color:#ccc;border:1px solid #3a3a3a;
+    border-radius:10px;padding:8px;font-size:13px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:transform .08s ease;
+  }
+  .mini-btn:active{transform:scale(.96);}
+  .mini-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">🟡⚫</div>
+    <h1>המנחוסים</h1>
+    <div class="sub">ביתר ירושלים • משחק הקבוצה</div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen active">
+    <div class="mode-card" onclick="Game.start('who')">
+      <div class="emoji">🕵️</div>
+      <div class="info">
+        <h3>מי אמר את זה?!</h3>
+        <p>ציטוט מהצ'אט — נחשו מי הפה הגדול</p>
+      </div>
+    </div>
+    <div class="mode-card" onclick="Game.start('toWhom')">
+      <div class="emoji">💬</div>
+      <div class="info">
+        <h3>מי אמר למי?</h3>
+        <p>שיחה מהקבוצה — מי דיבר אל מי</p>
+      </div>
+    </div>
+    <div class="mode-card" onclick="Game.start('context')">
+      <div class="emoji">🎭</div>
+      <div class="info">
+        <h3>באיזה הקשר?!</h3>
+        <p>משפט תלוש — מה באמת קרה שם</p>
+      </div>
+    </div>
+    <div class="mode-card diggers-card" onclick="Diggers.open()">
+      <div class="emoji">🔧</div>
+      <div class="info">
+        <h3>מי הכי חופר?</h3>
+        <p>טבלת המפציצים — כמה הודעות כל אחד שלח</p>
+      </div>
+    </div>
+    <div class="home-foot">📸 בסוף כל סבב אפשר לצלם ולשלוח לקבוצה</div>
+  </section>
+
+  <!-- ============ DIGGERS ============ -->
+  <section id="diggers" class="screen">
+    <div class="section-title">👑 טבלת כל הזמנים (12 חודשים אחרונים)</div>
+    <div class="subtle">מספר ההודעות שכל אחד שלח לקבוצה</div>
+    <div id="diggersOverall"></div>
+
+    <div class="section-title">📅 אלוף החופרים של כל חודש</div>
+    <div class="subtle">מי שלח הכי הרבה הודעות בכל חודש</div>
+    <table class="month-tbl">
+      <thead><tr><th>חודש</th><th>האלוף 🔧</th><th class="cnt">הודעות</th></tr></thead>
+      <tbody id="diggersMonths"></tbody>
+    </table>
+
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="game" class="screen">
+    <div class="gamectrl">
+      <button class="mini-btn" onclick="Game.restart()">🔄 התחל מחדש</button>
+      <button class="mini-btn" onclick="Game.quit()">🏠 מסך הבית</button>
+    </div>
+    <div class="gamebar">
+      <span class="pill">שאלה <b><span id="qNum">1</span>/<span id="qTotal">5</span></b></span>
+      <span class="pill">ניקוד <b id="score">0</b></span>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="timer" id="timerWrap"><div id="timerBar"></div></div>
+
+    <div class="qcard" id="qcard"></div>
+
+    <div class="options" id="options"></div>
+
+    <div class="feedback hide" id="feedback">
+      <div class="msg" id="fbMsg"></div>
+      <div class="stat" id="fbStat"></div>
+    </div>
+
+    <button class="btn btn-primary hidden" id="nextBtn" style="margin-top:16px" onclick="Game.next()">הבא ➟</button>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="screen">
+    <div class="result-card" id="resultCard">
+      <div><span class="big" id="rScore">0</span><span class="of">/<span id="rTotal">5</span></span></div>
+      <div class="title" id="rTitle">כל הכבוד!</div>
+      <div class="rank" id="rRank"></div>
+      <div class="mode-name" id="rMode"></div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" onclick="Game.replay()">🔁 עוד סבב באותו מצב</button>
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   DATA — ציטוטים אמיתיים מהצ'אט של הקבוצה (שנה אחרונה).
+   השמות מופו לפי מספרי הטלפון של החברים.
+   ========================================================= */
+
+const PLAYERS = ["ניב שחר","נועם","אביאל","מיכאל","מתן לוגסי","יצחק נגר",
+  "אורון","אופיר","בוקבוזה","משה אזולאי","עומרי","עידן","ליאו","שחר",
+  "דודי","נילי","אלעד","יוני סעדון","אליאור"];
+
+const DATA = {
+  // מצב 1: מי אמר את זה?
+  who: [
+    {
+      quote: "כל פעם שהייתי חושב על פייסל, הייתי נזכר באופיר וחושב ״אתה רוצה להיות כמוהו?״",
+      answer: "שחר",
+      options: ["שחר", "אורון", "ליאו", "יצחק נגר"]
+    },
+    {
+      quote: "תמחקקקקקקקקקקקק!!!!!!!!!!!!!!",
+      answer: "אביאל",
+      options: ["אביאל", "יצחק נגר", "מתן לוגסי", "עומרי"]
+    },
+    {
+      quote: "טוריאל שחקן מטורף, שיסיים העונה עם 15-20 גולים בליגה. אתם גנובים אחושרמוטה",
+      answer: "אופיר",
+      options: ["אופיר", "אורון", "ניב שחר", "מתן לוגסי"]
+    },
+    {
+      quote: "בשורה לרכש אין. בשורה לסרט דוקומנטרי על בית״ר ירושלים יש",
+      answer: "מתן לוגסי",
+      options: ["מתן לוגסי", "נועם", "עידן", "ניב שחר"]
+    },
+    {
+      quote: "מתי נטעם אליפות, מתי... עד מתי 2008?!",
+      answer: "אורון",
+      options: ["אורון", "ניב שחר", "מתן לוגסי", "עידן"]
+    },
+    {
+      quote: "סילבה יא בן זונה",
+      answer: "בוקבוזה",
+      options: ["בוקבוזה", "אופיר", "ליאו", "עידן"]
+    },
+    {
+      quote: "יש הודעה רשמית על זהבי!",
+      answer: "דודי",
+      options: ["דודי", "אופיר", "אורון", "בוקבוזה"]
+    },
+    {
+      quote: "חשבתי יש וולקאם... קיבלתי התקף לב",
+      answer: "עומרי",
+      options: ["עומרי", "מיכאל", "ליאו", "אלעד"]
+    },
+    {
+      quote: "הבן אדם כבר לא בקבוצה 😭",
+      answer: "נילי",
+      options: ["נילי", "אופיר", "דודי", "עידן"]
+    }
+  ],
+
+  // מצב 2: מי אמר למי? (שם הנמען הוסתר ב־___)
+  toWhom: [
+    {
+      chat:[{side:"right", who:"❓", text:"___ שלחת פה הרבה חרא, אבל הפעם התעלת על עצמך"}],
+      speaker:"עידן", target:"יצחק נגר",
+      options:["עידן ← יצחק נגר", "אביאל ← יצחק נגר", "עידן ← אופיר", "ליאו ← עומרי"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ שולח תמונות שהוא בדרך לאילת, תמונות שהוא באילת, תמונות שהוא בים... בלילה במלון אל תצלם אחי"}],
+      speaker:"נועם", target:"יצחק נגר",
+      options:["נועם ← יצחק נגר", "עידן ← אביאל", "נועם ← אורון", "בוקבוזה ← יצחק נגר"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ אתה מטריל בלי סוף אבא"}],
+      speaker:"אופיר", target:"דודי",
+      options:["אופיר ← דודי", "עידן ← דודי", "אופיר ← מיכאל", "יצחק נגר ← נועם"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ תפסיק להיכנס לקבוצה אחרי 10 שוטים של וויסקי"}],
+      speaker:"ניב שחר", target:"אופיר",
+      options:["ניב שחר ← אופיר", "נועם ← אופיר", "ניב שחר ← יצחק נגר", "עומרי ← ליאו"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___, תתרכז בילדה.. אתה מתחיל לדבר שטויות 😂"}],
+      speaker:"נילי", target:"נועם",
+      options:["נילי ← נועם", "נילי ← יצחק נגר", "דודי ← נועם", "נועם ← עידן"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ יא בן זונהההה"}],
+      speaker:"ליאו", target:"עומרי",
+      options:["ליאו ← עומרי", "עומרי ← ליאו", "בוקבוזה ← עומרי", "אופיר ← דודי"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ תקלל את יוסי הבן זונה"}],
+      speaker:"יצחק נגר", target:"מיכאל",
+      options:["יצחק נגר ← מיכאל", "אביאל ← מיכאל", "נועם ← מיכאל", "יצחק נגר ← אליאור"]
+    },
+    {
+      chat:[{side:"right", who:"❓", text:"___ זה חשיבה של לוזרים"}],
+      speaker:"אלעד", target:"עידן",
+      options:["אלעד ← עידן", "עידן ← אורון", "מתן לוגסי ← עידן", "אלעד ← נועם"]
+    }
+  ],
+
+  // מצב 3: באיזה הקשר נאמר המשפט?
+  context: [
+    {
+      quote: "קיץ עם פוטנציאל חרמנות 10/10",
+      answer: "כשניב שחר דמיין בקול מה יקרה אם ההרכבים של ברק (המאמן) יתגשמו",
+      options:[
+        "כשניב שחר דמיין בקול מה יקרה אם ההרכבים של ברק (המאמן) יתגשמו",
+        "אחרי ניצחון בדרבי מול הפועל ירושלים",
+        "כשהמועדון הכריז על מבצע כרטיסי מנוי",
+        "כשראה את תחזית מזג האוויר לשבת"
+      ]
+    },
+    {
+      quote: "שחר אחי, לך לים תנשום אוויר, תראה קצת משחקים של ביתר בשידור חוזר, תדליק לך פייסל טוב. מה אתה משתולל כל היום",
+      answer: "כששחר השתולל כל היום בקבוצה על ביתר ומישהו אמר לו להירגע",
+      options:[
+        "כששחר השתולל כל היום בקבוצה על ביתר ומישהו אמר לו להירגע",
+        "אחרי ששחר הודיע שהוא פורש מהאוהדים",
+        "כששחר ביקש המלצה לחופשה בים",
+        "אחרי ששחר החמיץ את המשחק בטלוויזיה"
+      ]
+    },
+    {
+      quote: "כאילו המדיה עושים לו בכוונה",
+      answer: "כשמתחו ביקורת על מחלקת המדיה של ביתר שמעלה תכנים מביכים",
+      options:[
+        "כשמתחו ביקורת על מחלקת המדיה של ביתר שמעלה תכנים מביכים",
+        "כשמישהו האשים את השופט בקנוניה",
+        "אחרי שהמאמן ענה תשובה מוזרה בראיון",
+        "כשהקבוצה פרסמה הרכב מוזר"
+      ]
+    },
+    {
+      quote: "כוס אמא שלו איזה בלם מעפן",
+      answer: "תוך כדי צפייה במשחק, אחרי שהבלם של ביתר פישל",
+      options:[
+        "תוך כדי צפייה במשחק, אחרי שהבלם של ביתר פישל",
+        "אחרי שקנה חולצה במידה לא נכונה",
+        "כשהבן של חבר בעט לו כדור בפרצוף",
+        "אחרי שראה את ההרכב שהמאמן פרסם"
+      ]
+    },
+    {
+      quote: "אני רואה זה חזק במשפחה 555",
+      answer: "כשמתן עקץ מישהו שכתב ״חרא עלינו״ — ״555״ זה חחח בטעות מקלדת",
+      options:[
+        "כשמתן עקץ מישהו שכתב ״חרא עלינו״ — ״555״ זה חחח בטעות מקלדת",
+        "אחרי שמישהו סיפר שאחיו שחקן כדורגל",
+        "כשדיברו על גנטיקה של ספורטאים",
+        "כשמישהו שלח תמונה משפחתית לצ'אט"
+      ]
+    }
+  ]
+};
+
+const MODE_META = {
+  who:     {title:"מי אמר את זה?!",   label:"מי אמר את המשפט הבא?"},
+  toWhom:  {title:"מי אמר למי?",      label:"מי כתב את ההודעה — ולמי?"},
+  context: {title:"באיזה הקשר?!",     label:"באיזה הקשר נאמר המשפט?"}
+};
+
+/* =========================================================
+   NAV
+   ========================================================= */
+const Nav = {
+  go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+};
+
+/* =========================================================
+   GAME ENGINE
+   ========================================================= */
+const TIME_PER_Q = 12; // שניות
+const Game = {
+  mode:null, questions:[], idx:0, score:0, timer:null, answered:false,
+
+  start(mode){
+    this.mode = mode;
+    this.questions = shuffle([...DATA[mode]]);
+    this.idx = 0;
+    this.score = 0;
+    Nav.go('game');
+    document.getElementById('qTotal').textContent = this.questions.length;
+    this.render();
+  },
+
+  render(){
+    this.answered = false;
+    const q = this.questions[this.idx];
+    const meta = MODE_META[this.mode];
+
+    // top bar
+    document.getElementById('qNum').textContent = this.idx+1;
+    document.getElementById('score').textContent = this.score;
+    document.getElementById('progressBar').style.width =
+        (this.idx/this.questions.length*100)+'%';
+
+    // question card
+    const qcard = document.getElementById('qcard');
+    if(this.mode==='toWhom'){
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="chat">` +
+        q.chat.map(b=>`<div class="bubble ${b.side}"><div class="who">${b.who}</div>${escapeHtml(b.text)}</div>`).join('') +
+        `</div>`;
+    } else {
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="quote"><span class="quote-mark">”</span>${escapeHtml(q.quote)}<span class="quote-mark">“</span></div>`;
+    }
+
+    // options
+    const answer = this.mode==='toWhom'
+        ? `${q.speaker} ← ${q.target}`
+        : q.answer;
+    const opts = shuffle([...q.options]);
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    opts.forEach(opt=>{
+      const b = document.createElement('button');
+      b.className='option';
+      b.textContent=opt;
+      b.onclick=()=>this.answer(b, opt, answer);
+      box.appendChild(b);
+    });
+
+    // feedback + next
+    document.getElementById('feedback').classList.add('hide');
+    document.getElementById('nextBtn').classList.add('hidden');
+
+    this.startTimer(answer);
+  },
+
+  startTimer(answer){
+    const wrap = document.getElementById('timerWrap');
+    const bar = document.getElementById('timerBar');
+    wrap.classList.remove('run');
+    bar.style.transition='none';
+    bar.style.width='100%';
+    bar.style.background='var(--green)';
+    // force reflow
+    void bar.offsetWidth;
+    wrap.classList.add('run');
+    bar.style.transition=`width ${TIME_PER_Q}s linear`;
+    bar.style.width='0%';
+    clearTimeout(this.timer);
+    this.timer = setTimeout(()=>{
+      if(!this.answered) this.answer(null, null, answer, true);
+    }, TIME_PER_Q*1000);
+  },
+
+  answer(btn, choice, answer, timeout=false){
+    if(this.answered) return;
+    this.answered = true;
+    clearTimeout(this.timer);
+    // freeze timer bar
+    const bar=document.getElementById('timerBar');
+    bar.style.transition='none';
+    bar.style.width=getComputedStyle(bar).width;
+
+    const correct = choice===answer;
+    const buttons = document.querySelectorAll('#options .option');
+    buttons.forEach(b=>{
+      b.classList.add('disabled');
+      if(b.textContent===answer) b.classList.add('correct');
+      else if(b===btn) b.classList.add('wrong');
+    });
+
+    // scoring: base 100 + time bonus
+    let gained=0;
+    if(correct){
+      const remaining = parseFloat(bar.style.width)/ (document.getElementById('timerWrap').offsetWidth) ;
+      gained = 100 + Math.round(50*remaining);
+      this.score += gained;
+      document.getElementById('score').textContent=this.score;
+    }
+
+    // feedback
+    const fb=document.getElementById('feedback');
+    const msg=document.getElementById('fbMsg');
+    const stat=document.getElementById('fbStat');
+    fb.classList.remove('hide');
+    if(timeout){ msg.textContent='⏱️ נגמר הזמן!'; msg.style.color='var(--red)'; }
+    else if(correct){ msg.textContent=`✅ נכון! +${gained}`; msg.style.color='var(--green)'; }
+    else { msg.textContent='❌ לא נכון'; msg.style.color='var(--red)'; }
+    stat.textContent = pickBanter(correct, timeout);
+
+    document.getElementById('nextBtn').classList.remove('hidden');
+  },
+
+  next(){
+    this.idx++;
+    if(this.idx>=this.questions.length) this.finish();
+    else this.render();
+  },
+
+  finish(){
+    clearTimeout(this.timer);
+    const total = this.questions.length;
+    const maxScore = total*150;
+    const pct = this.score/maxScore;
+    document.getElementById('rScore').textContent=this.score;
+    document.getElementById('rTotal').textContent=maxScore;
+    document.getElementById('rMode').textContent='מצב: '+MODE_META[this.mode].title;
+
+    let title, rank;
+    if(pct>=0.85){ title='חיה של הקבוצה! 🐐'; rank='מלך המנחוסים'; }
+    else if(pct>=0.6){ title='כל הכבוד! 🔥'; rank='ותיק ומנוסה'; }
+    else if(pct>=0.35){ title='לא רע בכלל 👏'; rank='חבר מן המניין'; }
+    else { title='נו באמת… 😅'; rank='חדש בקבוצה'; }
+    document.getElementById('rTitle').textContent=title;
+    document.getElementById('rRank').textContent='🏅 '+rank;
+
+    Nav.go('results');
+  },
+
+  replay(){ this.start(this.mode); },
+
+  restart(){ clearTimeout(this.timer); this.start(this.mode); },
+
+  quit(){ clearTimeout(this.timer); this.answered=true; Nav.go('home'); }
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const BANTER_OK=[
+  "יש לך את זה 😎","אתה מכיר אותם טוב מדי…","מנחוס אמיתי 🟡⚫","קלי קלות"
+];
+const BANTER_BAD=[
+  "אתה בכלל בקבוצה? 😂","נו נו נו…","תקרא יותר את הצ'אט","הבן שלך היה יודע"
+];
+function pickBanter(ok){ const a=ok?BANTER_OK:BANTER_BAD; return a[Math.floor(Math.random()*a.length)]; }
+
+/* =========================================================
+   DIGGERS — מי הכי חופר (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const DIGGERS = {
+  overall:[
+    {name:"ניב שחר",count:21122},{name:"נועם",count:21068},{name:"יצחק נגר",count:19386},
+    {name:"מתן לוגסי",count:18412},{name:"אורון",count:17526},{name:"בוקבוזה",count:16564},
+    {name:"אופיר",count:16454},{name:"משה אזולאי",count:13578},{name:"עומרי",count:12640},
+    {name:"עידן",count:11110},{name:"ליאו",count:8994},{name:"שחר",count:7995},
+    {name:"פדידה",count:7425},{name:"נילי",count:7354},{name:"דודי",count:7197}
+  ],
+  months:[
+    {label:"אוגוסט 2025",champ:"ניב שחר",count:4422},
+    {label:"ספטמבר 2025",champ:"ניב שחר",count:2115},
+    {label:"אוקטובר 2025",champ:"ניב שחר",count:2578},
+    {label:"נובמבר 2025",champ:"ניב שחר",count:1489},
+    {label:"דצמבר 2025",champ:"נועם",count:1762},
+    {label:"ינואר 2026",champ:"ניב שחר",count:2247},
+    {label:"פברואר 2026",champ:"מתן לוגסי",count:1830},
+    {label:"מרץ 2026",champ:"יצחק נגר",count:3180},
+    {label:"אפריל 2026",champ:"נועם",count:2183},
+    {label:"מאי 2026",champ:"יצחק נגר",count:2933},
+    {label:"יוני 2026",champ:"יצחק נגר",count:2681},
+    {label:"יולי 2026",champ:"יצחק נגר",count:2707}
+  ]
+};
+const Diggers = {
+  open(){
+    const max = DIGGERS.overall[0].count;
+    const medals=["🥇","🥈","🥉"];
+    document.getElementById('diggersOverall').innerHTML =
+      DIGGERS.overall.map((d,i)=>{
+        const w = Math.max(12, Math.round(d.count/max*100));
+        const rk = i<3?medals[i]:(i+1);
+        return `<div class="bar-row ${i===0?'top1':''}">
+          <span class="rk">${rk}</span>
+          <div class="bar-wrap">
+            <div class="bar" style="width:${w}%"><span class="nm">${escapeHtml(d.name)}</span></div>
+            <span class="ct">${d.count.toLocaleString('he-IL')}</span>
+          </div></div>`;
+      }).join('');
+    document.getElementById('diggersMonths').innerHTML =
+      DIGGERS.months.map(m=>`<tr>
+        <td class="mon">${escapeHtml(m.label)}</td>
+        <td class="champ">${escapeHtml(m.champ)}</td>
+        <td class="cnt">${m.count.toLocaleString('he-IL')}</td></tr>`).join('');
+    Nav.go('diggers');
+  }
+};
+</script>
+</body>
+</html>
