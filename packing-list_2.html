@@ -6,7 +6,7 @@
 <title>רשימת ציוד · פאפוס 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#0F3239; --sea:#17646F; --surf:#8ED2CE; --limestone:#F1F3EE;
@@ -275,6 +275,23 @@ const cats = () => [...new Set([...categories, ...items.map(i=>i.category)])].fi
 
 function seedLocal(){ items = SEED.map(([category,name,qty,note])=>({id:uid(),category,name,qty,note,packed:false,who:"",by:"",updatedAt:0})); }
 
+/* ===== מטמון מקומי — טעינה מיידית ===== */
+const CACHE_KEY = "paphos-list-v1";
+function saveCache(){ try{ localStorage.setItem(CACHE_KEY, JSON.stringify({items,categories,me})); }catch(e){} }
+function loadCache(){
+  try{
+    const raw = localStorage.getItem(CACHE_KEY); if(!raw) return false;
+    const c = JSON.parse(raw);
+    if(Array.isArray(c.items) && c.items.length){
+      items = c.items;
+      if(Array.isArray(c.categories) && c.categories.length) categories = c.categories;
+      if(c.me){ me = c.me; }
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
 /* ===== סנכרון ===== */
 function setSync(s,t){ $("#dot").className="dot "+s; $("#syncText").textContent=t; }
 async function call(action,payload){
@@ -389,7 +406,7 @@ function render(){
   const total=items.length, packed=items.filter(i=>i.packed).length, pct=total?Math.round(packed/total*100):0;
   $("#packed").textContent=packed; $("#total").textContent=total; $("#water").style.height=pct+"%";
   $("#quick").placeholder=`הוסף פריט ל“${active}”…`;
-  renderTabs(); renderList();
+  renderTabs(); renderList(); saveCache();
 }
 
 /* ===== חיווט ===== */
@@ -418,8 +435,13 @@ $("#syncDlg").addEventListener("close",()=>{ if($("#syncDlg").returnValue==="sav
 (function(){ const d=Math.ceil((new Date(DEPART)-new Date())/86400000);
   $("#days").textContent = d>1?`עוד ${d} ימים`:d===1?"מחר!":d===0?"היום!":"בדרך"; })();
 
-if(api){ setSync("dot--busy","מתחבר…"); pull(); setInterval(pull,POLL_MS); }
-else{ seedLocal(); setSync("dot--off","לא מחובר"); render(); }
+// ציור מיידי: מטמון קודם, אחרת רשימה התחלתית — בלי לחכות לרשת
+if(!loadCache()) seedLocal();
+if(me) $("#meBtn").textContent = me;
+render();
+
+if(api){ setSync("dot--busy","מסתנכרן…"); pull(); setInterval(pull,POLL_MS); }
+else{ setSync("dot--off","לא מחובר"); }
 </script>
 </body>
 </html>
