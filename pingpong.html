@@ -395,6 +395,7 @@ let paddleW, paddleH, ballR;
 let youX, botX, ball, botTargetX, rafId=null;
 let faceYou=null, faceBot=null;               // player photos drawn on the table
 const keys={left:false,right:false};          // desktop keyboard state
+let trail=[];                                 // ball motion trail
 
 function loadFace(ch){ if(!ch||!ch.img) return null; const im=new Image(); im.src=ch.img; return im; }
 
@@ -403,7 +404,7 @@ function resize(){
   W=r.width; H=r.height;
   cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  paddleW=Math.max(74, W*0.26); paddleH=Math.max(13,H*0.02); ballR=Math.max(7,W*0.024);
+  paddleW=Math.max(66, W*0.22); paddleH=Math.max(13,H*0.018); ballR=Math.max(8,W*0.026);
   if(youX===undefined){ youX=W/2; botX=W/2; }
 }
 window.addEventListener('resize', ()=>{ if(state.running){resize();} });
@@ -421,7 +422,7 @@ function startGame(){
 function updateScore(){ $('#g-you-score').textContent=state.youScore; $('#g-bot-score').textContent=state.botScore; }
 
 function prepareServe(server){
-  state.serving=true; state.lastServer=server;
+  state.serving=true; state.lastServer=server; trail=[];
   ball={ x:W/2, y: server==='you'? H-paddleH-ballR-30 : paddleH+ballR+30, vx:0, vy:0, speed:baseBallSpeed() };
   botX=W/2; botTargetX=W/2;
   const btn=$('#serve-btn'), msg=$('#serve-msg');
@@ -492,6 +493,7 @@ function step(dt){
   if(state.serving){ if(state.lastServer==='bot'){ ball.x=botX; } return; }
   const mx=ball.vx*dt, my=ball.vy*dt;   // this frame's displacement
   ball.x+=mx; ball.y+=my;
+  trail.push({x:ball.x,y:ball.y}); if(trail.length>7) trail.shift();
   if(ball.x-ballR<0){ ball.x=ballR; ball.vx*=-1; }
   if(ball.x+ballR>W){ ball.x=W-ballR; ball.vx*=-1; }
   const youY=H-paddleH-6, botY=6;
@@ -541,39 +543,140 @@ function sayBubble(who){
 }
 
 /* ---------- draw ---------- */
-function drawTable(){
-  ctx.fillStyle='#0e1116'; ctx.fillRect(0,0,W,H);
-  const m=6;
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#0d74cc'); g.addColorStop(.5,'#0b6bbf'); g.addColorStop(1,'#0a5aa3');
-  ctx.fillStyle=g; ctx.fillRect(m,m,W-2*m,H-2*m);
-  // outer border
-  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.strokeRect(m+2,m+2,W-2*m-4,H-2*m-4);
-  // center service line
-  ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(W/2,m); ctx.lineTo(W/2,H-m); ctx.stroke();
-  // net
-  const ny=H/2;
-  ctx.fillStyle='rgba(255,255,255,.14)'; ctx.fillRect(m,ny-8,W-2*m,16);
-  ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1;
-  for(let x=m;x<W-m;x+=9){ ctx.beginPath(); ctx.moveTo(x,ny-8); ctx.lineTo(x,ny+8); ctx.stroke(); }
-  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(m,ny); ctx.lineTo(W-m,ny); ctx.stroke();
-  // posts
-  ctx.fillStyle='#eee'; ctx.fillRect(m-3,ny-10,6,20); ctx.fillRect(W-m-3,ny-10,6,20);
-}
-function drawPaddle(cx,y,color,edge){
-  const x=cx-paddleW/2;
-  const g=ctx.createLinearGradient(0,y,0,y+paddleH);
-  g.addColorStop(0, color); g.addColorStop(1, edge);
-  roundRect(x,y,paddleW,paddleH,paddleH/2,g);
-  ctx.fillStyle='rgba(255,255,255,.25)'; roundRect(x+4,y+2,paddleW-8,paddleH*0.35,paddleH*0.18,'rgba(255,255,255,.22)');
-}
-function roundRect(x,y,w,h,r,color){
+function roundRectPath(x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
   ctx.beginPath(); ctx.moveTo(x+r,y);
   ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
   ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+  ctx.closePath();
+}
+function roundRect(x,y,w,h,r,color){ roundRectPath(x,y,w,h,r); ctx.fillStyle=color; ctx.fill(); }
+function ellipsePath(cx,cy,rx,ry){ ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); }
+
+// table geometry shared by table + paddles + net
+function tableRect(){ const m=Math.max(8,W*0.03); const e=Math.max(4,W*0.014); return {m,e,sx:m+e,sy:m+e,sw:W-2*(m+e),sh:H-2*(m+e),rad:Math.max(10,W*0.04)}; }
+
+function drawTable(){
+  // floor / surround
+  const floor=ctx.createRadialGradient(W/2,H*0.42,H*0.05, W/2,H*0.5,H*0.85);
+  floor.addColorStop(0,'#1a232c'); floor.addColorStop(1,'#0a0e12');
+  ctx.fillStyle=floor; ctx.fillRect(0,0,W,H);
+
+  const {m,e,sx,sy,sw,sh,rad}=tableRect();
+  const tx=m,ty=m,tw=W-2*m,th=H-2*m;
+
+  // table drop shadow
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=26; ctx.shadowOffsetY=12;
+  roundRectPath(tx,ty,tw,th,rad+2); ctx.fillStyle='#07243f'; ctx.fill();
+  ctx.restore();
+
+  // side rail (edge thickness) — darker blue
+  const rail=ctx.createLinearGradient(0,ty,0,ty+th);
+  rail.addColorStop(0,'#0a4c86'); rail.addColorStop(1,'#06345e');
+  roundRectPath(tx,ty,tw,th,rad+2); ctx.fillStyle=rail; ctx.fill();
+
+  // playing surface
+  const g=ctx.createLinearGradient(0,sy,0,sy+sh);
+  g.addColorStop(0,'#1b8ce0'); g.addColorStop(.5,'#0f72c4'); g.addColorStop(1,'#0c5da8');
+  roundRectPath(sx,sy,sw,sh,rad); ctx.fillStyle=g; ctx.fill();
+
+  // top gloss sheen
+  const gloss=ctx.createLinearGradient(0,sy,0,sy+sh*0.55);
+  gloss.addColorStop(0,'rgba(255,255,255,.14)'); gloss.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.save(); roundRectPath(sx,sy,sw,sh,rad); ctx.clip();
+  ctx.fillStyle=gloss; ctx.fillRect(sx,sy,sw,sh*0.55);
+  // corner vignette
+  const vg=ctx.createRadialGradient(W/2,H/2,H*0.12, W/2,H/2,H*0.72);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.28)');
+  ctx.fillStyle=vg; ctx.fillRect(sx,sy,sw,sh);
+  ctx.restore();
+
+  // boundary line
+  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=Math.max(3,W*0.011);
+  roundRectPath(sx+8,sy+8,sw-16,sh-16,Math.max(6,rad-6)); ctx.stroke();
+  // center service line
+  ctx.strokeStyle='rgba(255,255,255,.4)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W/2,sy+8); ctx.lineTo(W/2,sy+sh-8); ctx.stroke();
+
+  drawNet(sx,sw);
+}
+
+function drawNet(sx,sw){
+  const ny=H/2;
+  const nh=Math.max(18,H*0.03);
+  const top=ny-nh/2, bot=ny+nh/2, left=sx, right=sx+sw;
+
+  // net shadow cast on the table
+  const sh=ctx.createLinearGradient(0,ny,0,ny+nh*0.8);
+  sh.addColorStop(0,'rgba(0,0,0,.22)'); sh.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=sh; ctx.fillRect(left,ny+2,sw,nh*0.8);
+
+  // mesh
+  ctx.save();
+  ctx.beginPath(); ctx.rect(left,top,sw,nh); ctx.clip();
+  ctx.fillStyle='rgba(230,240,255,.07)'; ctx.fillRect(left,top,sw,nh);
+  ctx.strokeStyle='rgba(255,255,255,.32)'; ctx.lineWidth=1;
+  const gap=Math.max(6,W*0.02);
+  for(let x=left;x<=right;x+=gap){ ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,bot); ctx.stroke(); }
+  for(let y=top;y<=bot;y+=gap){ ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(right,y); ctx.stroke(); }
+  ctx.restore();
+
+  // white tape along the top of the net
+  ctx.fillStyle='#f4f7fb'; ctx.fillRect(left,top-4,sw,6);
+  ctx.fillStyle='rgba(0,0,0,.12)'; ctx.fillRect(left,top+2,sw,1);
+
+  // posts on both edges
+  drawPost(left,ny,nh); drawPost(right,ny,nh);
+}
+function drawPost(x,ny,nh){
+  const w=Math.max(6,W*0.02), h=nh+12;
+  const g=ctx.createLinearGradient(x-w/2,0,x+w/2,0);
+  g.addColorStop(0,'#aeb4ba'); g.addColorStop(.5,'#f2f5f8'); g.addColorStop(1,'#9aa1a8');
+  roundRect(x-w/2,ny-h/2,w,h,3,g);
+  ctx.fillStyle='rgba(0,0,0,.15)'; ctx.fillRect(x-w/2,ny-1,w,2);
+}
+
+// a real table-tennis bat (מטקה) seen from above: round rubber blade + wooden handle
+function drawPaddle(cx,y,c){
+  const down = y >= H/2;                          // bottom bat -> handle points down (toward you)
+  const rx = paddleW/2;                           // blade horizontal radius (= hit width)
+  const ry = Math.min(paddleW*0.34, H*0.05);      // blade vertical radius (rounded oval)
+  const bcy = y + paddleH/2 + (down ? -ry*0.45 : ry*0.45);  // pull blade onto the table (less overhang)
+  // --- wooden handle ---
+  const hw=Math.max(15,paddleW*0.19), hh=Math.max(22,ry*1.7);
+  const hy = down ? bcy+ry*0.55 : bcy-ry*0.55-hh;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=8; ctx.shadowOffsetY=down?4:-4;
+  const wg=ctx.createLinearGradient(cx-hw/2,0,cx+hw/2,0);
+  wg.addColorStop(0,'#6d3f18'); wg.addColorStop(.45,'#b3742f'); wg.addColorStop(1,'#5e3512');
+  roundRect(cx-hw/2, hy, hw, hh, hw/2.4, wg);
+  ctx.restore();
+  ctx.strokeStyle='rgba(0,0,0,.22)'; ctx.lineWidth=1;
+  for(let i=0;i<3;i++){ const gy = (down? hy+hh-8-i*6 : hy+8+i*6); ctx.beginPath(); ctx.moveTo(cx-hw/2+4,gy); ctx.lineTo(cx+hw/2-4,gy); ctx.stroke(); }
+  // --- wooden blade edge (slightly larger oval behind the rubber) ---
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=14; ctx.shadowOffsetY=down?6:-6;
+  const wood=ctx.createLinearGradient(0,bcy-ry,0,bcy+ry);
+  wood.addColorStop(0,'#e0a860'); wood.addColorStop(1,'#a06a2c');
+  ellipsePath(cx,bcy,rx+4,ry+4); ctx.fillStyle=wood; ctx.fill();
+  ctx.restore();
+  // --- rubber blade ---
+  const g=ctx.createRadialGradient(cx-rx*0.25,bcy-ry*0.4,ry*0.2, cx,bcy,rx);
+  g.addColorStop(0,c.top); g.addColorStop(1,c.bottom);
+  ellipsePath(cx,bcy,rx,ry); ctx.fillStyle=g; ctx.fill();
+  // pips + gloss (clipped to the rubber oval)
+  ctx.save(); ellipsePath(cx,bcy,rx,ry); ctx.clip();
+  ctx.fillStyle='rgba(0,0,0,.13)';
+  const step=Math.max(6,ry*0.5);
+  for(let px=cx-rx; px<cx+rx; px+=step) for(let py=bcy-ry; py<bcy+ry; py+=step){ ctx.beginPath(); ctx.arc(px,py,1,0,7); ctx.fill(); }
+  ellipsePath(cx-rx*0.3, bcy-ry*0.45, rx*0.6, ry*0.5);
+  const gl=ctx.createRadialGradient(cx-rx*0.3,bcy-ry*0.45,1, cx-rx*0.3,bcy-ry*0.45,rx*0.7);
+  gl.addColorStop(0,'rgba(255,255,255,.55)'); gl.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=gl; ctx.fill();
+  ctx.restore();
+  // rim
+  ctx.lineWidth=1.5; ctx.strokeStyle=c.rim; ellipsePath(cx,bcy,rx-1,ry-1); ctx.stroke();
 }
 function drawFace(im, cy, ring){
   if(!im || !im.complete || !im.naturalWidth) return;
@@ -593,13 +696,24 @@ function draw(){
   drawFace(faceBot, H*0.26, 'rgba(74,163,232,.8)');
   drawFace(faceYou, H*0.74, 'rgba(255,122,26,.85)');
   const youY=H-paddleH-6, botY=6;
-  drawPaddle(botX,botY,'#3a4750','#101418');
-  drawPaddle(youX,youY,'#f26161','#c62f2f');
-  // ball with shadow
-  ctx.beginPath(); ctx.arc(ball.x,ball.y+3,ballR*0.9,0,7); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fill();
-  const bg=ctx.createRadialGradient(ball.x-ballR*0.3,ball.y-ballR*0.3,ballR*0.2,ball.x,ball.y,ballR);
-  bg.addColorStop(0,'#ffd9a8'); bg.addColorStop(.5,'#ff9e3d'); bg.addColorStop(1,'#f2760f');
+  drawPaddle(botX,botY,{top:'#5a646d',bottom:'#12171c',rim:'#05070a'});   // bot: black rubber
+  drawPaddle(youX,youY,{top:'#ff6b6b',bottom:'#cf2f2f',rim:'#7f1717'});   // you: red rubber
+  // ball trail
+  for(let i=0;i<trail.length;i++){
+    const t=trail[i], a=(i+1)/trail.length*0.35;
+    ctx.beginPath(); ctx.arc(t.x,t.y,ballR*(0.5+0.5*(i+1)/trail.length),0,7);
+    ctx.fillStyle='rgba(255,150,50,'+a+')'; ctx.fill();
+  }
+  // ball soft shadow (ellipse on the table)
+  ctx.save(); ctx.translate(ball.x,ball.y+ballR*0.55); ctx.scale(1,0.55);
+  ctx.beginPath(); ctx.arc(0,0,ballR*0.95,0,7); ctx.fillStyle='rgba(0,0,0,.28)'; ctx.fill(); ctx.restore();
+  // ball body
+  const bg=ctx.createRadialGradient(ball.x-ballR*0.35,ball.y-ballR*0.35,ballR*0.15,ball.x,ball.y,ballR);
+  bg.addColorStop(0,'#fff3e0'); bg.addColorStop(.45,'#ffb057'); bg.addColorStop(1,'#ef6f0c');
   ctx.beginPath(); ctx.arc(ball.x,ball.y,ballR,0,7); ctx.fillStyle=bg; ctx.fill();
+  // specular highlight
+  ctx.beginPath(); ctx.arc(ball.x-ballR*0.35,ball.y-ballR*0.38,ballR*0.28,0,7);
+  ctx.fillStyle='rgba(255,255,255,.75)'; ctx.fill();
 }
 let lastTs=0;
 function loop(ts){
