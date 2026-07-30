@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל משחק הקבוצה 🏭</title>
+<style>
+  :root{--ac:#ffd200;--bg:#111;--card:#1c1c1c;--gray:#2a2a2a;--ok:#28c76f;--bad:#ea5455;}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:radial-gradient(circle at 50% 0%,#333,#0c0c0c 70%);color:#fff;min-height:100vh;padding:20px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  header{text-align:center;margin-bottom:24px;}
+  header h1{color:var(--ac);font-size:30px;}
+  header p{color:#aaa;font-size:14px;margin-top:4px;}
+  .step{background:var(--card);border:1px solid #333;border-radius:16px;padding:20px;margin-bottom:18px;}
+  .step.off{opacity:.45;pointer-events:none;}
+  .step h2{font-size:18px;color:var(--ac);margin-bottom:12px;display:flex;gap:8px;align-items:center;}
+  .step h2 .num{background:var(--ac);color:#000;width:26px;height:26px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
+  /* dropzone */
+  #drop{border:3px dashed #444;border-radius:14px;padding:38px 16px;text-align:center;
+    cursor:pointer;transition:.15s;color:#bbb;}
+  #drop.hot{border-color:var(--ac);background:rgba(255,210,0,.06);color:#fff;}
+  #drop .big{font-size:42px;}
+  #drop b{color:var(--ac);}
+  .filetag{margin-top:12px;font-size:14px;color:var(--ok);font-weight:700;}
+  /* form grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .fld label{display:block;font-size:13px;color:#aaa;margin-bottom:5px;}
+  .fld input[type=text]{width:100%;background:var(--gray);border:1px solid #3a3a3a;border-radius:10px;
+    padding:11px;color:#fff;font-size:15px;font-family:inherit;}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .sw{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+  .sw.sel{border-color:#fff;}
+  input[type=color]{width:44px;height:34px;border:none;background:none;cursor:pointer;vertical-align:middle;}
+  /* name map */
+  .maprow{background:var(--gray);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+  .maprow .num{font-size:13px;color:#888;}
+  .maprow .samp{font-size:12px;color:#bbb;margin:4px 0;line-height:1.4;font-style:italic;}
+  .maprow input{width:100%;background:#111;border:1px solid #3a3a3a;border-radius:8px;padding:8px;color:#fff;font-family:inherit;}
+  /* review */
+  .rev-group{margin-bottom:16px;}
+  .rev-group h3{font-size:15px;color:#ddd;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:6px;}
+  .revitem{display:flex;gap:10px;align-items:flex-start;background:var(--gray);border-radius:10px;
+    padding:10px;margin-bottom:7px;font-size:14px;line-height:1.45;}
+  .revitem input{margin-top:3px;transform:scale(1.3);accent-color:var(--ac);flex:0 0 auto;}
+  .revitem .who{color:var(--ac);font-weight:700;}
+  .revitem.drop-x{opacity:.4;}
+  /* buttons */
+  .btn{display:block;width:100%;border:none;border-radius:12px;padding:15px;font-size:17px;
+    font-weight:800;font-family:inherit;cursor:pointer;background:var(--ac);color:#000;transition:.1s;}
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{background:#444;color:#888;cursor:not-allowed;}
+  .btn.sec{background:var(--gray);color:#fff;border:1px solid #3a3a3a;margin-top:10px;}
+  .hint{font-size:12px;color:#777;margin-top:8px;}
+  .log{font-size:12px;color:#8a8;margin-top:10px;white-space:pre-wrap;font-family:monospace;}
+  .hidden{display:none!important;}
+  a.dl{color:var(--ac);font-weight:800;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏭 מחולל משחק הקבוצה</h1>
+    <p>גוררים ייצוא צ'אט (וואטסאפ/טלגרם), עונים על כמה שאלות — ומקבלים משחק HTML מוכן.<br>הכל רץ אצלך בדפדפן. הצ'אט לא נשלח לשום מקום. 🔒</p>
+  </header>
+
+  <!-- STEP 1: file -->
+  <div class="step" id="s1">
+    <h2><span class="num">1</span> גררו את קובץ הצ'אט</h2>
+    <div id="drop">
+      <div class="big">📁⬇️</div>
+      <div style="margin-top:8px">גררו לכאן <b>WhatsApp</b> (‎.txt / .zip) או <b>Telegram</b> (‎.json)<br>או לחצו לבחירה</div>
+      <div class="filetag hidden" id="filetag"></div>
+    </div>
+    <input type="file" id="file" class="hidden" accept=".txt,.zip,.json">
+    <div class="log" id="parselog"></div>
+  </div>
+
+  <!-- STEP 2: names (whatsapp only) -->
+  <div class="step off hidden" id="s2">
+    <h2><span class="num">2</span> מי זה מי? <span style="font-size:13px;color:#888">(וואטסאפ — לפי מספרים)</span></h2>
+    <p class="hint">כתבו שם לכל מספר. השאירו ריק כדי לדלג על מישהו. יש דוגמאות הודעה לזיהוי.</p>
+    <div id="mapList" style="margin-top:12px"></div>
+    <button class="btn" id="mapDone">המשך לניתוח ➟</button>
+  </div>
+
+  <!-- STEP 3: settings -->
+  <div class="step off" id="s3">
+    <h2><span class="num">3</span> עיצוב ופרטים</h2>
+    <div class="grid">
+      <div class="fld"><label>שם הקבוצה</label><input type="text" id="cGroup" placeholder="למשל: המנחוסים"></div>
+      <div class="fld"><label>קבוצת כדורגל</label><input type="text" id="cTeam" placeholder="למשל: ביתר ירושלים"></div>
+      <div class="fld"><label>אימוג'י / לוגו</label><input type="text" id="cEmoji" placeholder="🟡⚫" value="⚽"></div>
+      <div class="fld"><label>שם קובץ הפלט</label><input type="text" id="cФile" placeholder="game.html" value="game.html"></div>
+    </div>
+    <div class="fld" style="margin-top:14px">
+      <label>צבע ראשי</label>
+      <div class="swatches" id="swatches"></div>
+      <div style="margin-top:8px">צבע מותאם: <input type="color" id="cColor" value="#ffd200"></div>
+    </div>
+  </div>
+
+  <!-- STEP 4: review -->
+  <div class="step off" id="s4">
+    <h2><span class="num">4</span> אישור מהיר <span style="font-size:13px;color:#888">(סמנו מה נכנס)</span></h2>
+    <p class="hint">בחרנו אוטומטית את הכי מצחיקים. בטלו סימון להסרה. אפשר פשוט להשאיר הכל.</p>
+    <div id="review" style="margin-top:12px"></div>
+  </div>
+
+  <!-- STEP 5: generate -->
+  <div class="step off" id="s5">
+    <h2><span class="num">5</span> יצירת המשחק</h2>
+    <button class="btn" id="gen">🎮 צור והורד את המשחק</button>
+    <div class="log" id="genlog"></div>
+  </div>
+</div>
+
+<!-- ===== embedded game template ===== -->
+<script type="text/template" id="gameTpl"><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>__GROUP__ — משחק הקבוצה</title>
+<style>
+  :root{
+    --yellow:__PRIMARY__;
+    --yellow-dark:__PRIMARY_DARK__;
+    --black:#111;
+    --black-soft:#1c1c1c;
+    --gray:#2a2a2a;
+    --green:#28c76f;
+    --red:#ea5455;
+    --white:#fff;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#333 0%,var(--black) 60%);
+    color:var(--white);
+    min-height:100%;
+    display:flex;
+    justify-content:center;
+    padding:14px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ===== Header ===== */
+  header{
+    text-align:center;
+    padding:8px 0 14px;
+  }
+  header .logo{
+    font-size:40px;
+    line-height:1;
+  }
+  header h1{
+    font-size:26px;
+    color:var(--yellow);
+    letter-spacing:.5px;
+    margin-top:4px;
+  }
+  header .sub{
+    font-size:14px;
+    color:#bbb;
+    margin-top:2px;
+  }
+
+  /* ===== Screens ===== */
+  .screen{display:none;animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ===== Buttons ===== */
+  .btn{
+    display:block;
+    width:100%;
+    border:none;
+    border-radius:var(--radius);
+    padding:16px;
+    font-size:17px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:transform .08s ease, filter .15s ease;
+    text-align:center;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--yellow);color:var(--black);}
+  .btn-dark{background:var(--gray);color:var(--white);border:2px solid #3a3a3a;}
+  .btn-ghost{background:transparent;color:var(--yellow);border:2px solid var(--yellow);}
+
+  /* ===== Mode cards (home) ===== */
+  .mode-card{
+    background:linear-gradient(135deg,var(--black-soft),var(--gray));
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:transform .08s ease, border-color .15s ease;
+  }
+  .mode-card:active{transform:scale(.98);}
+  .mode-card:hover{border-color:var(--yellow);}
+  .mode-card .emoji{font-size:34px;}
+  .mode-card .info h3{font-size:18px;color:var(--yellow);margin-bottom:3px;}
+  .mode-card .info p{font-size:13px;color:#aaa;}
+
+  .home-foot{margin-top:6px;text-align:center;font-size:12px;color:#666;}
+
+  /* ===== Game top bar ===== */
+  .gamebar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-size:14px;
+  }
+  .gamebar .pill{
+    background:var(--gray);
+    padding:7px 12px;
+    border-radius:999px;
+    font-weight:700;
+  }
+  .gamebar .pill b{color:var(--yellow);}
+  .progress{
+    height:8px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .progress > div{
+    height:100%;
+    background:var(--yellow);
+    width:0%;
+    transition:width .3s ease;
+  }
+
+  /* ===== Timer ===== */
+  .timer{
+    height:6px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .timer > div{
+    height:100%;
+    background:var(--green);
+    width:100%;
+  }
+  .timer.run > div{transition:width linear;}
+
+  /* ===== Question card ===== */
+  .qcard{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .qcard .label{
+    font-size:12px;
+    color:var(--yellow);
+    font-weight:700;
+    margin-bottom:10px;
+    letter-spacing:.5px;
+  }
+  .quote{
+    font-size:20px;
+    line-height:1.5;
+    font-weight:600;
+  }
+  .quote-mark{color:var(--yellow);font-size:26px;}
+
+  /* chat bubbles for mode 2 */
+  .chat{display:flex;flex-direction:column;gap:8px;}
+  .bubble{
+    max-width:85%;
+    padding:10px 14px;
+    border-radius:16px;
+    font-size:15px;
+    line-height:1.4;
+  }
+  .bubble.left{align-self:flex-start;background:var(--gray);border-top-right-radius:4px;}
+  .bubble.right{align-self:flex-end;background:#3a3520;border-top-left-radius:4px;}
+  .bubble .who{font-size:11px;color:var(--yellow);margin-bottom:3px;font-weight:700;}
+
+  /* ===== Options ===== */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{
+    background:var(--gray);
+    border:2px solid #3a3a3a;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:16px;
+    font-weight:600;
+    font-family:inherit;
+    color:var(--white);
+    cursor:pointer;
+    text-align:right;
+    transition:transform .08s ease, background .15s;
+  }
+  .option:active{transform:scale(.98);}
+  .option.correct{background:var(--green);border-color:var(--green);color:#04240f;}
+  .option.wrong{background:var(--red);border-color:var(--red);}
+  .option.disabled{pointer-events:none;opacity:.85;}
+
+  .feedback{
+    text-align:center;
+    margin-top:16px;
+    min-height:52px;
+  }
+  .feedback .msg{font-size:18px;font-weight:700;margin-bottom:4px;}
+  .feedback .stat{font-size:13px;color:#aaa;}
+  .feedback.hide{display:none;}
+
+  /* ===== Results ===== */
+  .result-card{
+    background:linear-gradient(135deg,var(--yellow),var(--yellow-dark));
+    color:var(--black);
+    border-radius:var(--radius);
+    padding:26px 20px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .result-card .big{font-size:52px;font-weight:800;line-height:1;}
+  .result-card .of{font-size:20px;font-weight:700;opacity:.7;}
+  .result-card .title{font-size:22px;font-weight:800;margin:10px 0 4px;}
+  .result-card .rank{font-size:16px;font-weight:700;background:rgba(0,0,0,.12);display:inline-block;padding:6px 14px;border-radius:999px;margin-top:8px;}
+  .result-card .mode-name{font-size:14px;font-weight:700;opacity:.75;margin-top:12px;}
+
+  .stack{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+
+  /* ===== Diggers (מי הכי חופר) ===== */
+  .diggers-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px dashed var(--yellow);
+  }
+  .section-title{
+    font-size:16px;color:var(--yellow);font-weight:800;
+    margin:20px 0 10px;display:flex;align-items:center;gap:8px;
+  }
+  .subtle{font-size:12px;color:#888;margin-bottom:14px;text-align:center;}
+
+  .bar-row{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:14px;
+  }
+  .bar-row .rk{width:24px;text-align:center;font-weight:800;color:#888;flex:0 0 auto;}
+  .bar-row .bar-wrap{flex:1;background:var(--gray);border-radius:8px;overflow:hidden;height:30px;position:relative;}
+  .bar-row .bar{
+    height:100%;background:linear-gradient(90deg,var(--yellow-dark),var(--yellow));
+    display:flex;align-items:center;padding:0 8px;
+    border-radius:8px;min-width:fit-content;
+  }
+  .bar-row .nm{font-weight:700;color:var(--black);font-size:13px;white-space:nowrap;}
+  .bar-row .ct{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+    font-size:12px;font-weight:800;color:#ccc;}
+  .bar-row.top1 .bar{background:linear-gradient(90deg,#d4a017,#ffe14d);}
+
+  .month-tbl{width:100%;border-collapse:collapse;font-size:14px;}
+  .month-tbl th{
+    text-align:right;color:#888;font-weight:700;font-size:12px;
+    padding:6px 8px;border-bottom:1px solid #333;
+  }
+  .month-tbl td{padding:9px 8px;border-bottom:1px solid #262626;}
+  .month-tbl tr:hover td{background:#1e1e1e;}
+  .month-tbl .champ{font-weight:800;color:var(--yellow);}
+  .month-tbl .cnt{color:#bbb;text-align:left;font-variant-numeric:tabular-nums;}
+  .month-tbl .mon{color:#ddd;white-space:nowrap;}
+
+  /* ===== Awards (פרסי המנחוסים) ===== */
+  .awards-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px solid #d4a017;
+  }
+  .award{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;border-radius:16px;
+    padding:16px;margin-bottom:12px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .award.gold{border-color:var(--yellow);box-shadow:0 0 24px rgba(255,210,0,.12);}
+  .award .aw-emoji{font-size:42px;flex:0 0 auto;}
+  .award .aw-body{flex:1;min-width:0;}
+  .award .aw-title{font-size:16px;font-weight:800;color:var(--yellow);}
+  .award .aw-sub{font-size:12px;color:#999;margin-bottom:6px;}
+  .award .aw-winner{font-size:22px;font-weight:800;color:#fff;}
+  .award .aw-winner .aw-num{font-size:14px;color:#aaa;font-weight:700;margin-right:6px;}
+  .award .aw-runners{font-size:12px;color:#777;margin-top:4px;}
+  .award .aw-preview{
+    font-size:12px;color:#aaa;margin-top:6px;font-style:italic;
+    border-right:3px solid var(--yellow);padding-right:8px;line-height:1.4;
+  }
+
+  /* ===== In-game controls ===== */
+  .gamectrl{display:flex;gap:8px;margin-bottom:12px;}
+  .mini-btn{
+    flex:1;background:var(--gray);color:#ccc;border:1px solid #3a3a3a;
+    border-radius:10px;padding:8px;font-size:13px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:transform .08s ease;
+  }
+  .mini-btn:active{transform:scale(.96);}
+  .mini-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">__EMOJI__</div>
+    <h1>__GROUP__</h1>
+    <div class="sub">__TEAM__ • משחק הקבוצה</div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen active">
+    <div class="mode-card" onclick="Game.start('who')">
+      <div class="emoji">🕵️</div>
+      <div class="info">
+        <h3>מי אמר את זה?!</h3>
+        <p>ציטוט מהצ'אט — נחשו מי הפה הגדול</p>
+      </div>
+    </div>
+    <div class="mode-card" onclick="Game.start('toWhom')">
+      <div class="emoji">💬</div>
+      <div class="info">
+        <h3>מי אמר למי?</h3>
+        <p>שיחה מהקבוצה — מי דיבר אל מי</p>
+      </div>
+    </div>
+    <div class="mode-card" onclick="Game.start('context')">
+      <div class="emoji">🎭</div>
+      <div class="info">
+        <h3>מה נאמר לפני?!</h3>
+        <p>הודעה מהצ'אט — מה נכתב רגע לפניה</p>
+      </div>
+    </div>
+    <div class="mode-card diggers-card" onclick="Diggers.open()">
+      <div class="emoji">🔧</div>
+      <div class="info">
+        <h3>מי הכי חופר?</h3>
+        <p>טבלת המפציצים — כמה הודעות כל אחד שלח</p>
+      </div>
+    </div>
+    <div class="mode-card awards-card" onclick="Awards.open()">
+      <div class="emoji">🏆</div>
+      <div class="info">
+        <h3>פרסי המנחוסים</h3>
+        <p>מלך הצחוקים, ינשוף הלילה, הפה המלוכלך ועוד</p>
+      </div>
+    </div>
+    <div class="home-foot">📸 בסוף כל סבב אפשר לצלם ולשלוח לקבוצה</div>
+  </section>
+
+  <!-- ============ DIGGERS ============ -->
+  <section id="diggers" class="screen">
+    <div class="section-title">👑 טבלת כל הזמנים (12 חודשים אחרונים)</div>
+    <div class="subtle">מספר ההודעות שכל אחד שלח לקבוצה</div>
+    <div id="diggersOverall"></div>
+
+    <div class="section-title">📅 אלוף החופרים של כל חודש</div>
+    <div class="subtle">מי שלח הכי הרבה הודעות בכל חודש</div>
+    <table class="month-tbl">
+      <thead><tr><th>חודש</th><th>האלוף 🔧</th><th class="cnt">הודעות</th></tr></thead>
+      <tbody id="diggersMonths"></tbody>
+    </table>
+
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ AWARDS ============ -->
+  <section id="awards" class="screen">
+    <div class="section-title">🏆 פרסי המנחוסים</div>
+    <div class="subtle">התארים היוקרתיים של הקבוצה — לפי הצ'אט מהשנה האחרונה</div>
+    <div id="awardsList"></div>
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="game" class="screen">
+    <div class="gamectrl">
+      <button class="mini-btn" onclick="Game.restart()">🔄 התחל מחדש</button>
+      <button class="mini-btn" onclick="Game.quit()">🏠 מסך הבית</button>
+    </div>
+    <div class="gamebar">
+      <span class="pill">שאלה <b><span id="qNum">1</span>/<span id="qTotal">5</span></b></span>
+      <span class="pill">ניקוד <b id="score">0</b></span>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="timer" id="timerWrap"><div id="timerBar"></div></div>
+
+    <div class="qcard" id="qcard"></div>
+
+    <div class="options" id="options"></div>
+
+    <div class="feedback hide" id="feedback">
+      <div class="msg" id="fbMsg"></div>
+      <div class="stat" id="fbStat"></div>
+    </div>
+
+    <button class="btn btn-primary hidden" id="nextBtn" style="margin-top:16px" onclick="Game.next()">הבא ➟</button>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="screen">
+    <div class="result-card" id="resultCard">
+      <div><span class="big" id="rScore">0</span><span class="of">/<span id="rTotal">5</span></span></div>
+      <div class="title" id="rTitle">כל הכבוד!</div>
+      <div class="rank" id="rRank"></div>
+      <div class="mode-name" id="rMode"></div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" onclick="Game.share()">📲 שתף לקבוצה</button>
+      <button class="btn btn-dark" onclick="Game.replay()">🔁 עוד סבב באותו מצב</button>
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   DATA — ציטוטים אמיתיים מהצ'אט של הקבוצה (שנה אחרונה).
+   השמות מופו לפי מספרי הטלפון של החברים.
+   ========================================================= */
+
+const PLAYERS = __PLAYERS__;
+
+const DATA = __DATA__;
+
+const MODE_META = {
+  who:     {title:"מי אמר את זה?!",   label:"מי אמר את המשפט הבא?"},
+  toWhom:  {title:"מי אמר למי?",      label:"מי כתב את ההודעה — ולמי?"},
+  context: {title:"מה נאמר לפני?!",    label:"__CTX_LABEL__"}
+};
+
+/* =========================================================
+   NAV
+   ========================================================= */
+const Nav = {
+  go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+};
+
+/* =========================================================
+   GAME ENGINE
+   ========================================================= */
+const TIME_PER_Q = 12; // שניות
+const Game = {
+  mode:null, questions:[], idx:0, score:0, timer:null, answered:false,
+
+  start(mode){
+    this.mode = mode;
+    this.questions = shuffle([...DATA[mode]]);
+    this.idx = 0;
+    this.score = 0;
+    Nav.go('game');
+    document.getElementById('qTotal').textContent = this.questions.length;
+    this.render();
+  },
+
+  render(){
+    this.answered = false;
+    const q = this.questions[this.idx];
+    const meta = MODE_META[this.mode];
+
+    // top bar
+    document.getElementById('qNum').textContent = this.idx+1;
+    document.getElementById('score').textContent = this.score;
+    document.getElementById('progressBar').style.width =
+        (this.idx/this.questions.length*100)+'%';
+
+    // question card
+    const qcard = document.getElementById('qcard');
+    if(this.mode==='toWhom'){
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="chat">` +
+        q.chat.map(b=>`<div class="bubble ${b.side}"><div class="who">${b.who}</div>${escapeHtml(b.text)}</div>`).join('') +
+        `</div>`;
+    } else {
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="quote"><span class="quote-mark">”</span>${escapeHtml(q.quote)}<span class="quote-mark">“</span></div>`;
+    }
+
+    // options
+    const answer = this.mode==='toWhom'
+        ? `${q.speaker} ← ${q.target}`
+        : q.answer;
+    const opts = shuffle([...q.options]);
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    opts.forEach(opt=>{
+      const b = document.createElement('button');
+      b.className='option';
+      b.textContent=opt;
+      b.onclick=()=>this.answer(b, opt, answer);
+      box.appendChild(b);
+    });
+
+    // feedback + next
+    document.getElementById('feedback').classList.add('hide');
+    document.getElementById('nextBtn').classList.add('hidden');
+
+    this.startTimer(answer);
+  },
+
+  startTimer(answer){
+    const wrap = document.getElementById('timerWrap');
+    const bar = document.getElementById('timerBar');
+    wrap.classList.remove('run');
+    bar.style.transition='none';
+    bar.style.width='100%';
+    bar.style.background='var(--green)';
+    // force reflow
+    void bar.offsetWidth;
+    wrap.classList.add('run');
+    bar.style.transition=`width ${TIME_PER_Q}s linear`;
+    bar.style.width='0%';
+    clearTimeout(this.timer);
+    this.timer = setTimeout(()=>{
+      if(!this.answered) this.answer(null, null, answer, true);
+    }, TIME_PER_Q*1000);
+  },
+
+  answer(btn, choice, answer, timeout=false){
+    if(this.answered) return;
+    this.answered = true;
+    clearTimeout(this.timer);
+    // freeze timer bar
+    const bar=document.getElementById('timerBar');
+    bar.style.transition='none';
+    bar.style.width=getComputedStyle(bar).width;
+
+    const correct = choice===answer;
+    const buttons = document.querySelectorAll('#options .option');
+    buttons.forEach(b=>{
+      b.classList.add('disabled');
+      if(b.textContent===answer) b.classList.add('correct');
+      else if(b===btn) b.classList.add('wrong');
+    });
+
+    // scoring: base 100 + time bonus
+    let gained=0;
+    if(correct){
+      const remaining = parseFloat(bar.style.width)/ (document.getElementById('timerWrap').offsetWidth) ;
+      gained = 100 + Math.round(50*remaining);
+      this.score += gained;
+      document.getElementById('score').textContent=this.score;
+    }
+
+    // feedback
+    const fb=document.getElementById('feedback');
+    const msg=document.getElementById('fbMsg');
+    const stat=document.getElementById('fbStat');
+    fb.classList.remove('hide');
+    if(timeout){ msg.textContent='⏱️ נגמר הזמן!'; msg.style.color='var(--red)'; }
+    else if(correct){ msg.textContent=`✅ נכון! +${gained}`; msg.style.color='var(--green)'; }
+    else { msg.textContent='❌ לא נכון'; msg.style.color='var(--red)'; }
+    stat.textContent = pickBanter(correct, timeout);
+
+    document.getElementById('nextBtn').classList.remove('hidden');
+  },
+
+  next(){
+    this.idx++;
+    if(this.idx>=this.questions.length) this.finish();
+    else this.render();
+  },
+
+  finish(){
+    clearTimeout(this.timer);
+    const total = this.questions.length;
+    const maxScore = total*150;
+    const pct = this.score/maxScore;
+    document.getElementById('rScore').textContent=this.score;
+    document.getElementById('rTotal').textContent=maxScore;
+    document.getElementById('rMode').textContent='מצב: '+MODE_META[this.mode].title;
+
+    let title, rank;
+    if(pct>=0.85){ title='חיה של הקבוצה! 🐐'; rank='מלך המנחוסים'; }
+    else if(pct>=0.6){ title='כל הכבוד! 🔥'; rank='ותיק ומנוסה'; }
+    else if(pct>=0.35){ title='לא רע בכלל 👏'; rank='חבר מן המניין'; }
+    else { title='נו באמת… 😅'; rank='חדש בקבוצה'; }
+    document.getElementById('rTitle').textContent=title;
+    document.getElementById('rRank').textContent='🏅 '+rank;
+
+    this.lastResult = {score:this.score, max:maxScore, title, rank, mode:MODE_META[this.mode].title};
+    Nav.go('results');
+  },
+
+  async share(){
+    const r = this.lastResult || {score:0,max:0,title:'',rank:'',mode:''};
+    const text =
+      `🟡⚫ המנחוסים — משחק הקבוצה\n`+
+      `מצב: ${r.mode}\n`+
+      `הניקוד שלי: ${r.score.toLocaleString('he-IL')} 🏅 ${r.rank}\n`+
+      `${r.title}\n`+
+      `מי מנצח אותי? 😏`;
+    // try image share first
+    try{
+      const blob = await makeShareImage(r);
+      if(blob && navigator.canShare && navigator.canShare({files:[new File([blob],'manhousim.png',{type:'image/png'})]})){
+        await navigator.share({files:[new File([blob],'manhousim.png',{type:'image/png'})], text});
+        return;
+      }
+    }catch(e){/* fall through */}
+    // text share
+    if(navigator.share){ try{ await navigator.share({text}); return; }catch(e){} }
+    // whatsapp fallback
+    window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+  },
+
+  replay(){ this.start(this.mode); },
+
+  restart(){ clearTimeout(this.timer); this.start(this.mode); },
+
+  quit(){ clearTimeout(this.timer); this.answered=true; Nav.go('home'); }
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const BANTER_OK=[
+  "יש לך את זה 😎","אתה מכיר אותם טוב מדי…","מנחוס אמיתי 🟡⚫","קלי קלות"
+];
+const BANTER_BAD=[
+  "אתה בכלל בקבוצה? 😂","נו נו נו…","תקרא יותר את הצ'אט","הבן שלך היה יודע"
+];
+function pickBanter(ok){ const a=ok?BANTER_OK:BANTER_BAD; return a[Math.floor(Math.random()*a.length)]; }
+
+/* ===== שיתוף: יצירת תמונת כרטיס תוצאה ===== */
+function makeShareImage(r){
+  return new Promise((resolve)=>{
+    try{
+      const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+      const x=c.getContext('2d');
+      // background
+      const g=x.createLinearGradient(0,0,0,S);
+      g.addColorStop(0,'#1c1c1c'); g.addColorStop(1,'#000');
+      x.fillStyle=g; x.fillRect(0,0,S,S);
+      // yellow frame
+      x.strokeStyle='#ffd200'; x.lineWidth=14; x.strokeRect(30,30,S-60,S-60);
+      x.textAlign='center'; x.direction='rtl';
+      x.fillStyle='#ffd200'; x.font='bold 120px Arial'; x.fillText('🟡⚫',S/2,190);
+      x.fillStyle='#ffd200'; x.font='bold 96px Arial'; x.fillText('המנחוסים',S/2,320);
+      x.fillStyle='#bbb'; x.font='42px Arial'; x.fillText('ביתר ירושלים • משחק הקבוצה',S/2,390);
+      x.fillStyle='#fff'; x.font='bold 54px Arial'; x.fillText(r.mode,S/2,520);
+      // score
+      x.fillStyle='#ffd200'; x.font='bold 240px Arial'; x.fillText(String(r.score),S/2,760);
+      x.fillStyle='#888'; x.font='bold 60px Arial'; x.fillText('מתוך '+r.max,S/2,830);
+      // rank pill
+      x.fillStyle='#fff'; x.font='bold 64px Arial'; x.fillText(r.title,S/2,930);
+      x.fillStyle='#ffd200'; x.font='bold 56px Arial'; x.fillText('🏅 '+r.rank,S/2,1010);
+      c.toBlob(b=>resolve(b),'image/png');
+    }catch(e){ resolve(null); }
+  });
+}
+
+/* =========================================================
+   DIGGERS — מי הכי חופר (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const DIGGERS = __DIGGERS__;
+const Diggers = {
+  open(){
+    const max = DIGGERS.overall[0].count;
+    const medals=["🥇","🥈","🥉"];
+    document.getElementById('diggersOverall').innerHTML =
+      DIGGERS.overall.map((d,i)=>{
+        const w = Math.max(12, Math.round(d.count/max*100));
+        const rk = i<3?medals[i]:(i+1);
+        return `<div class="bar-row ${i===0?'top1':''}">
+          <span class="rk">${rk}</span>
+          <div class="bar-wrap">
+            <div class="bar" style="width:${w}%"><span class="nm">${escapeHtml(d.name)}</span></div>
+            <span class="ct">${d.count.toLocaleString('he-IL')}</span>
+          </div></div>`;
+      }).join('');
+    document.getElementById('diggersMonths').innerHTML =
+      DIGGERS.months.map(m=>`<tr>
+        <td class="mon">${escapeHtml(m.label)}</td>
+        <td class="champ">${escapeHtml(m.champ)}</td>
+        <td class="cnt">${m.count.toLocaleString('he-IL')}</td></tr>`).join('');
+    Nav.go('diggers');
+  }
+};
+
+/* =========================================================
+   AWARDS — פרסי המנחוסים (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const AWARDS = __AWARDS__;
+const Awards = {
+  open(){
+    document.getElementById('awardsList').innerHTML = AWARDS.map(a=>{
+      if(a.winner){
+        return `<div class="award gold">
+          <div class="aw-emoji">${a.emoji}</div>
+          <div class="aw-body">
+            <div class="aw-title">${a.title}</div>
+            <div class="aw-sub">${a.sub}</div>
+            <div class="aw-winner">${escapeHtml(a.winner.name)}
+              <span class="aw-num">${a.winner.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+            <div class="aw-preview">${escapeHtml(a.winner.preview)}</div>
+          </div></div>`;
+      }
+      const w=a.top[0];
+      const runners=a.top.slice(1).map((t,i)=>`${i===0?'🥈':'🥉'} ${t.name} (${t.n.toLocaleString('he-IL')})`).join('  ·  ');
+      return `<div class="award gold">
+        <div class="aw-emoji">${a.emoji}</div>
+        <div class="aw-body">
+          <div class="aw-title">${a.title}</div>
+          <div class="aw-sub">${a.sub}</div>
+          <div class="aw-winner">🥇 ${escapeHtml(w.name)}
+            <span class="aw-num">${w.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+          <div class="aw-runners">${runners}</div>
+        </div></div>`;
+    }).join('');
+    Nav.go('awards');
+  }
+};
+<\/script>
+</body>
+</html>
+</script>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const RTL=['‎','‏','‪','‫','‬','⁦','⁧','⁨','⁩'];
+const clean=s=>{s=s||'';for(const c of RTL)s=s.split(c).join('');return s.trim();};
+const HEMON=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+
+const state={msgs:[],source:'',names:{},top:[],cfg:{},cand:{who:[],toWhom:[],context:[]},diggers:null,awards:null,activeNames:[]};
+
+/* content blocklist: politics / heavy / racism (NOT general profanity — that's the humor) */
+const BLOCK=["ביבי","נתניהו","בחירות","הצבע","מפלג","ליכוד","סמוטריץ","בן גביר","גנץ","לפיד",
+ "חמאס","חטופים","חטוף","עוטף","טבח","מחבל","פיגוע","כושי","מסריח","שמאלן","ימני","מתנחל","גזע"];
+const isBlocked=t=>BLOCK.some(b=>t.includes(b));
+
+/* laughter */
+const LA=/(חח+|הה+ה|😂|🤣|😭|😆|💀)/;
+function isLaugh(t){t=(t||'').trim();if(t.length<=14&&LA.test(t))return true;
+  const l=t.replace(/[^\wא-ת]/g,'');return /^[חהכ]+$/.test(l)&&l.length>=3;}
+const MEDIA=["<המדיה","<Media","הושמט","הודעה זו נמחקה","<ההודעה"];
+function substantive(t){if(!t)return false;if(MEDIA.some(m=>t.includes(m)))return false;
+  if(t.includes('http'))return false;if(isLaugh(t))return false;
+  return t.length>=10&&t.length<=200;}
+
+/* ---------- file intake ---------- */
+const drop=$('#drop'),fileIn=$('#file');
+drop.onclick=()=>fileIn.click();
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot');}));
+drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)handleFile(f);});
+fileIn.onchange=()=>{if(fileIn.files[0])handleFile(fileIn.files[0]);};
+
+async function inflateRaw(u8){
+  const ds=new DecompressionStream('deflate-raw');
+  const s=new Blob([u8]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function readZip(buf){
+  const dv=new DataView(buf),u8=new Uint8Array(buf);
+  // find EOCD
+  let eo=-1;for(let i=buf.byteLength-22;i>=0;i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
+  if(eo<0)throw new Error('zip לא תקין');
+  let cd=dv.getUint32(eo+16,true),n=dv.getUint16(eo+10,true),p=cd,best=null;
+  for(let k=0;k<n;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),
+      nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),
+      lho=dv.getUint32(p+42,true),name=new TextDecoder().decode(u8.slice(p+46,p+46+nl));
+    if(/\.txt$/i.test(name)||name.includes('_chat')){best={method,csize,lho,name};}
+    p+=46+nl+el+cl;
+  }
+  if(!best)throw new Error('לא נמצא קובץ .txt בתוך ה-zip');
+  const lnl=dv.getUint16(best.lho+26,true),lel=dv.getUint16(best.lho+28,true),
+    ds=best.lho+30+lnl+lel,data=u8.slice(ds,ds+best.csize);
+  const out=best.method===0?data:await inflateRaw(data);
+  return new TextDecoder('utf-8').decode(out);
+}
+
+async function handleFile(f){
+  const log=$('#parselog');log.textContent='קורא את הקובץ…';
+  try{
+    let text,name=f.name.toLowerCase();
+    if(name.endsWith('.zip')) text=await readZip(await f.arrayBuffer());
+    else text=await f.text();
+    if(name.endsWith('.json')||text.trim().startsWith('{')){parseTelegram(text);state.source='telegram';}
+    else {parseWhatsApp(text);state.source='whatsapp';}
+    if(!state.msgs.length)throw new Error('לא זוהו הודעות בקובץ');
+    windowFilter();
+    $('#filetag').classList.remove('hidden');
+    $('#filetag').textContent='✅ '+f.name+' — '+state.msgs.length.toLocaleString('he-IL')+' הודעות ('+ (state.source==='telegram'?'טלגרם':'וואטסאפ') +')';
+    log.textContent='';
+    afterParse();
+  }catch(e){log.textContent='⚠️ '+e.message+'\nטיפ: אם זה zip של וואטסאפ שנכשל — חלצו וגררו את קובץ ה-.txt.';}
+}
+
+/* ---------- parsers ---------- */
+function pushMsg(a,dt,sender,txt){a.push({dt,sender:clean(sender),name:null,t:clean(txt)});}
+function parseWhatsApp(text){
+  const A=[];
+  const reAnd=/^(\d{1,2})\.(\d{1,2})\.(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::\d{2})?\s+-\s+(.*?):\s([\s\S]*)$/;
+  const reIos=/^\[(\d{1,2})\.(\d{1,2})\.(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::\d{2})?\]\s+(.*?):\s([\s\S]*)$/;
+  for(let raw of text.split('\n')){
+    raw=raw.replace(/\r$/,'');
+    let m=reAnd.exec(clean(raw))||reIos.exec(clean(raw));
+    if(m){let y=+m[3];if(y<100)y+=2000;
+      const dt=new Date(y,+m[2]-1,+m[1],+m[4],+m[5]);
+      pushMsg(A,dt,m[6],m[7]);
+    }else if(A.length&&raw.trim()){A[A.length-1].t+=' '+clean(raw);}
+  }
+  state.msgs=A;
+}
+function parseTelegram(text){
+  const j=JSON.parse(text),A=[],ms=j.messages||[];
+  for(const m of ms){
+    if(m.type!=='message')continue;
+    let t='';if(typeof m.text==='string')t=m.text;
+    else if(Array.isArray(m.text))t=m.text.map(x=>typeof x==='string'?x:(x.text||'')).join('');
+    const dt=m.date_unixtime?new Date(+m.date_unixtime*1000):new Date(m.date);
+    const who=m.from||'?';
+    A.push({dt,sender:clean(who),name:clean(who),t:clean(t)});
+  }
+  state.msgs=A;
+}
+function windowFilter(){
+  let max=0;for(const m of state.msgs)if(m.dt.getTime()>max)max=m.dt.getTime();
+  const cutoff=max-365*864e5;
+  state.msgs=state.msgs.filter(m=>m.dt.getTime()>=cutoff&&!isNaN(m.dt));
+}
+
+/* ---------- after parse: names or analyze ---------- */
+function afterParse(){
+  $('#s3').classList.remove('off');
+  if(state.source==='telegram'){for(const m of state.msgs)state.names[m.sender]=m.sender;analyze();showReview();}
+  else buildNameMap();
+}
+function tally(){const c={};for(const m of state.msgs)c[m.sender]=(c[m.sender]||0)+1;return c;}
+function buildNameMap(){
+  const c=tally();
+  state.top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,18).map(x=>x[0]);
+  const box=$('#mapList');box.innerHTML='';
+  state.top.forEach((snd,i)=>{
+    const samples=state.msgs.filter(m=>m.sender===snd&&substantive(m.t)&&!m.t.includes('@')).slice(0,3);
+    const seen=new Set(),uniq=[];for(const s of samples){if(seen.has(s.t.slice(0,15)))continue;seen.add(s.t.slice(0,15));uniq.push(s.t);}
+    const d=document.createElement('div');d.className='maprow';
+    d.innerHTML=`<div class="num">${c[snd].toLocaleString('he-IL')} הודעות · ${snd}</div>`+
+      uniq.map(u=>`<div class="samp">• ${esc(u).slice(0,90)}</div>`).join('')+
+      `<input type="text" data-snd="${esc(snd)}" placeholder="שם...">`;
+    box.appendChild(d);
+  });
+  $('#s2').classList.remove('hidden','off');
+}
+$('#mapDone').onclick=()=>{
+  $$('#mapList input').forEach(inp=>{const v=inp.value.trim();if(v)state.names[inp.dataset.snd]=v;});
+  $('#s2').classList.add('off');analyze();showReview();
+};
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nameOf=snd=>state.names[snd]||null;
+
+/* ---------- analysis ---------- */
+function analyze(){
+  const M=state.msgs;
+  // laughter scoring
+  for(let i=0;i<M.length;i++){
+    const m=M[i];let who=new Set();
+    for(let j=i+1;j<Math.min(i+8,M.length);j++){
+      if(M[j].dt-m.dt>9e5)break;if(M[j].sender===m.sender)continue;
+      if(isLaugh(M[j].t))who.add(M[j].sender);
+    }
+    m.score=who.size*2;m.laughers=who.size;
+  }
+  // active names + counts
+  const cnt={};for(const m of M){const n=nameOf(m.sender);if(n)cnt[n]=(cnt[n]||0)+1;}
+  state.activeNames=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  const firsts={};for(const n of state.activeNames)firsts[n.split(' ')[0]]=n;
+
+  // WHO
+  let who=M.filter(m=>nameOf(m.sender)&&substantive(m.t)&&m.score>=4&&!isBlocked(m.t));
+  who.sort((a,b)=>b.score-a.score);
+  const seen=new Set();state.cand.who=[];
+  for(const m of who){const k=m.t.slice(0,15);if(seen.has(k))continue;seen.add(k);
+    state.cand.who.push({quote:m.t,answer:nameOf(m.sender)});if(state.cand.who.length>=15)break;}
+
+  // TOWHOM: text starts with known first name, sender!=target
+  const names=Object.keys(firsts).sort((a,b)=>b.length-a.length);
+  const addr=new RegExp('^@?('+names.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?=[\\s,.:!?]|$)');
+  let tw=[];
+  for(const m of M){if(!nameOf(m.sender)||!substantive(m.t)||isBlocked(m.t))continue;
+    const mm=addr.exec(m.t);if(!mm)continue;const tgt=firsts[mm[1]];const spk=nameOf(m.sender);
+    if(tgt&&tgt!==spk&&m.t.length<=160){
+      const masked=m.t.replace(addr,'___');
+      tw.push({text:masked,speaker:spk,target:tgt,score:m.score});}}
+  tw.sort((a,b)=>b.score-a.score);
+  const s2=new Set();state.cand.toWhom=[];
+  for(const x of tw){const k=x.text.slice(0,18);if(s2.has(k))continue;s2.add(k);state.cand.toWhom.push(x);if(state.cand.toWhom.length>=12)break;}
+
+  // CONTEXT: funny reply + the real previous substantive message
+  let ctx=[];
+  for(let i=1;i<M.length;i++){const m=M[i];
+    if(!nameOf(m.sender)||!substantive(m.t)||m.score<5||isBlocked(m.t))continue;
+    const p=M[i-1];if(!p||!substantive(p.t)||isBlocked(p.t)||p.t.length>120)continue;
+    ctx.push({quote:m.t,prev:p.t,score:m.score});}
+  ctx.sort((a,b)=>b.score-a.score);
+  const s3=new Set();state.cand.context=[];
+  for(const x of ctx){const k=x.quote.slice(0,15);if(s3.has(k))continue;s3.add(k);state.cand.context.push(x);if(state.cand.context.length>=10)break;}
+
+  buildDiggers();buildAwards();
+}
+
+function buildDiggers(){
+  const c={},perM={};
+  for(const m of state.msgs){
+    let n=nameOf(m.sender);if(!n){const d=(m.sender.match(/\d/g)||[]).join('');n=d?('לא ידוע ('+d.slice(-4)+')'):m.sender;}
+    c[n]=(c[n]||0)+1;
+    const key=m.dt.getFullYear()+'-'+(m.dt.getMonth()+1);
+    (perM[key]=perM[key]||{})[n]=(perM[key][n]||0)+1;
+  }
+  const overall=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([name,count])=>({name,count}));
+  const keys=Object.keys(perM).sort((a,b)=>{const[ay,am]=a.split('-'),[by,bm]=b.split('-');return ay-by||am-bm;});
+  const months=keys.slice(-12).map(k=>{const[y,mo]=k.split('-');
+    const top=Object.entries(perM[k]).sort((a,b)=>b[1]-a[1])[0];
+    return{label:HEMON[mo-1]+' '+y,champ:top[0],count:top[1]};});
+  state.diggers={overall,months};
+}
+function buildAwards(){
+  const M=state.msgs;
+  const laugh={},night={},dirty={},media={};let scroll=null;
+  const CURSE=/(שרמוטה|זונה|מניאק|מפגר|אחושרמוטה|כוסאמק|כוס אמ|פסיכופת|מטומטם|בן זונה|תזדיין|מזיין|יזיין)/;
+  for(let i=0;i<M.length;i++){const m=M[i],n=nameOf(m.sender);if(!n)continue;
+    if(m.laughers&&substantive(m.t))laugh[n]=(laugh[n]||0)+m.laughers;
+    if(m.dt.getHours()>=1&&m.dt.getHours()<5)night[n]=(night[n]||0)+1;
+    const cu=(m.t.match(new RegExp(CURSE,'g'))||[]).length;if(cu)dirty[n]=(dirty[n]||0)+cu;
+    if(MEDIA.some(x=>m.t.includes(x))||m.t.includes('http'))media[n]=(media[n]||0)+1;
+    if(substantive(m.t)&&!isBlocked(m.t)&&(!scroll||m.t.length>scroll.n))scroll={name:n,n:m.t.length,preview:'״'+m.t.slice(0,58)+'…״'};}
+  const t3=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([name,n])=>({name,n}));
+  state.awards=[
+    {emoji:"🤡",title:"מלך הצחוקים",sub:"מי גרף הכי הרבה חחח מהחבר'ה",unit:"צחוקים",top:t3(laugh)},
+    {emoji:"🦉",title:"ינשוף הלילה",sub:"הכי הרבה הודעות בין 01:00 ל-05:00",unit:"הודעות לילה",top:t3(night)},
+    {emoji:"🤬",title:"הפה המלוכלך",sub:"אלוף הקללות של הקבוצה",unit:"קללות",top:t3(dirty)},
+    {emoji:"📸",title:"מלך הפורוורדים",sub:"הכי הרבה מדיה ולינקים",unit:"פורוורדים",top:t3(media)},
+    {emoji:"📜",title:"המגילה",sub:"ההודעה הכי ארוכה שנשלחה",unit:"תווים",winner:scroll||{name:'-',n:0,preview:''}}
+  ].filter(a=>a.winner||a.top.length);
+}
+
+/* ---------- review UI ---------- */
+function showReview(){
+  const r=$('#review');const g=[];
+  const item=(id,i,html)=>`<label class="revitem"><input type="checkbox" checked data-g="${id}" data-i="${i}"><span>${html}</span></label>`;
+  g.push(`<div class="rev-group"><h3>🕵️ מי אמר את זה? (${state.cand.who.length})</h3>`+
+    state.cand.who.map((x,i)=>item('who',i,`״${esc(x.quote)}״ <span class="who">— ${esc(x.answer)}</span>`)).join('')+`</div>`);
+  g.push(`<div class="rev-group"><h3>💬 מי אמר למי? (${state.cand.toWhom.length})</h3>`+
+    state.cand.toWhom.map((x,i)=>item('toWhom',i,`״${esc(x.text)}״ <span class="who">${esc(x.speaker)} ← ${esc(x.target)}</span>`)).join('')+`</div>`);
+  g.push(`<div class="rev-group"><h3>🎭 מה נאמר לפני? (${state.cand.context.length})</h3>`+
+    state.cand.context.map((x,i)=>item('context',i,`״${esc(x.quote)}״ <span class="who">← ${esc(x.prev)}</span>`)).join('')+`</div>`);
+  r.innerHTML=g.join('');
+  r.onchange=e=>{if(e.target.type==='checkbox')e.target.closest('.revitem').classList.toggle('drop-x',!e.target.checked);};
+  $('#s4').classList.remove('off');$('#s5').classList.remove('off');
+  const need=$('#cGroup');if(!need.value)need.focus();
+  $('#genlog').textContent='';
+  logCounts();
+}
+function logCounts(){
+  $('#genlog').textContent=`מוכן: ${state.cand.who.length} + ${state.cand.toWhom.length} + ${state.cand.context.length} שאלות · ${state.activeNames.length} שחקנים`;
+}
+function selected(id){return $$(`#review input[data-g="${id}"]`).filter(c=>c.checked).map(c=>+c.dataset.i);}
+
+/* ---------- settings: swatches ---------- */
+const PRESETS=[["#ffd200","צהוב"],["#e63946","אדום"],["#2a9d8f","טורקיז"],["#4361ee","כחול"],
+  ["#38b000","ירוק"],["#ff6d00","כתום"],["#9d4edd","סגול"],["#f72585","ורוד"]];
+const swBox=$('#swatches');
+PRESETS.forEach(([hex],i)=>{const d=document.createElement('div');d.className='sw'+(i===0?' sel':'');
+  d.style.background=hex;d.onclick=()=>{$$('.sw').forEach(s=>s.classList.remove('sel'));d.classList.add('sel');
+    $('#cColor').value=hex;applyAccent(hex);};swBox.appendChild(d);});
+$('#cColor').oninput=e=>{$$('.sw').forEach(s=>s.classList.remove('sel'));applyAccent(e.target.value);};
+function applyAccent(hex){document.documentElement.style.setProperty('--ac',hex);}
+function darken(hex,f){f=f||.88;const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.round(r*f);g=Math.round(g*f);b=Math.round(b*f);
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+
+/* ---------- generate ---------- */
+function pick3(pool,exclude){const p=pool.filter(x=>!exclude.includes(x));const out=[];
+  while(out.length<3&&p.length){const k=Math.floor(Math.random()*p.length);out.push(p.splice(k,1)[0]);}
+  while(out.length<3)out.push('—');return out;}
+function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+$('#gen').onclick=()=>{
+  try{
+    const names=state.activeNames;
+    if(names.length<4){$('#genlog').textContent='⚠️ צריך לפחות 4 שחקנים מזוהים.';return;}
+    const cfg={
+      group:$('#cGroup').value.trim()||'הקבוצה',
+      team:$('#cTeam').value.trim()||'',
+      emoji:$('#cEmoji').value.trim()||'⚽',
+      color:$('#cColor').value,
+      file:($('#cФile').value.trim()||'game.html').replace(/[^\w.\-]/g,'_')
+    };
+    const WHO=selected('who').map(i=>state.cand.who[i]).map(x=>({
+      quote:x.quote,answer:x.answer,options:shuf([x.answer,...pick3(names,[x.answer])])}));
+    const TW=selected('toWhom').map(i=>state.cand.toWhom[i]).map(x=>{
+      const correct=x.speaker+' ← '+x.target;
+      const others=[];while(others.length<3){const a=names[Math.floor(Math.random()*names.length)],b=names[Math.floor(Math.random()*names.length)];
+        const s=a+' ← '+b;if(a!==b&&s!==correct&&!others.includes(s))others.push(s);if(names.length<3)break;}
+      return{chat:[{side:'right',who:'❓',text:x.text}],speaker:x.speaker,target:x.target,options:shuf([correct,...others])};});
+    const allShort=state.msgs.filter(m=>substantive(m.t)&&m.t.length<120&&!isBlocked(m.t)).map(m=>m.t);
+    const CTX=selected('context').map(i=>state.cand.context[i]).map(x=>{
+      const opts=[x.prev];while(opts.length<4){const r=allShort[Math.floor(Math.random()*allShort.length)];if(r&&!opts.includes(r))opts.push(r);if(allShort.length<4)break;}
+      return{quote:x.quote,answer:x.prev,options:shuf(opts)};});
+    if(!WHO.length&&!TW.length&&!CTX.length){$('#genlog').textContent='⚠️ לא נבחרו שאלות.';return;}
+
+    let tpl=$('#gameTpl').textContent;
+    tpl=tpl.split('<\\/script>').join('<\/script>');
+    const R=(k,v)=>{tpl=tpl.split(k).join(v);};
+    R('__PRIMARY__',cfg.color);R('__PRIMARY_DARK__',darken(cfg.color));
+    R('__GROUP__',cfg.group);R('__TEAM__',cfg.team);R('__EMOJI__',cfg.emoji);
+    R('__CTX_LABEL__','מה נכתב בצ\'אט רגע לפני ההודעה?');
+    R('__PLAYERS__',JSON.stringify(names));
+    R('__DATA__',JSON.stringify({who:WHO,toWhom:TW,context:CTX}));
+    R('__DIGGERS__',JSON.stringify(state.diggers));
+    R('__AWARDS__',JSON.stringify(state.awards));
+
+    const blob=new Blob([tpl],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=cfg.file;document.body.appendChild(a);a.click();a.remove();
+    $('#genlog').innerHTML=`✅ נוצר! (${WHO.length}+${TW.length}+${CTX.length} שאלות) · אם ההורדה לא התחילה, <a class="dl" href="${url}" download="${cfg.file}">לחצו כאן</a>`;
+  }catch(e){$('#genlog').textContent='⚠️ שגיאה: '+e.message;}
+};
+</script>
+</body>
+</html>
