@@ -263,6 +263,30 @@
   .month-tbl .cnt{color:#bbb;text-align:left;font-variant-numeric:tabular-nums;}
   .month-tbl .mon{color:#ddd;white-space:nowrap;}
 
+  /* ===== Awards (פרסי המנחוסים) ===== */
+  .awards-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px solid #d4a017;
+  }
+  .award{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;border-radius:16px;
+    padding:16px;margin-bottom:12px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .award.gold{border-color:var(--yellow);box-shadow:0 0 24px rgba(255,210,0,.12);}
+  .award .aw-emoji{font-size:42px;flex:0 0 auto;}
+  .award .aw-body{flex:1;min-width:0;}
+  .award .aw-title{font-size:16px;font-weight:800;color:var(--yellow);}
+  .award .aw-sub{font-size:12px;color:#999;margin-bottom:6px;}
+  .award .aw-winner{font-size:22px;font-weight:800;color:#fff;}
+  .award .aw-winner .aw-num{font-size:14px;color:#aaa;font-weight:700;margin-right:6px;}
+  .award .aw-runners{font-size:12px;color:#777;margin-top:4px;}
+  .award .aw-preview{
+    font-size:12px;color:#aaa;margin-top:6px;font-style:italic;
+    border-right:3px solid var(--yellow);padding-right:8px;line-height:1.4;
+  }
+
   /* ===== In-game controls ===== */
   .gamectrl{display:flex;gap:8px;margin-bottom:12px;}
   .mini-btn{
@@ -315,6 +339,13 @@
         <p>טבלת המפציצים — כמה הודעות כל אחד שלח</p>
       </div>
     </div>
+    <div class="mode-card awards-card" onclick="Awards.open()">
+      <div class="emoji">🏆</div>
+      <div class="info">
+        <h3>פרסי המנחוסים</h3>
+        <p>מלך הצחוקים, ינשוף הלילה, הפה המלוכלך ועוד</p>
+      </div>
+    </div>
     <div class="home-foot">📸 בסוף כל סבב אפשר לצלם ולשלוח לקבוצה</div>
   </section>
 
@@ -331,6 +362,16 @@
       <tbody id="diggersMonths"></tbody>
     </table>
 
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ AWARDS ============ -->
+  <section id="awards" class="screen">
+    <div class="section-title">🏆 פרסי המנחוסים</div>
+    <div class="subtle">התארים היוקרתיים של הקבוצה — לפי הצ'אט מהשנה האחרונה</div>
+    <div id="awardsList"></div>
     <div class="stack" style="margin-top:20px">
       <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
     </div>
@@ -370,7 +411,8 @@
       <div class="mode-name" id="rMode"></div>
     </div>
     <div class="stack">
-      <button class="btn btn-primary" onclick="Game.replay()">🔁 עוד סבב באותו מצב</button>
+      <button class="btn btn-primary" onclick="Game.share()">📲 שתף לקבוצה</button>
+      <button class="btn btn-dark" onclick="Game.replay()">🔁 עוד סבב באותו מצב</button>
       <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
     </div>
   </section>
@@ -695,7 +737,30 @@ const Game = {
     document.getElementById('rTitle').textContent=title;
     document.getElementById('rRank').textContent='🏅 '+rank;
 
+    this.lastResult = {score:this.score, max:maxScore, title, rank, mode:MODE_META[this.mode].title};
     Nav.go('results');
+  },
+
+  async share(){
+    const r = this.lastResult || {score:0,max:0,title:'',rank:'',mode:''};
+    const text =
+      `🟡⚫ המנחוסים — משחק הקבוצה\n`+
+      `מצב: ${r.mode}\n`+
+      `הניקוד שלי: ${r.score.toLocaleString('he-IL')} 🏅 ${r.rank}\n`+
+      `${r.title}\n`+
+      `מי מנצח אותי? 😏`;
+    // try image share first
+    try{
+      const blob = await makeShareImage(r);
+      if(blob && navigator.canShare && navigator.canShare({files:[new File([blob],'manhousim.png',{type:'image/png'})]})){
+        await navigator.share({files:[new File([blob],'manhousim.png',{type:'image/png'})], text});
+        return;
+      }
+    }catch(e){/* fall through */}
+    // text share
+    if(navigator.share){ try{ await navigator.share({text}); return; }catch(e){} }
+    // whatsapp fallback
+    window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
   },
 
   replay(){ this.start(this.mode); },
@@ -725,6 +790,34 @@ const BANTER_BAD=[
   "אתה בכלל בקבוצה? 😂","נו נו נו…","תקרא יותר את הצ'אט","הבן שלך היה יודע"
 ];
 function pickBanter(ok){ const a=ok?BANTER_OK:BANTER_BAD; return a[Math.floor(Math.random()*a.length)]; }
+
+/* ===== שיתוף: יצירת תמונת כרטיס תוצאה ===== */
+function makeShareImage(r){
+  return new Promise((resolve)=>{
+    try{
+      const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+      const x=c.getContext('2d');
+      // background
+      const g=x.createLinearGradient(0,0,0,S);
+      g.addColorStop(0,'#1c1c1c'); g.addColorStop(1,'#000');
+      x.fillStyle=g; x.fillRect(0,0,S,S);
+      // yellow frame
+      x.strokeStyle='#ffd200'; x.lineWidth=14; x.strokeRect(30,30,S-60,S-60);
+      x.textAlign='center'; x.direction='rtl';
+      x.fillStyle='#ffd200'; x.font='bold 120px Arial'; x.fillText('🟡⚫',S/2,190);
+      x.fillStyle='#ffd200'; x.font='bold 96px Arial'; x.fillText('המנחוסים',S/2,320);
+      x.fillStyle='#bbb'; x.font='42px Arial'; x.fillText('ביתר ירושלים • משחק הקבוצה',S/2,390);
+      x.fillStyle='#fff'; x.font='bold 54px Arial'; x.fillText(r.mode,S/2,520);
+      // score
+      x.fillStyle='#ffd200'; x.font='bold 240px Arial'; x.fillText(String(r.score),S/2,760);
+      x.fillStyle='#888'; x.font='bold 60px Arial'; x.fillText('מתוך '+r.max,S/2,830);
+      // rank pill
+      x.fillStyle='#fff'; x.font='bold 64px Arial'; x.fillText(r.title,S/2,930);
+      x.fillStyle='#ffd200'; x.font='bold 56px Arial'; x.fillText('🏅 '+r.rank,S/2,1010);
+      c.toBlob(b=>resolve(b),'image/png');
+    }catch(e){ resolve(null); }
+  });
+}
 
 /* =========================================================
    DIGGERS — מי הכי חופר (נתונים אמיתיים, 12 חודשים אחרונים)
@@ -773,6 +866,51 @@ const Diggers = {
         <td class="champ">${escapeHtml(m.champ)}</td>
         <td class="cnt">${m.count.toLocaleString('he-IL')}</td></tr>`).join('');
     Nav.go('diggers');
+  }
+};
+
+/* =========================================================
+   AWARDS — פרסי המנחוסים (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const AWARDS = [
+  {emoji:"🤡",title:"מלך הצחוקים",sub:"מי גרף הכי הרבה חחח מהחבר'ה",unit:"צחוקים",
+   top:[{name:"נועם",n:2097},{name:"יצחק נגר",n:1675},{name:"מתן לוגסי",n:1575}]},
+  {emoji:"🦉",title:"ינשוף הלילה",sub:"הכי הרבה הודעות בין 01:00 ל-05:00",unit:"הודעות לילה",
+   top:[{name:"שחר",n:814},{name:"יצחק נגר",n:591},{name:"ניב שחר",n:586}]},
+  {emoji:"🤬",title:"הפה המלוכלך",sub:"אלוף הקללות של הקבוצה",unit:"קללות",
+   top:[{name:"אופיר",n:481},{name:"נועם",n:359},{name:"ניב שחר",n:343}]},
+  {emoji:"📸",title:"מלך הפורוורדים",sub:"הכי הרבה מדיה ולינקים",unit:"פורוורדים",
+   top:[{name:"יצחק נגר",n:3236},{name:"מתן לוגסי",n:2614},{name:"משה אזולאי",n:2072}]},
+  {emoji:"📜",title:"המגילה",sub:"ההודעה הכי ארוכה שנשלחה אי פעם",unit:"תווים",
+   winner:{name:"אורון",n:5330,preview:"״דוברות המשטרה: משטרת ישראל נערכת לקראת משחק הכדורגל...״"}}
+];
+const Awards = {
+  open(){
+    document.getElementById('awardsList').innerHTML = AWARDS.map(a=>{
+      if(a.winner){
+        return `<div class="award gold">
+          <div class="aw-emoji">${a.emoji}</div>
+          <div class="aw-body">
+            <div class="aw-title">${a.title}</div>
+            <div class="aw-sub">${a.sub}</div>
+            <div class="aw-winner">${escapeHtml(a.winner.name)}
+              <span class="aw-num">${a.winner.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+            <div class="aw-preview">${escapeHtml(a.winner.preview)}</div>
+          </div></div>`;
+      }
+      const w=a.top[0];
+      const runners=a.top.slice(1).map((t,i)=>`${i===0?'🥈':'🥉'} ${t.name} (${t.n.toLocaleString('he-IL')})`).join('  ·  ');
+      return `<div class="award gold">
+        <div class="aw-emoji">${a.emoji}</div>
+        <div class="aw-body">
+          <div class="aw-title">${a.title}</div>
+          <div class="aw-sub">${a.sub}</div>
+          <div class="aw-winner">🥇 ${escapeHtml(w.name)}
+            <span class="aw-num">${w.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+          <div class="aw-runners">${runners}</div>
+        </div></div>`;
+    }).join('');
+    Nav.go('awards');
   }
 };
 </script>
