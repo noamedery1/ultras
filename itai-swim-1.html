@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>איתי בן 11 — אליפות השחייה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--pool-deep:#064a72;--sun:#ffc53d;--ink:#06283d}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0;overflow:hidden}
+  body{
+    background:radial-gradient(900px 700px at 50% -10%, #7fd8f5 0%, #2c9fd0 45%, #0b5a86 100%);
+    font-family:'Heebo',system-ui,Arial,sans-serif;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;padding:8px;
+  }
+  #frame{
+    position:relative;width:min(100%,57vh);aspect-ratio:3/5;
+    border-radius:20px;overflow:hidden;background:#0e86bd;
+    box-shadow:0 24px 60px rgba(3,40,64,.45),0 0 0 5px rgba(255,255,255,.5),0 0 0 10px rgba(6,74,114,.3);
+  }
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+
+  #hud{position:absolute;inset:0;pointer-events:none;padding:12px 12px 0;display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .chip{
+    background:rgba(255,255,255,.9);border-radius:999px;padding:5px 12px;
+    font-family:'Rubik',sans-serif;font-weight:800;font-size:clamp(11px,2.6vw,15px);
+    box-shadow:0 3px 10px rgba(3,40,64,.25);display:flex;gap:6px;align-items:center;white-space:nowrap;
+  }
+  .chip small{font-weight:600;opacity:.6;font-size:.78em}
+  #energyWrap{flex:1;height:16px;border-radius:999px;background:rgba(255,255,255,.82);padding:3px;box-shadow:0 3px 10px rgba(3,40,64,.25)}
+  #energyBar{height:100%;border-radius:999px;width:100%;background:linear-gradient(90deg,#00c2a8,#7ee787);transition:width .12s linear,background .3s}
+  #muteBtn{pointer-events:auto;cursor:pointer;border:0;font:inherit}
+
+  /* ג'ויסטיק */
+  #stick{
+    position:absolute;bottom:2.2%;left:50%;transform:translateX(-50%);
+    width:23%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.42),rgba(255,255,255,.16));
+    border:3px solid rgba(255,255,255,.6);
+    box-shadow:0 8px 20px rgba(3,40,64,.35),inset 0 2px 10px rgba(255,255,255,.4);
+    touch-action:none;display:flex;align-items:center;justify-content:center;
+  }
+  #knob{
+    width:46%;height:46%;border-radius:50%;
+    background:linear-gradient(180deg,#3fc0ef,#0b6c9c);
+    border:3px solid rgba(255,255,255,.85);
+    box-shadow:0 5px 12px rgba(3,40,64,.4);
+    transition:transform .05s linear;pointer-events:none;
+  }
+  #stickHint{
+    position:absolute;bottom:.6%;left:50%;transform:translateX(-50%);
+    font-size:clamp(9px,2vw,12px);font-weight:800;color:rgba(6,40,61,.55);pointer-events:none
+  }
+
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,rgba(4,45,70,.84),rgba(4,45,70,.94));padding:14px;text-align:center}
+  .card{background:linear-gradient(175deg,#fff,#eaf6fb);border-radius:18px;padding:clamp(16px,4vw,26px);
+    width:100%;max-width:440px;box-shadow:0 20px 50px rgba(0,0,0,.35);border:3px solid rgba(14,134,189,.25)}
+  h1{font-family:'Rubik',sans-serif;font-weight:900;font-size:clamp(20px,5.4vw,32px);margin:0 0 6px;color:var(--pool-deep);line-height:1.15}
+  .sub{font-weight:600;color:#3d6b85;margin:0 0 14px;font-size:clamp(12px,3vw,15px)}
+  .keys{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 14px;font-size:clamp(11px,2.7vw,13px)}
+  .keys div{background:rgba(14,134,189,.09);border-radius:11px;padding:7px 8px;font-weight:700}
+  .btn{border:0;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:900;
+    font-size:clamp(15px,3.6vw,20px);padding:13px 30px;border-radius:999px;color:#fff;
+    background:linear-gradient(180deg,#12a2df,#0b6c9c);box-shadow:0 7px 0 #084f74,0 12px 22px rgba(0,0,0,.25);
+    transition:transform .08s,box-shadow .08s}
+  .btn:active{transform:translateY(5px);box-shadow:0 2px 0 #084f74}
+  .btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+  .avatar{width:74px;height:74px;border-radius:50%;object-fit:cover;border:4px solid var(--sun);
+    box-shadow:0 6px 16px rgba(0,0,0,.25);margin-bottom:8px}
+  .stats{display:flex;gap:8px;justify-content:center;margin:4px 0 16px;flex-wrap:wrap}
+  .stat{background:rgba(14,134,189,.1);border-radius:13px;padding:8px 14px;min-width:92px}
+  .stat b{display:block;font-family:'Rubik',sans-serif;font-size:clamp(18px,4.6vw,26px);color:var(--pool-deep)}
+  .stat span{font-size:11px;font-weight:700;color:#4f7d95}
+  .hidden{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="frame">
+  <canvas id="game" width="600" height="1000" aria-label="משחק שחייה של איתי"></canvas>
+
+  <div id="hud">
+    <div class="row">
+      <div class="chip">🏊 <span id="distTxt">0</span> <small>מ׳</small></div>
+      <div class="chip">🏆 <span id="bestTxt">0</span></div>
+      <div class="chip">💧 <span id="bottleTxt">0</span></div>
+      <button id="muteBtn" class="chip" aria-label="השתקה">🔊</button>
+    </div>
+    <div class="row">
+      <div class="chip" id="styleChip">🏊 חתירה</div>
+      <div id="energyWrap"><div id="energyBar"></div></div>
+    </div>
+  </div>
+
+  <div id="stick"><div id="knob"></div></div>
+  <div id="stickHint">הזז ימינה ושמאלה</div>
+
+  <div class="screen" id="menu">
+    <div class="card">
+      <img class="avatar" id="avatar" alt="איתי">
+      <h1>איתי בן 11 🏊‍♂️<br>אליפות השחייה</h1>
+      <p class="sub">שחה למעלה במסלול, התחמק מהשחיינים ואסוף בקבוקי מים. כל הבריכה מעודדת אותך!</p>
+      <div class="keys">
+        <div>🕹️ ג'ויסטיק למטה</div>
+        <div>⬅️ ➡️ חיצים / A D</div>
+        <div>💧 בקבוק = כוח + בוסט</div>
+        <div>🚫 התנגשות = איבוד כוח</div>
+      </div>
+      <button class="btn" id="startBtn">מתחילים לשחות!</button>
+    </div>
+  </div>
+
+  <div class="screen hidden" id="over">
+    <div class="card">
+      <img class="avatar" id="avatar2" alt="איתי">
+      <h1 id="overTitle">איתי עייף! 😮‍💨</h1>
+      <p class="sub" id="overSub">כל הכבוד על השחייה!</p>
+      <div class="stats">
+        <div class="stat"><b id="finalDist">0</b><span>מטרים</span></div>
+        <div class="stat"><b id="finalBottles">0</b><span>בקבוקים</span></div>
+        <div class="stat"><b id="finalBest">0</b><span>שיא</span></div>
+      </div>
+      <button class="btn" id="againBtn">עוד סיבוב!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const ITAI_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wAARCADcANwDASIAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAABQIDBAYHAQgA/8QANRAAAQQCAQMDAgQFAwUBAAAAAQACAwQFESEGEjETQVEiYQcUIzIVQlJxgQgWoRckM5HRYv/EABoBAAMBAQEBAAAAAAAAAAAAAAIDBAEABQb/xAAoEQACAgICAgEEAQUAAAAAAAAAAQIRAyESMQRBIjJCUXETFFKBobH/2gAMAwEAAhEDEQA/ANCPASAeU44Lgavlj6U61SYzoJgBOhwaEyIuQ8ZF8Jfuoj5PumnTaHlHzB4k8zBI9YH3QmS3o+UhtrZ8oeZvANB4cldoKGMsDY5U+KTbdkgf3KNOwGh30x5SSxdsWIK8fqSSgAfdCD1Zh42uEkg49wdoweibKw+yG2Iz7hCLvX2JZtkMjSQgz/xJoCTslZwPJ7UDg36DUl+Q5NATvQQ2xWJB4UD/AKiYaaUMHaGk8oi3P4myG9szfqSZQY6LvpgaxV1vjlR44tHekf76Fp5bFO3ZHyos9R0fI5H2SK2P9ENnwpcTu1RSO1LbJpEAEe/jhKZId6KgCbXG06x+0yMhbVBSOT7p8v21D43eFIDuE27OR1x2eVHkGwdJx5+EyXIWgiI9uiuBSHtBGwmC07WpA2aCSdr4FJ2upSZzHGhcfwE439qS5qMD2RXbUWd+gpj2/CEZS/Ux1Z09uQNDRwNoHYxIizSlm3Pd2tHuUBt9WUKcoZH+q7x5VSyvUeRztt0dMejVB/d7n/4h0levVhM1mX6vlOx4q3IGc71E0L/cVu3F6lZjA0ckn2UGXqO3rTJtv9+eFmdzqJ8LOyCbsYfbfJ/woNePP3XmUztghPguPP8A6TowfaQuTjVM0DMdQ2XRBss7iP6QdlVK7kMjIz1K0T+3xxsqbTxUTB33L0Zf52472ptm7JBVbFBJBGwfzOGkcdAtL1oAV8lLCNXx6e+NlqVcrNMJliIcxw2B4Qu/adk7X5WS6yzJ7NZwAl2HQY6myC5PIJBxxzpUImbIuMgui3I91F5A9wNhTJ826qTG9vptH38Lrclbhxxdi7oc0+Q7yhjMQzLRSTWLZ9QclvttFxT7AuuidHlrYaLWOsucR/LtH8J+IszZfy9/z4Pd7KiTYuxi3fmKry4NPLB7oZPcjtzF3puZL77GilywRl6GxzSj7PRVPI0cpF3QSNDyN62uSdzHaI0sGwvUtvFW2gud2E6W0YrMV8vSDhK0ygLz8uJwLceRT6J4fvhSoCS4BRGtIdpEK8fgqVdjn0TWjhOByS0cLjlTFiXo653CjOfykyyEKK6XlHQUWS+8rveFBE33X3rBajmaOlNGyudu08xqmSs5jjRwviNJYGguPc1kbpHOADRvlOoUtkW3NFSqSWbDuxrQTtea+u+uHZLNyVqk/wChGdEgqy/id13enklxGNPGtOePhYtUpwV5HTXJzK5ztnZ8p+LH9zF5J/bEv9bIsiwrZe4gkbABQqzdu56zHTqh7Tsdzz4AQh9507xHBGSxo4G+FKx+duULhiZXa8nwWhP4rsBzfV0i3/7ZbDEBX9F0+vqkkPgpyDD5WBjnOkhlY3ne9NCH1mZPJNdM4sa8c9rn60hd+hn53ObZyvpwDxHEfZCk3qw20tpBu7lMbTjDpfSntN/kYdgKq5TJjNHTmua0e0fhIkxFqKH/ALaGQscdF0g/d90Wx+JirYuaZ7wC0Hf901JRQhtzYIrtFWANrM7SPMhPKfNyCcltqZumj9rudr6DFS5OtL/3ZhcDwB7hMSY5sTzBJE6Qa+p48rbSMUbWiwW8PRgx1e3Vut9SVo7mt55VauTWq9tlepLov9x7ojj8a/0u2uJX+dBycq4m1Pd/UrSMc08EjYXc0d/Gxuo3IuHZZ07XPd8qDlseQfViaC7XPGtq+Yio19/0JW97vBGk5e6fc98rhGQweAs57C/jtGPz90ZAkb27+Ud6azj8XdaZZD6ZPz4UnOYYRF2x3a8fZV4V+6sR2gaHj4RySmqYtcoSPRGLvVsrWZPXPcdc6RqFumhY1+HnU0dKw2hMNDxtxW1xlr2tkZ+13K8mWPhKj0oTU42hYCS/gJ3SZl8FEkYyDORyhsryCVPmB5Q6byQts1DRl5XPVKZeDtNFx37okzTa2sJKfa0gJbY/Ce7NDaGMRLkR9FVXr3Mx4TpqeYuLXdp1pXAN28cbXn3/AFBZWevQjqxvLRIdHSZGPJpASlxi5GNnqJ17IzmZ+3SOJ2fhcsVK7XizJK5+uewKs0wO9riOfYqwCflrdeoGjZ+B9l6Dio6RLF2thbD3IyXH8uO0+xVmoXcIxxa+uO7+lg2VT6cp2Znx9kXwPJSn5Evk9OrAYwf6Ryp5K3RVDSstWX6kwWKe0Qhz3+TEE3S6zpu3YZiWepr6S/lV/HdOC651l+3k7JDvKteM6XZXDe6HjyAeUuThH9joRnPtaGx1Fkrzw+41oDzpkTB7IrBgbGWsBv8A4IOzbm/KlR9L2HZCvL2AMHsFbI6j4LJ7OC5vbpLeYd/TeisRYcODK9eMxuadEj3V8qdGVZPRnbW7na+okeSimCwTXPidPH3a8rUKlOgyoyMN0B8IU3J2a4RxqqKFQ6NxlUMlsY4Fwd3DjynzicW3IepDSa0fzMI4WhTOifG2PtBa35Uf0KXcNw6PusfemB/gz9vTWLZk5J4qXYJBzoeCpVjpJox8koe0gjhpHlXV9aqHhzG8b8FN3WRyNJjPGvBWpi2jzf1f0q4QPniZss34WYfkhG4xvj1v3+V6qz9OL8q5phaS8cjSxHN9NudO+WKQNIPgKrHLRLkjuzM5Ks9C023Ax22nu4W6dFZh2Uw0fqb7mj3WZS2fyshqWYA8H30rx0M8MYQ0aYT49lmZWrNxOpUXwSAJLyHBRpH6cdeE36x+VKVHJmofPHzwFOfICFFe8FYzUQXx6CiPADlPkI0VBedvWPRqN9DBpKIX3cAvi4JpLQlrfqP9l5W/1ESynMVYdnt3terGac4ryh/qCmj/AN0VWEggc/dNxfWgMquDMfqwFkYL0YqhgiJ7gefCZji9WMEDgqfjMd+v3Het+E+c/wAnY8bvQUp1/XjH0aB+yM1MYyN4cWA/YhSKFcAhoaOEbjgD5GNHABXnTybPYxYVWxdCiBHwwNJ+FZaVRkcfe8b14CaqQNGkUY0FwHsEhzZUoJD1ONz9vkbongI1SxoktMc5uwPdRqcYc4bVpqMY0NI8rouzJa6DNSCKGFrWAeFOZN2+EPhdoKS3RTeRNV9kk2CDtcbOHP2Sm+3bUw9jgQRwgcmdxQSEwI0U1I8BpHyoQe4eUsu7maJWczHjB+Uq/mq5ZrZ+Qs6yOCe2y8OB07nlaZHOx0hY861womXoPmcHAA78EKuErVohyRqVGIZnpd72F5iG2+CF3p2CelL2Oj03wCVpFmi8NLXguAPIVfv4+StNHNDHph4IKe9xJ+pJnz3klMPfpPPaQFClJ2o7LGj50x+U2ZdlMvcUgnlaYOPdsKI4fUU8Uk+VjOTNwE4PulCYH3QZtn7p+OYn3WqYHAMxSb20HyF5T/H2swdTV5OS4n3Xp6CYiQfded/9QVLVipeYOWu0nYpfNCskfgzMaETfy7Wgc6R2pB2kHSC4d3fE0uHKs9cDt2hyumV+PFNJk+rpqNVD4KBxnkBHKXICimz1YIsFTkBFIY+QhlTgjlGIXjhKGtBKk3tcEfrSjSr8MnbpEIZ9I0KlsskUv0+VJZOFXG2y33UiGd0h4Pb/AHKOxfEskdhvgp3ua77qvsvU4HD8zcYz28onDlsI1gDrjC77ORJWKlSJ5g23YTLonaPClVLtG4S2CVoPts+VJe3026ezRPuscAVMrFuIxMdIwHu902Mg01dSnRCOz1xMw9rdlUvO1ZowXNBA90eOTixeWKkh5sjJpXEEEH4Uq7SgsYpwY0dzEAoF0UXcNk+VZ8dO2SnJtu9hXQZ5s1RQpGaBB8jhQJo0XvjsvSgDQJ2EOk5UT06Kk7VguRh2mu3RU17OUy5oC0xkcpOvsnHlMl3PC6zjR2SEkIjA7gIZCwnlE4WEBIixkiWx2iDtZD+OVMz9PtnA7vTdtaySQFVuuccMt01YgI2XMOk2MqkmKmri0jy/iX8a8BWqvstGlVMfE+vdlpzDUkTi0q5UYu7SozdjfFdolwsPCL1z2gKD+Yo1ATYlA7fKE3uuqFVpbTi9V491Kscp9HoSyxx/Uy+V5nAA6KJQXGn3WMs69y00m2QFrfYI/jep8jO0GWPtB90cvHlHsCPlQm6Rq8NoEhu0QjmI0VQaGV9VwO+Ve8O387APdK60P9WM5LISwVnPjbtwHACzLP8AUHVU8obBYfDGP6VquVpejC4u9lnuQkrMc98hAYPdFHuxbTkqKYIuq8jKWG/KR87KPYjpvqeCQSm9I/R3pxOk9H1FWiIjoVXTP+WjhWbFZvOZBhZFBVgLfPqv0ncm9UI/igtthbFHqdhboF2vf5Wh4nqi9XaypkoTI0+59lm4zPU2Mk75qUNiEckwO3pGMX1djspKIrG4JvHa/gpT0M4KXRq9ezFMRJB+086Uu3jq+Rx8kbowJCOCq/hYnt7XVpO9h9lbKsgbIGOGifKZDZJktGSXa9ihO+As4B8qS26KeKcS0954AA5Kt3U+LAmdO1u2nnhDcPXpvhM1loIj+U1vgrJoxeSXEqTOnuo8nXN+Ko1kfkB50SgMvrQzur2IjHKzy0rRrv4k0sXbFJrB6Y4OvCrnU5r5RjMrTA55OlGs0JSr2ehPw8uPHz7SKo8pl6ccdjaYeU0iGZCFFJ5T0hUcnlccavDHp5brwUSYwBqQYQ25OwfyvI18KSGaCVFByZGkBA4Qu39cL43Dgj3RiRvCGyxF8n910gUzzL1dR/hvXXcG9rJyfb3RGSw2hU9QDbnN+lHPxXxkceRrWo5Gl7HjYQCzW/M1YP7BU2pRVhYbi5JAODD389aJmmLIifAKueN6LwdCD1LbmcDy8oaJ48PU2zl5HAVfudRFjXz23mw5vPpg+Ea5S1EbJY4LlPsuViv01E135eB0pH9LNoJPkKTdsbC+H2BLVTJPxEviNzK0LYQfACLY2TNZXEi+4B8hP7XN0NJ78eSVsmj5sJS4w/4FqGW9C/6fftjjwV6B/DyIW4GlxB2PdecZq30wufGI5+4b7V6Y/DGPdWq3Wi4BQTS5qj0o24Ssl9XU3NilYxv8qxjK4eWeg+V2xGw7IHkr0j1JSMsrm9vGvCzbJdO2JY5Y6umk+AfG0Mnxk0bD5QRhtOSa5LLVqNdTY0HT3NIJKoNo9XMyc9eOW049xHc3gEf3WxZSDK4q4Yr9EtaDxIxmwV9WnxkkgfNG1zvOvBVmPPGH2kWfxZZup0UHBSde1muY2zMXHhrXHuV9w+A/ELJTMksYyJ2/D+7RVpx9+Jz2x47EmV/yAtF6dxnUshbNI1sDP6UvLmU3qI3F4zxLcz7pOLq7ERMiv41rmD+ZrtrVKVmGzW7p4eyUBBoZr9dmpHB+vPCmQWg47e3W0qFRZma59iMp+tCW62As7z112OpvZX2S/gBq0GxO2OwGu8HhZT1/khhrrLRjLou7ZXZZXGjvGhWRMHnpS7lcS+4+I+oR3bKkdOwv/hM+Ps/+WLY0VaOmeucfkaMcfaB3DRCayFFsGUktV+GSDnS83Ik2pR7R9BhlKpY59MoMsRZK+P8ApJUORqK3QBelHhD5R5Xp1Z8tVNoGy+VHO9qZK1RXN5WUYbpZdXfnJmQkH1G+pseN+CEsga8LFqn4mS4ShRu5rHyyejO31rDWktfGfp33eN/3W1zOid2SwO74ZWCRjvkEbB/9FHKDi9mSkm9EWRqiys/Tk157VOdohNBgL9ex4S2jkzzj+Ib3y5xsD3EAO4B8LkMDf4fEXO8BHfxcxAr3Ib0Y0Q7lBKR9SnFvxpctKj0ElqSRUeo23JCIqMbnHx3H2QrG9PZHvJssDhJ52tItVfWaGQsDT7lMN6byk5BimI39k+OZxVIVLxlOXJ7K/j+lsXSk9WWCNzxzrQVgqtdMfy9WLTRx9A4CN0OgrUmn3J3v+QrQ3D1cXT1FGNgeUqedy7Y/H48YfSqM2vY/tvQV2jukc8BelPw8xTa1ert4DmtBWBVwJ+r4t/tYdr0b0hNAImuLgC0JSdzQyS445UWHNwfrF+vZVietolzR5VxyM0NmINjd9elXZKF4MdIzTgPZNyq5aJsLairAk2NimiLrELZB/wDobQZnT2EdZ3JRjDif6UZlzTYi6CxH2PHHPG0O/iML5tgjykSl+CzHB+y1YXC4iHt9GqxuvsrrDjmOiaGMDR9lQ8TkGDX1cK3xZn9MNa4a0q8LjWyHyYzuojlzGljSWkFB3RhjvCIPybncE738qHIQ872syOL6BxqSXyBOUee6NzTzsbQrO4upmMLLXsRNe4t9/dE8mzYaR7FRbz/y9VrxvbuNBTz6soxfUkYxUw1jC5FkMLna79Af5WtVY3y4/U3Lgz3UyLpupLT/AIiWbn1sfZR68jxXnc8FoaNaKRKK7PSjkctfgzPKO7MvMzfCgPclZOwJc5Zc3wDpRi/furT56X1P9nJNa0ozhz5Tr3pgv2USQB3qqhVu9PStqvic6VuoXiT9NzjwHA8j3WuYNt2t0dhquTLPz8FWOKcsdsOcBraxf8JGY6THOOUmi9GJ/dqZ3a3uPIDQft8La3WGzASM/YR9PHsum2vi/Qcqk+S/BI9Rd9TRB2oJl17rnr/KVYNFL/FKkbWJc8Degsyxcm6LG78Dlbd1LGy3gpA4b0CsGquMGSsVSf2uOlns9DC7gWzFxiaTke6veOggjiaS0KhYybsO1b6FouLQTwlN7LYLVlqihD2jQACCZ4xw1n6I8IhHdETNnkAKrZqybLJdHQ0UylQO7KjHuvbNqNu+eStE6f6gkjhZ9ZAKxy7dsS0bOND3QvfsCQIh0XNlaGP/ACWQsfmGg7Y8nkBaoau9mN7r0bPm+uKvT8TLmUyLK1c+7uSjnT/4qdK5uoBQy0Ng+CA7RH+Fk9vG4rPPa3Kg2Iw3RaeQFIxfQeDhlbFhYG1A4/U9vnS37bXYLirp1X+zRs46DOuc6holo/cFRLrshibH657o/n4Wp0sXTxmJjqVP3BvJ9yq3nMW2SNweO/u8rHibW+zIZqlS6BWKzJc1rmv2rfTy5c0AuWQ2I7GGtd7O4wE8j4VhxuYbKxpa9LVx0Uyqe0ac3I7HLk/HkQ7Q2qSy+8t20kqZDadsEnW1zkxLxoujtWITxvS7DA2VwDm92vZQsRYD4ywnewuXcyzETtdKdAn3R2nG2S8Xz4otdeBrmCMgNB9lTeu3xYbGySRkDuHOvdKk62rghzXNGlQOuupDmomwMPvzpbzjNUg5QnhTm2URsrpJHzHy87ThkIC4I+1uvhNSHQTEecckm17poTfdR53kAqOJDpMiLkjRug+nTgulacO4poHt9Rj/ANzmH3B39/BCtUkh3y7f3SY4m1K7KjAA2IaGvCbkdwp5SbbbHVWhEkuvdMGxz50mpXlRS/nyltnUEpNWaMsRPkLEcxTdR6lc5zdB5/5W0VHH1B8HgrPPxBZFHfD2tA04aKJfkfge3EGVJACFZKE/bpU6tLy078qyY+QkgbXUXxlqg/avBlcEu0SgNqyXwkd37l9krDWu7Xnj7hQmky+BsIqMcgbJUY95cQOVLpQSGZscbSd/ASbE8EB25w/yuV882Jw9J7Ng8doTFFvZiVu2XGnhrY7fSrnuPnfhaVg8HFBVa+1JGx5Hjaxb/e9+CE9wld/YKVWzvVGTaDRjfo8/UUSSW2bLE+PZvJirxs+mdjv8oJfBcHAlpHztZK6bq8YuzcnsiAw+W7VHzHW3V0VSOLGyutWZToBg32plctIl4xju7NjysDZInteGe/lUiCQ1MmYDxzsaPCA4LpT8Qc0GX89l5IN8iBp1x91Y2YqWpmGMmf3lg8lIyRUdWOxSbd1X7LrjgXxtLvdEJD2OAaPBQyoexgA4Ur1OeSp2UN7LDjbQjcPq0g/W9gyMjaODwk159TBoPuhvVVkSSxsB+Ajxoi8l0rQBJf26Lv8AlRnxgnuPlPF40m3OHynENt9sjPZ5UKYIg8jSgTOHK45A2ZpdtRuzSmvcOVCfIQ7QXc6KFFNG95eI1cmYXN7SRtC5HcFHuqhuzUsjkEuaSq5Idpb7Fz1JkWU72mANlPvHKQ1vKU0YSIfpIKCdT9Ofx2P6Don3BRxiea7R2EaRnJxdoyLI4SzgXRsnc5zN6BKJY142OVc+qMe3KYl2h9bBws6ozOglMUvD2HRBTGV4snJbLTlsOLmMM0J+sc8LNMq/qaEOZTeG64Wt4y4ySsY3EeFXcgI4rj2PZ9LvdbF0xk1ZhNibqtuQbLbdJI0HkA8aVow+UfWytSezC9tRp+tpbtXSfHRSv0QCPbhO1sTrj0Wvb8EKt5VNU0Lh40f72v3sM3c701cxE35GF8kxZ9Gme6I9LdSTxY+GCHDSPst454BQ+tVlhhLYq0bd+/aitGPINcPrDQfgJXGNUyhYIJ/KYzF0Znsz1HeymfzArUZx9NGA8f5KtmJ6Ww+MYHV6rNt4BI2Vyq5+h3uLnfdGq44G0UprqIv4QVQFuhbHAXnz8Km34Qb4l99q8TMdIzxwq7cxzjL3n25U8+tGY/qtkKJ2gAlGQ78pEmo+FFmnDWnnlJHWS6s/ffa1p5CFdQzn+IsaT4BUnDl0l0ycoDn5j/FvPymw0R+RtHPW37rjpvuoAl99pL5hryjJCVJNx5Q6zYAHBTcs5+UMszE75WpBIfNje+U2Ts72hxlcHfZOica5SpKmA8/HR6azu5sa5/kRvBGlW3jjaNTztmx7wXnk8AIWW/SuZRm+pEBwXWtUh0fPhJ7PsgoVYloXfCVr2XCNo0hbYgnyDyDwVQ+p8JJWnN6uw9vvr3V9LUowRWIDBM0Fp/4RmwlxdmVY/JvYR2u4RK1NHbr7d+8e6T1J0xZxkzrtFhdEeXMCB1rzZGdu9EeR7hC7PQhNSWglAHEad7e6J1AA5QcYWyz+m4gbPBR41DXmaNbB91ykM4j8bwGgKUyTWjpKjgjIHHKLVa1fQ7nAH+yKzOLEU2veQQCj8MTmsBJX0FaoxoLZgHfdKdJGT6YftyyTpHKNsKwwgxgnwgWYmbE8gHRRZ11kFZrSeVnudyxsX3Njd48oHLVI5Q3Y1Ysdzyh80u+N7TbpvclNB3e8D5S7HJFi6djJcXHgaKqHUZ1myBzwfCvOEYWdvHnhAetOnbkLxkoI3SNby4NHOkWN2yXyVUCodxTbnn5XzHtkj7mn/HwkkJ5DZHmcSCh8pKJmPvUWeDQ8IkLnKgW4klKAOk4Y9FKGgPCyR5mWTs3ytP6kbY2+/OlI2heJcXjZP7W6CJbO0tnu5Xcj4gJHalnlcHlakTtjZauEJUju3wAm2PLvICNRFtndJQI0knykdx2uNJOo5ozDM0OY4a5WW9ZYSLG23XKw7AeTrwVpQcdoD1rDHLgy9427R5WrYcJNPRndC12yseCr7TtRXoG9509gWTVp5Gxgg+6tGIvWA5uiPKCUPZ6OPLT4svQmIcADoKSZw1gd3IYJHPjBdrf2UWeV/aRvWtIaKOQaGY9J/YST9wida9G39R37lUIXEDfG1GsZO00lrS0D+yFxNc16LRlcz5a13J+FV3Sbc5xO3E7JUIWJZHbe7fuu9zvlAzESO/ZU2hCZZhx4Q5nJVmw8bNE650gYSLDjogzt4V8o1a2QomvOwHY1yqZRA7wrti/pYNcLcbpic20Zj1b+FcwtPu4V4hc47c0j6Hf/ABUabpLqCBxjeK/cPYvLSf8A2F6og/Vb2vGwheZxFCeuTLAHf4VsFF9nk5ISW4OjzIcBnq43LipHj+qIhw/4Q61E6KT0rEMkDz4EjS1a1lpHY3KMgrH9Nx8O50rHBhMZn6La+VqMnjcPfyPuD7KyODkvizz55ZJWzzlNDrkKA/QeRytE696XxvTOU/L4105icN9sr+7X/Czez/5/8KWUKdMlbU9o/9k=";
+
+const W=600, H=1000;
+const DECK_W=104, WATER_L=DECK_W, WATER_R=W-DECK_W;
+const POOL_B=848;
+const SWIM_L=WATER_L+38, SWIM_R=WATER_R-38;
+const ITAI_Y=655;
+
+const cvs=document.getElementById('game'), ctx=cvs.getContext('2d');
+const el=id=>document.getElementById(id);
+const distTxt=el('distTxt'),bestTxt=el('bestTxt'),bottleTxt=el('bottleTxt'),energyBar=el('energyBar');
+const styleChip=el('styleChip');
+const menu=el('menu'), over=el('over');
+
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[(Math.random()*a.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+let state='menu';
+let t=0,dist=0,best=0,energy=100,speed=210,boost=0,inv=0,shake=0,bottlesGot=0;
+let spawnT=1.4,bottleT=3.5,cheerT=1;
+let banner=null;
+let obstacles=[],bottles=[],foam=[],confetti=[],cheers=[],spectators=[];
+let itai={x:W/2,vx:0,tilt:0};
+let scrollY=0,lastMile=0,muted=false;
+/* 0 = חתירה, 1 = חזה, 2 = פרפר — מתחלף כל 200 מטר */
+const STYLES=[{n:'חתירה',i:'🏊'},{n:'חזה',i:'🐸'},{n:'פרפר',i:'🦋'}];
+const STYLE_SPD=[1,0.9,0.98];
+let styleIdx=0;
+let photo=new Image(); photo.src=ITAI_PHOTO; let photoReady=false;
+photo.onload=()=>photoReady=true;
+el('avatar').src=ITAI_PHOTO; el('avatar2').src=ITAI_PHOTO;
+
+/* audio */
+let ac=null;
+function beep(f,d,ty,v){ if(muted)return;
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=ty||'sine';o.frequency.value=f;
+    g.gain.setValueAtTime(v||.08,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){}
+}
+
+function rr(x,y,w,h,r){ctx.beginPath();
+  if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);return;}
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function ell(x,y,rx,ry,rot){ctx.beginPath();ctx.ellipse(x,y,rx,ry,rot||0,0,Math.PI*2);}
+function circ(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);}
+
+/* ---------- קהל ---------- */
+const SHIRTS=['#ff6b57','#ffc53d','#7ee787','#ff8fd0','#8ab6ff','#ffffff','#b48cff','#ffd9a0'];
+const SKINS=['#f4c9a0','#e0aa7a','#c98a5b','#8d5a35','#fadfc4'];
+const HAIRS=['#2b2118','#4a3324','#8a5a2b','#d8b370','#1a1a1a'];
+const CHEERS=['קדימה איתי!','יאללה איתי!','אתה אלוף! 🏅','מזל טוב! גיל 11 🎂','הכי מהיר בבריכה!','עוד קצת!','אנחנו איתך ❤️','בראבו איתי!','שחה שחה!','איזה סגנון!','איתי מלך 👑','תמשיך ככה!'];
+
+function makeSpectator(y,deck){
+  const kid=Math.random()<.45;
+  return{y:y,deck:deck,x:deck===0?rand(40,66):W-rand(40,66),kid:kid,
+    s:kid?rand(.6,.76):rand(.86,1.02),shirt:pick(SHIRTS),skin:pick(SKINS),hair:pick(HAIRS),
+    ph:rand(0,7),wave:Math.random()<.75,
+    prop:Math.random()<.3?pick(['flag','balloon','pom']):null,propColor:pick(SHIRTS)};
+}
+function initSpectators(){
+  spectators=[];
+  for(let d=0;d<2;d++){let y=rand(-60,10);while(y<H+120){spectators.push(makeSpectator(y,d));y+=rand(86,132);}}
+}
+function drawSpectator(sp){
+  const s=sp.s,w=sp.wave?Math.sin(t*7+sp.ph):0;
+  ctx.save();
+  ctx.translate(sp.x,sp.y);
+  ctx.rotate(sp.deck===0?Math.PI/2:-Math.PI/2);
+  ctx.scale(s,s);
+  ctx.fillStyle='rgba(90,70,45,.18)';ell(2,14,24,9);ctx.fill();
+  ctx.strokeStyle=sp.skin;ctx.lineWidth=7;ctx.lineCap='round';
+  [-1,1].forEach(side=>{const a=(side===-1?w:-w)*.5;
+    ctx.beginPath();ctx.moveTo(side*15,-2);
+    ctx.quadraticCurveTo(side*26,-14,side*(24+a*8),-26-Math.abs(w)*9);ctx.stroke();});
+  ctx.fillStyle=sp.shirt;rr(-16,-8,32,30,11);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.08)';rr(-16,12,32,10,7);ctx.fill();
+  ctx.fillStyle=sp.skin;circ(0,-20,12);ctx.fill();
+  ctx.fillStyle=sp.hair;ctx.beginPath();ctx.arc(0,-21,12.4,Math.PI*1.05,Math.PI*2.05);ctx.fill();
+  ctx.fillStyle='rgba(20,20,20,.75)';circ(-4,-19,1.7);ctx.fill();circ(4,-19,1.7);ctx.fill();
+  if(sp.prop==='balloon'){ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(20,-24);ctx.lineTo(24,-46);ctx.stroke();
+    ctx.fillStyle=sp.propColor;ell(25,-54,9,11);ctx.fill();}
+  else if(sp.prop==='flag'){ctx.strokeStyle='#7a5a3a';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(-22,-22);ctx.lineTo(-24,-48);ctx.stroke();
+    ctx.fillStyle=sp.propColor;ctx.beginPath();ctx.moveTo(-24,-48);ctx.lineTo(-4+w*3,-42);ctx.lineTo(-24,-36);ctx.fill();}
+  else if(sp.prop==='pom'){ctx.fillStyle=sp.propColor;circ(24+w*4,-30,8);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.4)';circ(22+w*4,-32,3);ctx.fill();}
+  ctx.restore();
+}
+
+/* ---------- בועות דיבור ---------- */
+function spawnCheer(){
+  if(cheers.length>=2) return;
+  const side = cheers.length?(cheers[0].sp.deck===0?1:0):(Math.random()<.5?0:1);
+  const vis=spectators.filter(s=>s.deck===side&&s.y>120&&s.y<POOL_B-80);
+  if(!vis.length) return;
+  cheers.push({sp:pick(vis),text:pick(CHEERS),life:0,max:2.8});
+}
+function drawCheer(c){
+  const sp=c.sp,k=c.life/c.max;
+  let a=k<.12?k/.12:(k>.8?(1-k)/.2:1); a=clamp(a,0,1);
+  const pop=k<.12?.72+.28*(k/.12):1;
+  ctx.save();
+  ctx.font='800 17px Heebo, Arial, sans-serif';
+  const bw=ctx.measureText(c.text).width+24, bh=32;
+  const left=sp.deck===0;
+  const cx=left?sp.x+18+bw/2:sp.x-18-bw/2;
+  const cy=clamp(sp.y-34-c.life*7,26,POOL_B-30);
+  ctx.globalAlpha=a;ctx.translate(cx,cy);ctx.scale(pop,pop);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=10;ctx.shadowOffsetY=3;
+  ctx.fillStyle='#fff';rr(-bw/2,-bh/2,bw,bh,14);ctx.fill();
+  ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+  ctx.fillStyle='#fff';ctx.beginPath();
+  if(left){ctx.moveTo(-bw/2+2,-4);ctx.lineTo(-bw/2+2,10);ctx.lineTo(-bw/2-13,10);}
+  else{ctx.moveTo(bw/2-2,-4);ctx.lineTo(bw/2-2,10);ctx.lineTo(bw/2+13,10);}
+  ctx.fill();
+  ctx.strokeStyle='rgba(14,134,189,.35)';ctx.lineWidth=2;rr(-bw/2,-bh/2,bw,bh,14);ctx.stroke();
+  ctx.fillStyle='#06283d';ctx.fillText(c.text,0,1);
+  ctx.restore();
+}
+
+/* ---------- שפת הבריכה ---------- */
+let terrazzo=null;
+function makeTerrazzo(){
+  const c=document.createElement('canvas');c.width=c.height=90;
+  const g=c.getContext('2d');
+  g.fillStyle='#e9e0d1';g.fillRect(0,0,90,90);
+  for(let i=0;i<70;i++){
+    g.fillStyle=pick(['rgba(160,145,120,.35)','rgba(120,150,160,.3)','rgba(200,190,170,.5)','rgba(140,120,100,.25)']);
+    g.beginPath();g.ellipse(Math.random()*90,Math.random()*90,rand(1,3.4),rand(1,2.6),Math.random()*3,0,7);g.fill();}
+  terrazzo=ctx.createPattern(c,'repeat');
+}
+function drawDecks(){
+  ctx.save();
+  ctx.fillStyle=terrazzo;
+  ctx.fillRect(0,0,DECK_W,H); ctx.fillRect(W-DECK_W,0,DECK_W,H); ctx.fillRect(0,POOL_B,W,H-POOL_B);
+  ctx.fillStyle='rgba(255,220,150,.12)';
+  ctx.fillRect(0,0,DECK_W,H);ctx.fillRect(W-DECK_W,0,DECK_W,H);ctx.fillRect(0,POOL_B,W,H-POOL_B);
+
+  // מרזב אריחים לאורך שפת המים
+  const off=(scrollY*.35)%40;
+  ctx.fillStyle='#f3f7f8';
+  ctx.fillRect(WATER_L-20,0,20,POOL_B); ctx.fillRect(WATER_R,0,20,POOL_B);
+  ctx.fillStyle='rgba(6,74,114,.1)';
+  for(let y=off-40;y<POOL_B+40;y+=40){ctx.fillRect(WATER_L-20,y,20,2);ctx.fillRect(WATER_R,y,20,2);}
+  ctx.fillStyle='#0b5f8b';
+  ctx.fillRect(WATER_L-4,0,4,POOL_B);ctx.fillRect(WATER_R,0,4,POOL_B);
+  // קיר תחתון
+  ctx.fillStyle='#f3f7f8';ctx.fillRect(WATER_L-20,POOL_B,WATER_R-WATER_L+40,20);
+  ctx.fillStyle='#0b5f8b';ctx.fillRect(WATER_L-20,POOL_B,WATER_R-WATER_L+40,4);
+  ctx.restore();
+}
+
+/* ---------- מים ---------- */
+function drawWater(){
+  const g=ctx.createLinearGradient(WATER_L,0,WATER_R,0);
+  g.addColorStop(0,'#0a5f92');g.addColorStop(.5,'#1aa2d4');g.addColorStop(1,'#0a5f92');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,POOL_B);
+  ctx.save();
+  ctx.beginPath();ctx.rect(WATER_L,0,WATER_R-WATER_L,POOL_B);ctx.clip();
+
+  ctx.strokeStyle='rgba(255,255,255,.055)';ctx.lineWidth=1.5;
+  const oy=(scrollY*.45)%56;
+  for(let y=oy-56;y<POOL_B+56;y+=56){ctx.beginPath();ctx.moveTo(WATER_L,y);ctx.lineTo(WATER_R,y);ctx.stroke();}
+  for(let x=WATER_L;x<WATER_R;x+=56){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,POOL_B);ctx.stroke();}
+
+  // פס המסלול על רצפת הבריכה
+  const midX=(WATER_L+WATER_R)/2;
+  ctx.strokeStyle='rgba(6,40,61,.3)';ctx.lineWidth=24;
+  ctx.beginPath();
+  for(let y=-20;y<=POOL_B+20;y+=24) ctx.lineTo(midX+Math.sin(y*.02+t*1.1)*4,y);
+  ctx.stroke();
+  const ty=(scrollY*.45)%520;
+  for(let y=ty-520;y<POOL_B+520;y+=520){
+    ctx.lineWidth=22;ctx.beginPath();ctx.moveTo(midX-48,y);ctx.lineTo(midX+48,y);ctx.stroke();}
+
+  // קאוסטיקה
+  for(let i=0;i<26;i++){
+    const y=((i*38+scrollY*.7)%(POOL_B+80))-40;
+    ctx.beginPath();
+    for(let x=WATER_L-20;x<=WATER_R+20;x+=20){
+      const yy=y+Math.sin(x*.028+t*1.5+i*.8)*8+Math.sin(x*.07-t*2.4+i)*3;
+      if(x===WATER_L-20)ctx.moveTo(x,yy);else ctx.lineTo(x,yy);
+    }
+    ctx.strokeStyle='rgba(255,255,255,'+(.045+.035*Math.sin(t*2.1+i*.9))+')';
+    ctx.lineWidth=2+Math.abs(Math.sin(i*1.7))*2.4;ctx.stroke();
+  }
+  const sg=ctx.createRadialGradient(W*.5,140,10,W*.5,140,320);
+  sg.addColorStop(0,'rgba(255,255,255,.16)');sg.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sg;ctx.fillRect(WATER_L,0,WATER_R-WATER_L,POOL_B);
+  ctx.restore();
+}
+function drawRopes(){
+  const cols=['#e63946','#f8f9fa','#1d3557','#f8f9fa'];
+  [WATER_L+18,WATER_R-18].forEach(x=>{
+    ctx.save();
+    ctx.fillStyle='rgba(4,50,80,.28)';ctx.fillRect(x+6,0,7,POOL_B);
+    const off=(scrollY)%(4*22);
+    for(let y=off-88,i=0;y<POOL_B+44;y+=22,i++){
+      const bob=Math.sin((y-scrollY)*.05+t*3)*1.6;
+      ctx.fillStyle=cols[((i%4)+4)%4];circ(x+bob,y,9);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.45)';circ(x-3+bob,y-3,3);ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+/* ---------- שחיינים ---------- */
+function drawSwimmerBody(o){
+  ctx.save();
+  ctx.translate(o.x,o.y);
+  ctx.rotate(o.facing>0?-Math.PI/2:Math.PI/2);
+  ctx.scale(o.s,o.s);
+  ctx.fillStyle='rgba(3,40,64,.28)';ell(-4,12,40,17);ctx.fill();
+  const kick=Math.sin(t*15+o.ph);
+  ctx.strokeStyle=o.skin;ctx.lineWidth=9;ctx.lineCap='round';
+  [-1,1].forEach((side,i)=>{ctx.beginPath();ctx.moveTo(-26,side*7);
+    ctx.quadraticCurveTo(-44,side*9+kick*(i?10:-10),-58,side*12+kick*(i?18:-18));ctx.stroke();});
+  const bg=ctx.createLinearGradient(0,-16,0,16);
+  bg.addColorStop(0,o.suit);bg.addColorStop(1,'rgba(0,0,0,.35)');
+  ctx.fillStyle=bg;ell(-2,0,34,16);ctx.fill();
+  ctx.strokeStyle=o.skin;ctx.lineWidth=13;
+  const a=Math.sin(t*6+o.ph);
+  [-1,1].forEach((side,i)=>{ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,side*11);
+    ctx.quadraticCurveTo(26,side*22,30+a*(i?8:-8),side*26);ctx.stroke();});
+  ctx.globalAlpha=1;
+  ctx.fillStyle=o.cap;circ(28,0,13);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.35)';circ(24,-4,4);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.5)';
+  for(let i=0;i<4;i++){circ(-58-i*9,Math.sin(t*8+i+o.ph)*10,5-i*.7);ctx.fill();}
+  ctx.restore();
+}
+
+/* ---------- איתי ---------- */
+function drawItai(){
+  const flash=inv>0&&Math.floor(inv*14)%2===0;
+  const rot=-Math.PI/2+itai.tilt;
+  ctx.save();
+  ctx.translate(itai.x,ITAI_Y);ctx.rotate(rot);
+  ctx.globalAlpha=flash?.45:1;
+  ctx.fillStyle='rgba(255,255,255,.3)';ell(54,0,29,21);ctx.fill();
+  ctx.fillStyle='rgba(3,40,64,.3)';ell(-4,14,44,18);ctx.fill();
+  const SKIN='#f1c096';
+  drawLegs(SKIN);
+  const bg=ctx.createLinearGradient(0,-18,0,18);
+  bg.addColorStop(0,SKIN);bg.addColorStop(1,'#d1926a');
+  ctx.fillStyle=bg;ell(-2,0,38,17);ctx.fill();
+  ctx.save();ell(-2,0,38,17);ctx.clip();
+  ctx.fillStyle='#0b3f6b';ctx.fillRect(-40,-20,26,40);
+  ctx.fillStyle='#ffc53d';ctx.fillRect(-24,-20,5,40);ctx.restore();
+  drawArms(SKIN);
+  // ראש עם התמונה של איתי — תמיד ישרה
+  ctx.save();
+  ctx.translate(39,0);ctx.rotate(-rot);
+  ctx.fillStyle='rgba(3,40,64,.25)';circ(0,4,21);ctx.fill();
+  ctx.fillStyle=SKIN;circ(0,0,19.5);ctx.fill();
+  if(photoReady){
+    ctx.save();circ(0,2,18);ctx.clip();
+    const d=38;ctx.drawImage(photo,-d/2,2-d/2,d,d);ctx.restore();
+  }
+  const cg=ctx.createLinearGradient(0,-22,0,0);
+  cg.addColorStop(0,'#3fc9f7');cg.addColorStop(1,'#0b6c9c');
+  ctx.fillStyle=cg;
+  ctx.beginPath();ctx.arc(0,-3,19.8,Math.PI*1.04,Math.PI*1.96);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.arc(0,-3,19.8,Math.PI*1.04,Math.PI*1.96);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.45)';ell(-7,-13,5,2.9,-.5);ctx.fill();
+  ctx.fillStyle='#ffc53d';ctx.font='900 11px Rubik, Arial';ctx.textAlign='center';
+  ctx.fillText('11',0,-8.5);
+  ctx.restore();
+  ctx.restore();
+}
+function drawArms(SKIN){
+  if(styleIdx===1){ drawBreastArms(SKIN); return; }
+  const sp = styleIdx===2 ? 1.45 : 1.9;
+  const p=(t*sp)%1;
+  drawArm(p,1,SKIN);
+  drawArm(styleIdx===2 ? p : (p+.5)%1, -1, SKIN);
+}
+function drawBreastArms(SKIN){
+  const p=(t*1.15)%1;
+  [-1,1].forEach(side=>{
+    let hx,hy,alpha;
+    if(p<.35){const u=p/.35;hx=42-u*28;hy=side*(7+u*28);alpha=.6;}
+    else if(p<.6){const u=(p-.35)/.25;hx=14-u*4;hy=side*(35-u*28);alpha=.6;}
+    else{const u=(p-.6)/.4;hx=10+u*32;hy=side*7;alpha=.85;}
+    ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=SKIN;ctx.lineWidth=12;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(14,side*12);
+    ctx.quadraticCurveTo((14+hx)/2,side*25,hx,hy);ctx.stroke();ctx.restore();
+  });
+  if(p<.1){ctx.fillStyle='rgba(255,255,255,.5)';ell(42,0,20,23);ctx.fill();}
+}
+function drawLegs(SKIN){
+  ctx.strokeStyle=SKIN;ctx.lineWidth=11;ctx.lineCap='round';
+  if(styleIdx===0){
+    const k=Math.sin(t*22);
+    [-1,1].forEach((side,i)=>{ctx.beginPath();ctx.moveTo(-28,side*7);
+      ctx.quadraticCurveTo(-46,side*9+k*(i?12:-12),-62,side*13+k*(i?20:-20));ctx.stroke();});
+    ctx.fillStyle='rgba(255,255,255,'+(.35+.2*Math.abs(k))+')';ell(-66,0,20,17);ctx.fill();
+  } else if(styleIdx===2){
+    const k=Math.sin(t*13);
+    [-1,1].forEach(side=>{ctx.beginPath();ctx.moveTo(-28,side*7);
+      ctx.quadraticCurveTo(-46,side*8+k*10,-64,side*11+k*17);ctx.stroke();});
+    ctx.fillStyle='rgba(255,255,255,'+(.4+.28*Math.abs(k))+')';ell(-68,k*7,23,19);ctx.fill();
+  } else {
+    const p=(t*1.15)%1;
+    let sp,ext;
+    if(p<.5){sp=7;ext=1;}
+    else if(p<.75){const u=(p-.5)/.25;sp=7+u*30;ext=1-u*.42;}
+    else{const u=(p-.75)/.25;sp=37-u*30;ext=.58+u*.42;}
+    [-1,1].forEach(side=>{ctx.beginPath();ctx.moveTo(-26,side*7);
+      ctx.quadraticCurveTo(-38,side*sp,-26-34*ext,side*sp*.75);ctx.stroke();});
+    if(p>.72&&p<.92){ctx.fillStyle='rgba(255,255,255,.5)';ell(-58,0,23,25);ctx.fill();}
+  }
+}
+function drawArm(ph,side,SKIN){
+  const pull=ph<.55, u=pull?ph/.55:(ph-.55)/.45;
+  let hx,hy,alpha,lw;
+  if(pull){hx=34-u*62;hy=side*(15+Math.sin(u*Math.PI)*9);alpha=.5;lw=12;}
+  else{hx=-28+u*64;hy=side*(23+Math.sin(u*Math.PI)*13);alpha=1;lw=13;}
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=SKIN;ctx.lineWidth=lw;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(14,side*12);
+  ctx.quadraticCurveTo((14+hx)/2,side*26,hx,hy);ctx.stroke();ctx.restore();
+  if(pull&&u<.18){ctx.fillStyle='rgba(255,255,255,.7)';circ(hx,hy,11-u*30);ctx.fill();}
+}
+
+/* ---------- בקבוק ---------- */
+function drawBottle(b){
+  ctx.save();ctx.translate(b.x,b.y);
+  ctx.rotate(Math.sin(t*2+b.ph)*.22);
+  const p=1+Math.sin(t*5+b.ph)*.06;ctx.scale(p,p);
+  ctx.fillStyle='rgba(255,255,255,.2)';circ(0,0,30);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=2;
+  circ(0,0,26+Math.sin(t*4+b.ph)*3);ctx.stroke();
+  ctx.fillStyle='rgba(3,40,64,.25)';rr(-8,-14,20,34,9);ctx.fill();
+  const g=ctx.createLinearGradient(-10,0,10,0);
+  g.addColorStop(0,'#bff0ff');g.addColorStop(.5,'#7fd8f5');g.addColorStop(1,'#39b0dd');
+  ctx.fillStyle=g;rr(-10,-16,20,34,9);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.75)';rr(-7,-12,4,24,2);ctx.fill();
+  ctx.fillStyle='#fff';rr(-10,-4,20,11,2);ctx.fill();
+  ctx.fillStyle='#0b6c9c';ctx.font='900 8px Rubik, Arial';ctx.textAlign='center';ctx.fillText('WATER',0,4);
+  ctx.fillStyle='#0b6c9c';rr(-6,-24,12,9,3);ctx.fill();
+  ctx.globalAlpha=Math.abs(Math.sin(t*3+b.ph));ctx.fillStyle='#ffc53d';
+  ctx.beginPath();ctx.moveTo(17,-20);ctx.lineTo(20,-13);ctx.lineTo(27,-10);ctx.lineTo(20,-7);
+  ctx.lineTo(17,0);ctx.lineTo(14,-7);ctx.lineTo(7,-10);ctx.lineTo(14,-13);ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- חלקיקים ---------- */
+function addFoam(x,y,n,pw){
+  for(let i=0;i<n;i++)foam.push({x:x+rand(-9,9),y:y+rand(-8,8),r:rand(3,9)*(pw||1),
+    vx:rand(-30,30),vy:rand(40,150),life:0,max:rand(.4,1)});
+}
+function addConfetti(n){
+  for(let i=0;i<n;i++)confetti.push({x:rand(WATER_L,WATER_R),y:rand(-60,-5),
+    vx:rand(-30,30),vy:rand(120,300),rot:rand(0,7),vr:rand(-6,6),
+    c:pick(['#ff6b57','#ffc53d','#7ee787','#8ab6ff','#ff8fd0','#ffffff']),
+    w:rand(6,12),h:rand(8,15),life:0,max:rand(2.5,4.5)});
+}
+
+function spawnObstacle(){
+  const kid=Math.random()<.4, toward=Math.random()<.55;
+  obstacles.push({x:rand(SWIM_L,SWIM_R),y:-90,
+    s:kid?rand(.6,.76):rand(.88,1.04),r:kid?23:31,
+    facing:toward?-1:1, rel:toward?rand(20,95):rand(-95,-15),
+    ph:rand(0,7),drift:rand(-28,28),
+    skin:pick(SKINS),cap:pick(['#e63946','#ffc53d','#7ee787','#ff8fd0','#ffffff','#1d3557','#ff8c42']),
+    suit:pick(['#1d3557','#2a9d8f','#e76f51','#5c4b8a','#264653'])});
+}
+function spawnBottle(){bottles.push({x:rand(SWIM_L+10,SWIM_R-10),y:-70,ph:rand(0,7)});}
+
+/* ---------- קלט ---------- */
+const keys={};
+addEventListener('keydown',e=>{keys[e.key]=true;
+  if([' ','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();
+  if(e.key===' '&&state!=='playing')startGame();});
+addEventListener('keyup',e=>keys[e.key]=false);
+
+let joy=0;
+const stick=document.getElementById('stick'), knob=document.getElementById('knob');
+let stickId=null;
+function stickMove(e){
+  const r=stick.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  const max=r.width*.32;
+  let dx=clamp(e.clientX-cx,-max,max), dy=clamp(e.clientY-cy,-max,max);
+  joy=dx/max;
+  knob.style.transform='translate('+dx+'px,'+(dy*.35)+'px)';
+}
+stick.addEventListener('pointerdown',e=>{stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e);});
+stick.addEventListener('pointermove',e=>{if(stickId===e.pointerId)stickMove(e);});
+function stickEnd(e){if(stickId===e.pointerId){stickId=null;joy=0;knob.style.transform='translate(0,0)';}}
+stick.addEventListener('pointerup',stickEnd);
+stick.addEventListener('pointercancel',stickEnd);
+
+let pointerX=null;
+function ptrX(e){const r=cvs.getBoundingClientRect();return (e.clientX-r.left)*(W/r.width);}
+cvs.addEventListener('pointerdown',e=>{pointerX=ptrX(e);cvs.setPointerCapture(e.pointerId);});
+cvs.addEventListener('pointermove',e=>{if(pointerX!==null)pointerX=ptrX(e);});
+cvs.addEventListener('pointerup',()=>pointerX=null);
+cvs.addEventListener('pointercancel',()=>pointerX=null);
+
+/* ---------- משחק ---------- */
+function reset(){
+  dist=0;energy=100;speed=210;boost=0;inv=0;shake=0;bottlesGot=0;
+  obstacles=[];bottles=[];foam=[];confetti=[];cheers=[];
+  itai={x:W/2,vx:0,tilt:0};
+  scrollY=0;lastMile=0;spawnT=1.5;bottleT=3.5;cheerT=.8;banner=null;
+  styleIdx=0;styleChip.textContent=STYLES[0].i+' '+STYLES[0].n;
+  initSpectators();
+}
+function startGame(){
+  reset();state='playing';
+  menu.classList.add('hidden');over.classList.add('hidden');
+  beep(660,.12,'triangle',.08);setTimeout(()=>beep(880,.16,'triangle',.08),120);
+}
+function endGame(){
+  state='over';best=Math.max(best,Math.floor(dist));
+  el('finalDist').textContent=Math.floor(dist);
+  el('finalBottles').textContent=bottlesGot;
+  el('finalBest').textContent=best;
+  el('overTitle').textContent=(Math.floor(dist)>=best&&dist>0)?'שיא חדש! 🏆':'איתי עייף! 😮‍💨';
+  el('overSub').textContent=dist>200?'הקהל קם על הרגליים בשבילך!':'עוד ניסיון אחד ושוברים את השיא.';
+  over.classList.remove('hidden');
+  beep(300,.3,'sawtooth',.06);
+}
+
+function update(dt){
+  t+=dt;
+  if(state!=='playing'){
+    scrollY+=70*dt;
+    cheerT-=dt;if(cheerT<=0){spawnCheer();cheerT=rand(1.4,2.6);}
+    cheers.forEach(c=>c.life+=dt);cheers=cheers.filter(c=>c.life<c.max);
+    spectators.forEach(s=>s.y+=70*dt);recycleSpectators();
+    confetti.forEach(c=>{c.life+=dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.rot+=c.vr*dt;});
+    confetti=confetti.filter(c=>c.life<c.max&&c.y<H+40);
+    return;
+  }
+  let dir=joy;
+  if(keys['ArrowLeft']||keys['a']||keys['A'])dir-=1;
+  if(keys['ArrowRight']||keys['d']||keys['D'])dir+=1;
+  if(pointerX!==null)dir=clamp((pointerX-itai.x)/55,-1,1);
+  dir=clamp(dir,-1,1);
+  itai.vx+=dir*2100*dt;
+  itai.vx*=Math.pow(.0022,dt);
+  itai.x+=itai.vx*dt;
+  if(itai.x<SWIM_L){itai.x=SWIM_L;itai.vx*=-.25;}
+  if(itai.x>SWIM_R){itai.x=SWIM_R;itai.vx*=-.25;}
+  itai.tilt=clamp(itai.vx/1100,-.32,.32);
+
+  const target=(210+Math.min(dist*.55,150))*(boost>0?1.75:1)*STYLE_SPD[styleIdx];
+  speed+=(target-speed)*Math.min(1,dt*3);
+  scrollY+=speed*dt;
+  dist+=speed*dt/100;
+
+  if(boost>0)boost-=dt;
+  if(inv>0)inv-=dt;
+  if(shake>0)shake-=dt;
+
+  energy-=(2.6+(boost>0?2.6:0))*dt;
+  if(energy<=0){energy=0;endGame();return;}
+
+  if(Math.floor(dist/50)>lastMile){
+    lastMile=Math.floor(dist/50);const m=lastMile*50;
+    const ns=Math.floor(dist/200)%3;
+    if(ns!==styleIdx){
+      styleIdx=ns;const st=STYLES[styleIdx];
+      styleChip.textContent=st.i+' '+st.n;
+      banner={text:'סגנון '+st.n+'! '+st.i,life:0};
+      addConfetti(50);
+      beep(520,.1,'triangle',.07);setTimeout(()=>beep(820,.16,'triangle',.07),120);
+    }else{
+      banner={text:m===550?'מזל טוב איתי! גיל 11 🎂':(m+' מטר! 🔥'),life:0};
+      addConfetti(m===550?90:35);beep(880,.12,'triangle',.07);
+    }
+  }
+
+  spawnT-=dt;if(spawnT<=0){spawnObstacle();spawnT=rand(.85,1.6)*clamp(1-dist/900,.5,1);}
+  bottleT-=dt;if(bottleT<=0){spawnBottle();bottleT=rand(4,7.5);}
+  cheerT-=dt;if(cheerT<=0){spawnCheer();cheerT=rand(1.2,2.4);}
+
+  obstacles.forEach(o=>{
+    o.y+=(speed+o.rel)*dt;
+    o.x+=Math.sin(t*1.1+o.ph)*o.drift*dt;
+    o.x=clamp(o.x,SWIM_L-6,SWIM_R+6);
+    if(inv<=0){
+      const dx=o.x-itai.x,dy=o.y-ITAI_Y;
+      if(dx*dx+dy*dy<(o.r+28)*(o.r+28)){
+        energy-=22;inv=1.3;shake=.35;boost=0;speed*=.55;
+        addFoam(itai.x,ITAI_Y-20,16,1.4);beep(180,.22,'square',.07);
+        const vis=spectators.filter(s=>s.y>120&&s.y<POOL_B-80);
+        if(vis.length&&cheers.length<2)cheers.push({sp:pick(vis),text:pick(['אוי! 😬','זהירות איתי!','תמשיך תמשיך!']),life:0,max:2});
+      }
+    }
+  });
+  obstacles=obstacles.filter(o=>o.y<H+120);
+
+  bottles.forEach(b=>{
+    b.y+=speed*dt;
+    const dx=b.x-itai.x,dy=b.y-ITAI_Y;
+    if(dx*dx+dy*dy<44*44){
+      b.dead=true;bottlesGot++;energy=Math.min(100,energy+32);boost=2.6;
+      addFoam(b.x,b.y,14,.8);addConfetti(12);
+      beep(980,.1,'sine',.07);setTimeout(()=>beep(1320,.12,'sine',.06),90);
+    }
+  });
+  bottles=bottles.filter(b=>!b.dead&&b.y<H+60);
+
+  addFoam(itai.x,ITAI_Y+60,boost>0?3:2,boost>0?1.3:1);
+  foam.forEach(f=>{f.life+=dt;f.x+=f.vx*dt;f.y+=(f.vy+speed*.35)*dt;});
+  foam=foam.filter(f=>f.life<f.max&&f.y<POOL_B+40);
+
+  confetti.forEach(c=>{c.life+=dt;c.x+=c.vx*dt;c.y+=(c.vy+speed*.25)*dt;c.rot+=c.vr*dt;});
+  confetti=confetti.filter(c=>c.life<c.max&&c.y<H+40);
+
+  cheers.forEach(c=>c.life+=dt);cheers=cheers.filter(c=>c.life<c.max);
+
+  spectators.forEach(s=>s.y+=speed*dt*.9);recycleSpectators();
+
+  if(banner){banner.life+=dt;if(banner.life>2.2)banner=null;}
+
+  distTxt.textContent=Math.floor(dist);
+  bestTxt.textContent=Math.max(best,Math.floor(dist));
+  bottleTxt.textContent=bottlesGot;
+  energyBar.style.width=energy+'%';
+  energyBar.style.background=energy>50?'linear-gradient(90deg,#00c2a8,#7ee787)'
+    :energy>25?'linear-gradient(90deg,#ffb03a,#ffd76e)':'linear-gradient(90deg,#e63946,#ff8a7a)';
+}
+function recycleSpectators(){
+  for(const s of spectators){
+    if(s.y>H+130){
+      let minY=1e9;
+      for(const o of spectators) if(o.deck===s.deck&&o.y<minY) minY=o.y;
+      Object.assign(s,makeSpectator(minY-rand(86,132),s.deck));
+    }
+  }
+}
+
+function render(){
+  ctx.save();
+  if(shake>0)ctx.translate(rand(-6,6)*shake*3,rand(-6,6)*shake*3);
+
+  drawWater();
+  drawRopes();
+  bottles.forEach(drawBottle);
+  obstacles.forEach(drawSwimmerBody);
+  foam.forEach(f=>{const a=1-f.life/f.max;
+    ctx.fillStyle='rgba(255,255,255,'+(a*.55)+')';circ(f.x,f.y,f.r*(.6+a*.6));ctx.fill();});
+  if(state!=='menu')drawItai();
+
+  drawDecks();
+  spectators.forEach(drawSpectator);
+  cheers.forEach(drawCheer);
+
+  confetti.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.rot);
+    ctx.globalAlpha=clamp(1-c.life/c.max,0,1);ctx.fillStyle=c.c;
+    ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);ctx.restore();});
+
+  if(banner){
+    const k=banner.life/2.2,pop=k<.15?.6+.4*(k/.15):1;
+    ctx.save();ctx.globalAlpha=clamp(k>.75?(1-k)/.25:1,0,1);
+    ctx.translate(W/2,300);ctx.scale(pop,pop);
+    ctx.font='900 34px Rubik, Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineWidth=8;ctx.strokeStyle='rgba(6,40,61,.65)';ctx.strokeText(banner.text,0,0);
+    ctx.fillStyle='#ffc53d';ctx.fillText(banner.text,0,0);ctx.restore();
+  }
+  if(boost>0){
+    ctx.save();ctx.globalAlpha=.22+.14*Math.sin(t*14);
+    const g=ctx.createLinearGradient(0,POOL_B,0,POOL_B*.35);
+    g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;ctx.fillRect(WATER_L,POOL_B*.35,WATER_R-WATER_L,POOL_B*.65);ctx.restore();
+  }
+  ctx.restore();
+}
+
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  update(dt);render();requestAnimationFrame(loop);
+}
+
+el('startBtn').addEventListener('click',startGame);
+el('againBtn').addEventListener('click',startGame);
+el('muteBtn').addEventListener('click',()=>{muted=!muted;el('muteBtn').textContent=muted?'🔇':'🔊';});
+
+makeTerrazzo();reset();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
