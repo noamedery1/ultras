@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>המנחוסים 2 — ליל אוסטריה וינה 🟡⚫</title>
+<style>
+  :root{
+    --yellow:#ffd200;
+    --yellow-dark:#e6bd00;
+    --black:#111;
+    --black-soft:#1c1c1c;
+    --gray:#2a2a2a;
+    --green:#28c76f;
+    --red:#ea5455;
+    --white:#fff;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#333 0%,var(--black) 60%);
+    color:var(--white);
+    min-height:100%;
+    display:flex;
+    justify-content:center;
+    padding:14px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ===== Header ===== */
+  header{
+    text-align:center;
+    padding:8px 0 14px;
+  }
+  header .logo{
+    font-size:40px;
+    line-height:1;
+  }
+  header h1{
+    font-size:26px;
+    color:var(--yellow);
+    letter-spacing:.5px;
+    margin-top:4px;
+  }
+  header .sub{
+    font-size:14px;
+    color:#bbb;
+    margin-top:2px;
+  }
+
+  /* ===== Screens ===== */
+  .screen{display:none;animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ===== Buttons ===== */
+  .btn{
+    display:block;
+    width:100%;
+    border:none;
+    border-radius:var(--radius);
+    padding:16px;
+    font-size:17px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:transform .08s ease, filter .15s ease;
+    text-align:center;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--yellow);color:var(--black);}
+  .btn-dark{background:var(--gray);color:var(--white);border:2px solid #3a3a3a;}
+  .btn-ghost{background:transparent;color:var(--yellow);border:2px solid var(--yellow);}
+
+  /* ===== Mode cards (home) ===== */
+  .mode-card{
+    background:linear-gradient(135deg,var(--black-soft),var(--gray));
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:transform .08s ease, border-color .15s ease;
+  }
+  .mode-card:active{transform:scale(.98);}
+  .mode-card:hover{border-color:var(--yellow);}
+  .mode-card .emoji{font-size:34px;}
+  .mode-card .info h3{font-size:18px;color:var(--yellow);margin-bottom:3px;}
+  .mode-card .info p{font-size:13px;color:#aaa;}
+
+  .home-foot{margin-top:6px;text-align:center;font-size:12px;color:#666;}
+
+  /* ===== Game top bar ===== */
+  .gamebar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-size:14px;
+  }
+  .gamebar .pill{
+    background:var(--gray);
+    padding:7px 12px;
+    border-radius:999px;
+    font-weight:700;
+  }
+  .gamebar .pill b{color:var(--yellow);}
+  .progress{
+    height:8px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .progress > div{
+    height:100%;
+    background:var(--yellow);
+    width:0%;
+    transition:width .3s ease;
+  }
+
+  /* ===== Timer ===== */
+  .timer{
+    height:6px;
+    background:var(--gray);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .timer > div{
+    height:100%;
+    background:var(--green);
+    width:100%;
+  }
+  .timer.run > div{transition:width linear;}
+
+  /* ===== Question card ===== */
+  .qcard{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .qcard .label{
+    font-size:12px;
+    color:var(--yellow);
+    font-weight:700;
+    margin-bottom:10px;
+    letter-spacing:.5px;
+  }
+  .quote{
+    font-size:20px;
+    line-height:1.5;
+    font-weight:600;
+  }
+  .quote-mark{color:var(--yellow);font-size:26px;}
+
+  /* chat bubbles for mode 2 */
+  .chat{display:flex;flex-direction:column;gap:8px;}
+  .bubble{
+    max-width:85%;
+    padding:10px 14px;
+    border-radius:16px;
+    font-size:15px;
+    line-height:1.4;
+  }
+  .bubble.left{align-self:flex-start;background:var(--gray);border-top-right-radius:4px;}
+  .bubble.right{align-self:flex-end;background:#3a3520;border-top-left-radius:4px;}
+  .bubble .who{font-size:11px;color:var(--yellow);margin-bottom:3px;font-weight:700;}
+
+  /* ===== Options ===== */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{
+    background:var(--gray);
+    border:2px solid #3a3a3a;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:16px;
+    font-weight:600;
+    font-family:inherit;
+    color:var(--white);
+    cursor:pointer;
+    text-align:right;
+    transition:transform .08s ease, background .15s;
+  }
+  .option:active{transform:scale(.98);}
+  .option.correct{background:var(--green);border-color:var(--green);color:#04240f;}
+  .option.wrong{background:var(--red);border-color:var(--red);}
+  .option.disabled{pointer-events:none;opacity:.85;}
+
+  .feedback{
+    text-align:center;
+    margin-top:16px;
+    min-height:52px;
+  }
+  .feedback .msg{font-size:18px;font-weight:700;margin-bottom:4px;}
+  .feedback .stat{font-size:13px;color:#aaa;}
+  .feedback.hide{display:none;}
+
+  /* ===== Results ===== */
+  .result-card{
+    background:linear-gradient(135deg,var(--yellow),var(--yellow-dark));
+    color:var(--black);
+    border-radius:var(--radius);
+    padding:26px 20px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .result-card .big{font-size:52px;font-weight:800;line-height:1;}
+  .result-card .of{font-size:20px;font-weight:700;opacity:.7;}
+  .result-card .title{font-size:22px;font-weight:800;margin:10px 0 4px;}
+  .result-card .rank{font-size:16px;font-weight:700;background:rgba(0,0,0,.12);display:inline-block;padding:6px 14px;border-radius:999px;margin-top:8px;}
+  .result-card .mode-name{font-size:14px;font-weight:700;opacity:.75;margin-top:12px;}
+
+  .stack{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+
+  /* ===== Diggers (מי הכי חופר) ===== */
+  .diggers-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px dashed var(--yellow);
+  }
+  .section-title{
+    font-size:16px;color:var(--yellow);font-weight:800;
+    margin:20px 0 10px;display:flex;align-items:center;gap:8px;
+  }
+  .subtle{font-size:12px;color:#888;margin-bottom:14px;text-align:center;}
+
+  .bar-row{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:14px;
+  }
+  .bar-row .rk{width:24px;text-align:center;font-weight:800;color:#888;flex:0 0 auto;}
+  .bar-row .bar-wrap{flex:1;background:var(--gray);border-radius:8px;overflow:hidden;height:30px;position:relative;}
+  .bar-row .bar{
+    height:100%;background:linear-gradient(90deg,var(--yellow-dark),var(--yellow));
+    display:flex;align-items:center;padding:0 8px;
+    border-radius:8px;min-width:fit-content;
+  }
+  .bar-row .nm{font-weight:700;color:var(--black);font-size:13px;white-space:nowrap;}
+  .bar-row .ct{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+    font-size:12px;font-weight:800;color:#ccc;}
+  .bar-row.top1 .bar{background:linear-gradient(90deg,#d4a017,#ffe14d);}
+
+  .month-tbl{width:100%;border-collapse:collapse;font-size:14px;}
+  .month-tbl th{
+    text-align:right;color:#888;font-weight:700;font-size:12px;
+    padding:6px 8px;border-bottom:1px solid #333;
+  }
+  .month-tbl td{padding:9px 8px;border-bottom:1px solid #262626;}
+  .month-tbl tr:hover td{background:#1e1e1e;}
+  .month-tbl .champ{font-weight:800;color:var(--yellow);}
+  .month-tbl .cnt{color:#bbb;text-align:left;font-variant-numeric:tabular-nums;}
+  .month-tbl .mon{color:#ddd;white-space:nowrap;}
+
+  /* ===== Awards (פרסי המנחוסים) ===== */
+  .awards-card{
+    background:linear-gradient(135deg,#2a2410,#1a1a1a);
+    border:2px solid #d4a017;
+  }
+  .award{
+    background:linear-gradient(135deg,#242424,#181818);
+    border:2px solid #333;border-radius:16px;
+    padding:16px;margin-bottom:12px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .award.gold{border-color:var(--yellow);box-shadow:0 0 24px rgba(255,210,0,.12);}
+  .award .aw-emoji{font-size:42px;flex:0 0 auto;}
+  .award .aw-body{flex:1;min-width:0;}
+  .award .aw-title{font-size:16px;font-weight:800;color:var(--yellow);}
+  .award .aw-sub{font-size:12px;color:#999;margin-bottom:6px;}
+  .award .aw-winner{font-size:22px;font-weight:800;color:#fff;}
+  .award .aw-winner .aw-num{font-size:14px;color:#aaa;font-weight:700;margin-right:6px;}
+  .award .aw-runners{font-size:12px;color:#777;margin-top:4px;}
+  .award .aw-preview{
+    font-size:12px;color:#aaa;margin-top:6px;font-style:italic;
+    border-right:3px solid var(--yellow);padding-right:8px;line-height:1.4;
+  }
+
+  /* ===== In-game controls ===== */
+  .gamectrl{display:flex;gap:8px;margin-bottom:12px;}
+  .mini-btn{
+    flex:1;background:var(--gray);color:#ccc;border:1px solid #3a3a3a;
+    border-radius:10px;padding:8px;font-size:13px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:transform .08s ease;
+  }
+  .mini-btn:active{transform:scale(.96);}
+  .mini-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">🟡⚫</div>
+    <h1>המנחוסים</h1>
+    <div class="sub">ביתר ירושלים • ליל אוסטריה וינה, חמישי 30.7</div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen active">
+    <div class="mode-card" data-mode="who" onclick="Game.start('who')">
+      <div class="emoji">🕵️</div>
+      <div class="info">
+        <h3>מי אמר את זה?!</h3>
+        <p>ציטוט מהצ'אט — נחשו מי הפה הגדול</p>
+      </div>
+    </div>
+    <div class="mode-card" data-mode="toWhom" onclick="Game.start('toWhom')">
+      <div class="emoji">💬</div>
+      <div class="info">
+        <h3>מי אמר למי?</h3>
+        <p>שיחה מהקבוצה — מי דיבר אל מי</p>
+      </div>
+    </div>
+    <div class="mode-card" data-mode="context" onclick="Game.start('context')">
+      <div class="emoji">🎭</div>
+      <div class="info">
+        <h3>באיזה הקשר?!</h3>
+        <p>משפט תלוש — מה באמת קרה שם</p>
+      </div>
+    </div>
+    <div class="mode-card diggers-card" onclick="Diggers.open()">
+      <div class="emoji">🔧</div>
+      <div class="info">
+        <h3>מי הכי חופר?</h3>
+        <p>טבלת המפציצים — כמה הודעות כל אחד שלח</p>
+      </div>
+    </div>
+    <div class="mode-card awards-card" onclick="Awards.open()">
+      <div class="emoji">🏆</div>
+      <div class="info">
+        <h3>פרסי המנחוסים</h3>
+        <p>מלך הצחוקים, ינשוף הלילה, הפה המלוכלך ועוד</p>
+      </div>
+    </div>
+    <div class="home-foot">📸 בסוף כל סבב אפשר לצלם ולשלוח לקבוצה</div>
+  </section>
+
+  <!-- ============ DIGGERS ============ -->
+  <section id="diggers" class="screen">
+    <div class="section-title">👑 פטפטני הערב (חמישי 30.7, 16:00–06:00)</div>
+    <div class="subtle">מספר ההודעות שכל אחד שלח באותו לילה</div>
+    <div id="diggersOverall"></div>
+
+    <div class="section-title">🕐 אלוף החופרים של כל שעה</div>
+    <div class="subtle">מי שלח הכי הרבה הודעות בכל שעה</div>
+    <table class="month-tbl">
+      <thead><tr><th>שעה</th><th>האלוף 🔧</th><th class="cnt">הודעות</th></tr></thead>
+      <tbody id="diggersMonths"></tbody>
+    </table>
+
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ AWARDS ============ -->
+  <section id="awards" class="screen">
+    <div class="section-title">🏆 פרסי המנחוסים</div>
+    <div class="subtle">התארים היוקרתיים של הקבוצה — לפי הצ'אט מהשנה האחרונה</div>
+    <div id="awardsList"></div>
+    <div class="stack" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="game" class="screen">
+    <div class="gamectrl">
+      <button class="mini-btn" onclick="Game.restart()">🔄 התחל מחדש</button>
+      <button class="mini-btn" onclick="Game.quit()">🏠 מסך הבית</button>
+    </div>
+    <div class="gamebar">
+      <span class="pill">שאלה <b><span id="qNum">1</span>/<span id="qTotal">5</span></b></span>
+      <span class="pill">ניקוד <b id="score">0</b></span>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="timer" id="timerWrap"><div id="timerBar"></div></div>
+
+    <div class="qcard" id="qcard"></div>
+
+    <div class="options" id="options"></div>
+
+    <div class="feedback hide" id="feedback">
+      <div class="msg" id="fbMsg"></div>
+      <div class="stat" id="fbStat"></div>
+    </div>
+
+    <button class="btn btn-primary hidden" id="nextBtn" style="margin-top:16px" onclick="Game.next()">הבא ➟</button>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="screen">
+    <div class="result-card" id="resultCard">
+      <div><span class="big" id="rScore">0</span><span class="of">/<span id="rTotal">5</span></span></div>
+      <div class="title" id="rTitle">כל הכבוד!</div>
+      <div class="rank" id="rRank"></div>
+      <div class="mode-name" id="rMode"></div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" onclick="Game.share()">📲 שתף לקבוצה</button>
+      <button class="btn btn-dark" onclick="Game.replay()">🔁 עוד סבב באותו מצב</button>
+      <button class="btn btn-ghost" onclick="Nav.go('home')">🏠 חזרה למסך הבית</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   DATA — ציטוטים אמיתיים מהצ'אט של הקבוצה (שנה אחרונה).
+   השמות מופו לפי מספרי הטלפון של החברים.
+   ========================================================= */
+
+const PLAYERS = ["מתן לוגסי", "נועם", "אורון", "עומרי", "יצחק נגר", "ניב שחר", "אופיר", "בוקבוזה", "שמוליק", "ניב לא השוטר", "שחר", "נילי", "מתן מלכה", "אליאור", "משה אזולאי", "יוסף", "אלעד", "ליאו", "גיא", "עידן", "אביב", "סהר", "יוני סעדון", "אושר", "דודי", "אביאל", "מיכאל", "פדידה"];
+
+const DATA = {"who": [{"quote": "סילבה, לך הביתה בן זונה שוטר", "answer": "נועם", "options": ["נועם", "יוני סעדון", "אופיר", "משה אזולאי"]}, {"quote": "בואו נרד מהסיפור של רעיית שוער ראדון. היא לא נבחרת ציבור, והיא זכאית לפרטיות שלה", "answer": "מתן לוגסי", "options": ["מתן לוגסי", "ליאו", "אופיר", "אלעד"]}, {"quote": "איזה בושה, שני שערים: אחד אינו מטומטם, אחד קראבלי מטומטם", "answer": "אופיר", "options": ["אופיר", "אביאל", "מתן מלכה", "משה אזולאי"]}, {"quote": "סילבה אחראי להדחה מהגביע, סילבה אחראי להדחה מאירופה", "answer": "משה אזולאי", "options": ["משה אזולאי", "מתן לוגסי", "גיא", "עומרי"]}, {"quote": "שקט יא מנחוס", "answer": "אורון", "options": ["אורון", "אביאל", "אביב", "יוסף"]}, {"quote": "מי נתן לורמוט הזבל לפרשן אותנו", "answer": "ליאו", "options": ["ליאו", "משה אזולאי", "בוקבוזה", "אביב"]}, {"quote": "מה אלמוג הזבל הזה עושה איתם", "answer": "נועם", "options": ["נועם", "יוני סעדון", "משה אזולאי", "מתן לוגסי"]}, {"quote": "חייב בלם, וגם 6, כוס אמק", "answer": "אופיר", "options": ["אופיר", "אליאור", "אלעד", "מתן לוגסי"]}, {"quote": "אחד הרגעים הכי קשים בשנים האחרונות", "answer": "שחר", "options": ["שחר", "ניב שחר", "יוסף", "אורון"]}, {"quote": "ברור שיורחק, זה בושה שהוא הסתובב עם פטיש והתחיל לפגוע בדברים, איזה טמבל הוא", "answer": "ניב שחר", "options": ["ניב שחר", "דודי", "פדידה", "אביאל"]}, {"quote": "הבמאי חרמן מת עליה", "answer": "שחר", "options": ["שחר", "ליאו", "אושר", "בוקבוזה"]}, {"quote": "שחרית מנחה ערבית", "answer": "מתן לוגסי", "options": ["מתן לוגסי", "אורון", "אביאל", "אושר"]}, {"quote": "קופץ בלי לפתוח ידיים", "answer": "נועם", "options": ["נועם", "יצחק נגר", "יוני סעדון", "משה אזולאי"]}, {"quote": "אוסטריה וינה 3-1", "answer": "אורון", "options": ["אורון", "מתן מלכה", "שחר", "יוני סעדון"]}, {"quote": "אסור פנדלים!!!! ראיתם מה היה נגד הפועל!!!!", "answer": "יצחק נגר", "options": ["יצחק נגר", "מתן לוגסי", "משה אזולאי", "עידן"]}, {"quote": "בלמים שערורייה באמת", "answer": "עומרי", "options": ["עומרי", "אביאל", "ליאו", "משה אזולאי"]}, {"quote": "סילבה יא זונה, סילבה יא זונה", "answer": "נועם", "options": ["נועם", "יוסף", "אושר", "ניב לא השוטר"]}, {"quote": "בכל הפנדלים הוא קופץ למקום הנכון, ולא תופס", "answer": "ניב לא השוטר", "options": ["ניב לא השוטר", "פדידה", "מיכאל", "אלעד"]}, {"quote": "בן שרמוטה מכר אותנו", "answer": "ניב לא השוטר", "options": ["ניב לא השוטר", "דודי", "שחר", "עידן"]}, {"quote": "ארור מי שהשאיר את השוער הזה", "answer": "מתן מלכה", "options": ["מתן מלכה", "עידן", "בוקבוזה", "אביאל"]}, {"quote": "אנחנו עם 0 בעיטות למסגרת — איפה אנחנו עולים עליהם? בהחזקת כדור?", "answer": "מתן מלכה", "options": ["מתן מלכה", "ניב לא השוטר", "עידן", "שחר"]}, {"quote": "אולי צריכים שוטף כלים בבוקרשט", "answer": "שמוליק", "options": ["שמוליק", "שחר", "אביב", "יוני סעדון"]}, {"quote": "שמישהו יעדכן אותם שזה לא משחק אימון", "answer": "שמוליק", "options": ["שמוליק", "אליאור", "פדידה", "אופיר"]}, {"quote": "אף פעם אירופה לא הייתה הצד החזק שלנו", "answer": "יוסף", "options": ["יוסף", "ניב לא השוטר", "אופיר", "מתן לוגסי"]}, {"quote": "אמן, יפול מהמטוס בדרך חזרה", "answer": "גיא", "options": ["גיא", "פדידה", "אלעד", "מיכאל"]}, {"quote": "איזה גרוע אתה גיל כהן, לעזאזל", "answer": "אביב", "options": ["אביב", "אביאל", "נועם", "עומרי"]}, {"quote": "אתם מודעים לזה שאנחנו לא באמת גנבנו דירוג, כן?", "answer": "סהר", "options": ["סהר", "אביב", "עומרי", "ניב לא השוטר"]}, {"quote": "כל זה התחיל מאינו הטמבל הזה", "answer": "אושר", "options": ["אושר", "יצחק נגר", "שמוליק", "ניב שחר"]}, {"quote": "מוות לכולם", "answer": "אליאור", "options": ["אליאור", "אושר", "יוני סעדון", "יצחק נגר"]}, {"quote": "שמעו, הבנאדם הזה גאון", "answer": "אליאור", "options": ["אליאור", "אורון", "גיא", "יוסף"]}, {"quote": "מוצה גם חלש לא??", "answer": "אליאור", "options": ["אליאור", "בוקבוזה", "אביב", "מתן לוגסי"]}], "toWhom": [{"chat": [{"side": "right", "who": "❓", "text": "___ הרגת אותי"}], "speaker": "אורון", "target": "מתן לוגסי", "options": ["אורון ← מתן לוגסי", "אביב ← מתן לוגסי", "יוני סעדון ← ליאו", "יצחק נגר ← שחר"]}, {"chat": [{"side": "right", "who": "❓", "text": "איך ___ מעליי בפה מלוכלך??"}], "speaker": "אליאור", "target": "אופיר", "options": ["אליאור ← אופיר", "אופיר ← אורון", "גיא ← נילי", "יוני סעדון ← בוקבוזה"]}, {"chat": [{"side": "right", "who": "❓", "text": "עכשיו זה זמן טוב להרוויח נקודות במשחק של ___"}], "speaker": "מתן לוגסי", "target": "נועם", "options": ["מתן לוגסי ← נועם", "משה אזולאי ← מיכאל", "דודי ← סהר", "ליאו ← גיא"]}, {"chat": [{"side": "right", "who": "❓", "text": "___ התעוררה סוף סוף"}], "speaker": "אורון", "target": "נילי", "options": ["אורון ← נילי", "יוני סעדון ← אופיר", "מתן מלכה ← אביאל", "ניב שחר ← יוסף"]}, {"chat": [{"side": "right", "who": "❓", "text": "שמע ___ אתה אגדה"}], "speaker": "אורון", "target": "אופיר", "options": ["אורון ← אופיר", "נילי ← אביב", "ניב לא השוטר ← ליאו", "ניב לא השוטר ← מתן לוגסי"]}, {"chat": [{"side": "right", "who": "❓", "text": "זה עייפות פסיכית, 120 דקות באוגוסט הם גמורים, ימצחיק ___"}], "speaker": "אופיר", "target": "עומרי", "options": ["אופיר ← עומרי", "מתן לוגסי ← יוני סעדון", "שחר ← סהר", "יוסף ← אביב"]}, {"chat": [{"side": "right", "who": "❓", "text": "מה אתה אומר על אוסטריה וינה ___?"}], "speaker": "אופיר", "target": "מיכאל", "options": ["אופיר ← מיכאל", "עומרי ← פדידה", "שחר ← ניב לא השוטר", "עומרי ← בוקבוזה"]}, {"chat": [{"side": "right", "who": "❓", "text": "איפה הרומני ___"}], "speaker": "עומרי", "target": "דודי", "options": ["עומרי ← דודי", "בוקבוזה ← סהר", "מתן מלכה ← עומרי", "שחר ← אושר"]}, {"chat": [{"side": "right", "who": "❓", "text": "לא יגיע שוער חדש באוגוסט ___"}], "speaker": "אופיר", "target": "נילי", "options": ["אופיר ← נילי", "אלעד ← מתן מלכה", "סהר ← שמוליק", "אליאור ← מתן מלכה"]}, {"chat": [{"side": "right", "who": "❓", "text": "הדבר היחיד שאני רואה בתמונה זה את הדייט הבא של ___"}], "speaker": "משה אזולאי", "target": "נילי", "options": ["משה אזולאי ← נילי", "סהר ← יוסף", "אושר ← מיכאל", "סהר ← גיא"]}], "context": [{"quote": "בואו נרד מהסיפור של רעיית שוער ראדון, היא זכאית לפרטיות", "answer": "כשהקבוצה התחילה לרדת על אשתו של שוער היריב במקום על המשחק", "options": ["כשהקבוצה התחילה לרדת על אשתו של שוער היריב במקום על המשחק", "כשמישהו העלה תמונה של אשתו של סילבה", "אחרי שהשוער שלנו ספג גול", "כשדיברו על מזג האוויר בווינה"]}, {"quote": "הבמאי חרמן מת עליה", "answer": "כשהבמאי בשידור התעקש לצלם שוב ושוב בחורה מהיציע", "options": ["כשהבמאי בשידור התעקש לצלם שוב ושוב בחורה מהיציע", "כשראו את אשתו של המאמן", "כשדיברו על הזמרת ריהאנה", "כשהראו את ספסל היריבה"]}, {"quote": "אוסטריה וינה 3-1", "answer": "התוצאה שהדיחה את ביתר מאירופה — ׳אחד הרגעים הכי קשים בשנים האחרונות׳", "options": ["התוצאה שהדיחה את ביתר מאירופה — ׳אחד הרגעים הכי קשים בשנים האחרונות׳", "תוצאת משחק הליגה של שבת", "ניחוש של מישהו לפני המשחק", "תוצאה של מכבי ת״א באירופה"]}, {"quote": "שחרית מנחה ערבית", "answer": "כשמתן התחיל ׳להתפלל׳ שביתר תחזור למשחק", "options": ["כשמתן התחיל ׳להתפלל׳ שביתר תחזור למשחק", "כששאלו מתי מתפללים בשבת", "כשדיברו על הרב של הקבוצה", "כשמתן סיפר איך עבר עליו היום"]}, {"quote": "אסור פנדלים!!!! ראיתם מה היה נגד הפועל!!!!", "answer": "כשהמשחק התקרב להכרעה ויצחק נכנס לפאניקה מפנדלים", "options": ["כשהמשחק התקרב להכרעה ויצחק נכנס לפאניקה מפנדלים", "כשנזכרו בניצחון על הפועל", "כשדיברו על טעות של השופט", "כשביתר קיבלה פנדל לטובתה"]}, {"quote": "מי נתן לורמוט הזבל לפרשן אותנו", "answer": "כשהקבוצה עלבה בפרשן של השידור", "options": ["כשהקבוצה עלבה בפרשן של השידור", "כשחיפשו איפה משדרים את המשחק", "כשדיברו על מאמן חדש", "כשמישהו הזכיר שדרן ותיק"]}, {"quote": "קופץ בלי לפתוח ידיים", "answer": "כשסילבה השוער ניתר לכיוון הכדור בלי לנסות לעצור", "options": ["כשסילבה השוער ניתר לכיוון הכדור בלי לנסות לעצור", "כשתיארו חבר שרוקד בחתונה", "כשדיברו על שחקן כדורסל", "כשמישהו קפץ לבריכה בסטורי"]}]};
+
+const MODE_META = {
+  who:     {title:"מי אמר את זה?!",   label:"מי אמר את המשפט הבא?"},
+  toWhom:  {title:"מי אמר למי?",      label:"מי כתב את ההודעה — ולמי?"},
+  context: {title:"באיזה הקשר?!",     label:"באיזה הקשר נאמר המשפט?"}
+};
+
+/* =========================================================
+   NAV
+   ========================================================= */
+const Nav = {
+  go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+};
+
+/* =========================================================
+   GAME ENGINE
+   ========================================================= */
+const TIME_PER_Q = 12; // שניות
+const Game = {
+  mode:null, questions:[], idx:0, score:0, timer:null, answered:false,
+
+  start(mode){
+    this.mode = mode;
+    this.questions = shuffle([...DATA[mode]]).slice(0,10);
+    this.idx = 0;
+    this.score = 0;
+    Nav.go('game');
+    document.getElementById('qTotal').textContent = this.questions.length;
+    this.render();
+  },
+
+  render(){
+    this.answered = false;
+    const q = this.questions[this.idx];
+    const meta = MODE_META[this.mode];
+
+    // top bar
+    document.getElementById('qNum').textContent = this.idx+1;
+    document.getElementById('score').textContent = this.score;
+    document.getElementById('progressBar').style.width =
+        (this.idx/this.questions.length*100)+'%';
+
+    // question card
+    const qcard = document.getElementById('qcard');
+    if(this.mode==='toWhom'){
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="chat">` +
+        q.chat.map(b=>`<div class="bubble ${b.side}"><div class="who">${b.who}</div>${escapeHtml(b.text)}</div>`).join('') +
+        `</div>`;
+    } else {
+      qcard.innerHTML = `<div class="label">${meta.label}</div>
+        <div class="quote"><span class="quote-mark">”</span>${escapeHtml(q.quote)}<span class="quote-mark">“</span></div>`;
+    }
+
+    // options
+    const answer = this.mode==='toWhom'
+        ? `${q.speaker} ← ${q.target}`
+        : q.answer;
+    const opts = shuffle([...q.options]);
+    const box = document.getElementById('options');
+    box.innerHTML = '';
+    opts.forEach(opt=>{
+      const b = document.createElement('button');
+      b.className='option';
+      b.textContent=opt;
+      b.onclick=()=>this.answer(b, opt, answer);
+      box.appendChild(b);
+    });
+
+    // feedback + next
+    document.getElementById('feedback').classList.add('hide');
+    document.getElementById('nextBtn').classList.add('hidden');
+
+    this.startTimer(answer);
+  },
+
+  startTimer(answer){
+    const wrap = document.getElementById('timerWrap');
+    const bar = document.getElementById('timerBar');
+    wrap.classList.remove('run');
+    bar.style.transition='none';
+    bar.style.width='100%';
+    bar.style.background='var(--green)';
+    // force reflow
+    void bar.offsetWidth;
+    wrap.classList.add('run');
+    bar.style.transition=`width ${TIME_PER_Q}s linear`;
+    bar.style.width='0%';
+    clearTimeout(this.timer);
+    this.timer = setTimeout(()=>{
+      if(!this.answered) this.answer(null, null, answer, true);
+    }, TIME_PER_Q*1000);
+  },
+
+  answer(btn, choice, answer, timeout=false){
+    if(this.answered) return;
+    this.answered = true;
+    clearTimeout(this.timer);
+    // freeze timer bar
+    const bar=document.getElementById('timerBar');
+    bar.style.transition='none';
+    bar.style.width=getComputedStyle(bar).width;
+
+    const correct = choice===answer;
+    const buttons = document.querySelectorAll('#options .option');
+    buttons.forEach(b=>{
+      b.classList.add('disabled');
+      if(b.textContent===answer) b.classList.add('correct');
+      else if(b===btn) b.classList.add('wrong');
+    });
+
+    // scoring: base 100 + time bonus
+    var gained=0;
+    if(correct){
+      var tw0=document.getElementById('timerWrap').offsetWidth||1;var remaining=parseFloat(bar.style.width)/tw0;if(!isFinite(remaining))remaining=0;remaining=Math.max(0,Math.min(1,remaining));
+      gained = 100 + Math.round(50*remaining);
+      this.score += gained;
+      document.getElementById('score').textContent=this.score;
+    }
+
+    // feedback
+    const fb=document.getElementById('feedback');
+    const msg=document.getElementById('fbMsg');
+    const stat=document.getElementById('fbStat');
+    fb.classList.remove('hide');
+    if(timeout){ msg.textContent='⏱️ נגמר הזמן!'; msg.style.color='var(--red)'; }
+    else if(correct){ msg.textContent=`✅ נכון! +${gained}`; msg.style.color='var(--green)'; }
+    else { msg.textContent='❌ לא נכון'; msg.style.color='var(--red)'; }
+    stat.textContent = pickBanter(correct, timeout);
+
+    document.getElementById('nextBtn').classList.remove('hidden');
+  },
+
+  next(){
+    this.idx++;
+    if(this.idx>=this.questions.length) this.finish();
+    else this.render();
+  },
+
+  finish(){
+    clearTimeout(this.timer);
+    const total = this.questions.length;
+    const maxScore = total*150;
+    const pct = this.score/maxScore;
+    document.getElementById('rScore').textContent=this.score;
+    document.getElementById('rTotal').textContent=maxScore;
+    document.getElementById('rMode').textContent='מצב: '+MODE_META[this.mode].title;
+
+    let title, rank;
+    if(pct>=0.85){ title='חיה של הקבוצה! 🐐'; rank='מלך המנחוסים'; }
+    else if(pct>=0.6){ title='כל הכבוד! 🔥'; rank='ותיק ומנוסה'; }
+    else if(pct>=0.35){ title='לא רע בכלל 👏'; rank='חבר מן המניין'; }
+    else { title='נו באמת… 😅'; rank='חדש בקבוצה'; }
+    document.getElementById('rTitle').textContent=title;
+    document.getElementById('rRank').textContent='🏅 '+rank;
+
+    this.lastResult = {score:this.score, max:maxScore, title, rank, mode:MODE_META[this.mode].title};
+    Nav.go('results');
+  },
+
+  async share(){
+    const r = this.lastResult || {score:0,max:0,title:'',rank:'',mode:''};
+    const text =
+      `🟡⚫ המנחוסים — משחק הקבוצה\n`+
+      `מצב: ${r.mode}\n`+
+      `הניקוד שלי: ${r.score.toLocaleString('he-IL')} 🏅 ${r.rank}\n`+
+      `${r.title}\n`+
+      `מי מנצח אותי? 😏`;
+    // try image share first
+    try{
+      const blob = await makeShareImage(r);
+      if(blob && navigator.canShare && navigator.canShare({files:[new File([blob],'manhousim.png',{type:'image/png'})]})){
+        await navigator.share({files:[new File([blob],'manhousim.png',{type:'image/png'})], text});
+        return;
+      }
+    }catch(e){/* fall through */}
+    // text share
+    if(navigator.share){ try{ await navigator.share({text}); return; }catch(e){} }
+    // whatsapp fallback
+    window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+  },
+
+  replay(){ this.start(this.mode); },
+
+  restart(){ clearTimeout(this.timer); this.start(this.mode); },
+
+  quit(){ clearTimeout(this.timer); this.answered=true; Nav.go('home'); }
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const BANTER_OK=[
+  "יש לך את זה 😎","אתה מכיר אותם טוב מדי…","מנחוס אמיתי 🟡⚫","קלי קלות"
+];
+const BANTER_BAD=[
+  "אתה בכלל בקבוצה? 😂","נו נו נו…","תקרא יותר את הצ'אט","הבן שלך היה יודע"
+];
+function pickBanter(ok){ const a=ok?BANTER_OK:BANTER_BAD; return a[Math.floor(Math.random()*a.length)]; }
+
+/* ===== שיתוף: יצירת תמונת כרטיס תוצאה ===== */
+function makeShareImage(r){
+  return new Promise((resolve)=>{
+    try{
+      const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+      const x=c.getContext('2d');
+      // background
+      const g=x.createLinearGradient(0,0,0,S);
+      g.addColorStop(0,'#1c1c1c'); g.addColorStop(1,'#000');
+      x.fillStyle=g; x.fillRect(0,0,S,S);
+      // yellow frame
+      x.strokeStyle='#ffd200'; x.lineWidth=14; x.strokeRect(30,30,S-60,S-60);
+      x.textAlign='center'; x.direction='rtl';
+      x.fillStyle='#ffd200'; x.font='bold 120px Arial'; x.fillText('🟡⚫',S/2,190);
+      x.fillStyle='#ffd200'; x.font='bold 96px Arial'; x.fillText('המנחוסים',S/2,320);
+      x.fillStyle='#bbb'; x.font='42px Arial'; x.fillText('ביתר ירושלים • משחק הקבוצה',S/2,390);
+      x.fillStyle='#fff'; x.font='bold 54px Arial'; x.fillText(r.mode,S/2,520);
+      // score
+      x.fillStyle='#ffd200'; x.font='bold 240px Arial'; x.fillText(String(r.score),S/2,760);
+      x.fillStyle='#888'; x.font='bold 60px Arial'; x.fillText('מתוך '+r.max,S/2,830);
+      // rank pill
+      x.fillStyle='#fff'; x.font='bold 64px Arial'; x.fillText(r.title,S/2,930);
+      x.fillStyle='#ffd200'; x.font='bold 56px Arial'; x.fillText('🏅 '+r.rank,S/2,1010);
+      c.toBlob(b=>resolve(b),'image/png');
+    }catch(e){ resolve(null); }
+  });
+}
+
+/* =========================================================
+   DIGGERS — מי הכי חופר (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const DIGGERS = {"overall": [{"name": "מתן לוגסי", "count": 258}, {"name": "נועם", "count": 208}, {"name": "אורון", "count": 191}, {"name": "עומרי", "count": 156}, {"name": "יצחק נגר", "count": 150}, {"name": "ניב שחר", "count": 106}, {"name": "אופיר", "count": 105}, {"name": "בוקבוזה", "count": 104}, {"name": "שמוליק", "count": 97}, {"name": "ניב לא השוטר", "count": 96}, {"name": "שחר", "count": 73}, {"name": "נילי", "count": 68}, {"name": "מתן מלכה", "count": 62}, {"name": "אליאור", "count": 59}, {"name": "משה אזולאי", "count": 59}, {"name": "יוסף", "count": 49}, {"name": "אלעד", "count": 34}, {"name": "ליאו", "count": 33}, {"name": "גיא", "count": 31}, {"name": "עידן", "count": 30}], "months": [{"label": "16:00", "champ": "נועם", "count": 5}, {"label": "17:00", "champ": "ניב שחר", "count": 2}, {"label": "18:00", "champ": "סהר", "count": 2}, {"label": "19:00", "champ": "אורון", "count": 10}, {"label": "20:00", "champ": "אורון", "count": 35}, {"label": "21:00", "champ": "מתן לוגסי", "count": 81}, {"label": "22:00", "champ": "מתן לוגסי", "count": 79}, {"label": "23:00", "champ": "מתן לוגסי", "count": 85}, {"label": "00:00", "champ": "ניב שחר", "count": 14}, {"label": "01:00", "champ": "אלעד", "count": 13}, {"label": "02:00", "champ": "שמוליק", "count": 1}]};
+const Diggers = {
+  open(){
+    const max = DIGGERS.overall[0].count;
+    const medals=["🥇","🥈","🥉"];
+    document.getElementById('diggersOverall').innerHTML =
+      DIGGERS.overall.map((d,i)=>{
+        const w = Math.max(12, Math.round(d.count/max*100));
+        const rk = i<3?medals[i]:(i+1);
+        return `<div class="bar-row ${i===0?'top1':''}">
+          <span class="rk">${rk}</span>
+          <div class="bar-wrap">
+            <div class="bar" style="width:${w}%"><span class="nm">${escapeHtml(d.name)}</span></div>
+            <span class="ct">${d.count.toLocaleString('he-IL')}</span>
+          </div></div>`;
+      }).join('');
+    document.getElementById('diggersMonths').innerHTML =
+      DIGGERS.months.map(m=>`<tr>
+        <td class="mon">${escapeHtml(m.label)}</td>
+        <td class="champ">${escapeHtml(m.champ)}</td>
+        <td class="cnt">${m.count.toLocaleString('he-IL')}</td></tr>`).join('');
+    Nav.go('diggers');
+  }
+};
+
+/* =========================================================
+   AWARDS — פרסי המנחוסים (נתונים אמיתיים, 12 חודשים אחרונים)
+   ========================================================= */
+const AWARDS = [{"emoji": "🤡", "title": "מלך הצחוקים", "sub": "מי גרף הכי הרבה חחח באותו לילה", "unit": "צחוקים", "top": [{"name": "נועם", "n": 42}, {"name": "מתן לוגסי", "n": 36}, {"name": "אורון", "n": 35}]}, {"emoji": "🤬", "title": "הפה המלוכלך", "sub": "אלוף הקללות של הערב", "unit": "קללות", "top": [{"name": "נועם", "n": 52}, {"name": "אופיר", "n": 24}, {"name": "עומרי", "n": 20}]}, {"emoji": "📸", "title": "מלך הפורוורדים", "sub": "הכי הרבה מדיה ולינקים בלילה", "unit": "פורוורדים", "top": [{"name": "יצחק נגר", "n": 45}, {"name": "מתן לוגסי", "n": 21}, {"name": "אליאור", "n": 14}]}, {"emoji": "📜", "title": "המגילה", "sub": "ההודעה הכי ארוכה של הערב", "unit": "תווים", "winner": {"name": "משה אזולאי", "n": 186, "preview": "״בגדול אתם יותר טובים מהם אבל חוסר מזל מלא מצבים לא מצליחים…״"}}];
+const Awards = {
+  open(){
+    document.getElementById('awardsList').innerHTML = AWARDS.map(a=>{
+      if(a.winner){
+        return `<div class="award gold">
+          <div class="aw-emoji">${a.emoji}</div>
+          <div class="aw-body">
+            <div class="aw-title">${a.title}</div>
+            <div class="aw-sub">${a.sub}</div>
+            <div class="aw-winner">${escapeHtml(a.winner.name)}
+              <span class="aw-num">${a.winner.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+            <div class="aw-preview">${escapeHtml(a.winner.preview)}</div>
+          </div></div>`;
+      }
+      const w=a.top[0];
+      const runners=a.top.slice(1).map((t,i)=>`${i===0?'🥈':'🥉'} ${t.name} (${t.n.toLocaleString('he-IL')})`).join('  ·  ');
+      return `<div class="award gold">
+        <div class="aw-emoji">${a.emoji}</div>
+        <div class="aw-body">
+          <div class="aw-title">${a.title}</div>
+          <div class="aw-sub">${a.sub}</div>
+          <div class="aw-winner">🥇 ${escapeHtml(w.name)}
+            <span class="aw-num">${w.n.toLocaleString('he-IL')} ${a.unit}</span></div>
+          <div class="aw-runners">${runners}</div>
+        </div></div>`;
+    }).join('');
+    Nav.go('awards');
+  }
+};
+
+/* hide modes that have no questions (for generated games) */
+['who','toWhom','context'].forEach(function(m){
+  if(!DATA[m]||!DATA[m].length){
+    var el=document.querySelector('.mode-card[data-mode="'+m+'"]');
+    if(el) el.style.display='none';
+  }
+});
+</script>
+</body>
+</html>
