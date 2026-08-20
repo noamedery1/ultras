@@ -679,9 +679,9 @@ const Game = {
     });
 
     // scoring: base 100 + time bonus
-    let gained=0;
+    var gained=0;
     if(correct){
-      const remaining = parseFloat(bar.style.width)/ (document.getElementById('timerWrap').offsetWidth) ;
+      var tw0=document.getElementById('timerWrap').offsetWidth||1;var remaining=parseFloat(bar.style.width)/tw0;if(!isFinite(remaining))remaining=0;remaining=Math.max(0,Math.min(1,remaining));
       gained = 100 + Math.round(50*remaining);
       this.score += gained;
       document.getElementById('score').textContent=this.score;
@@ -1119,8 +1119,11 @@ function showReview(){
   $('#s4').classList.remove('off');$('#s5').classList.remove('off');
   let msg='✅ נותחו '+state.msgs.length.toLocaleString('he-IL')+' הודעות · '+state.activeNames.length+' שחקנים · סגנון: '+
     ({fun:'😂 מצחיק',roast:'🔥 ירידות',mild:'😇 עדין'}[state.style]);
-  if(state.activeNames.length<5) msg+='\n⚠️ רק '+state.activeNames.length+' אנשים קיבלו שם — מלאו עוד שמות בשלב 2 (מספרים בלי שם לא הופכים לשאלות "מי אמר").';
-  $('#anlog').innerHTML=state.activeNames.length<5?'<span class="warn">'+esc(msg)+'</span>':msg;
+  const na=state.activeNames.length;
+  let isWarn=false;
+  if(na===2) msg+='\n👥 מצב צ\'אט זוגי: "מי אמר את זה" יופיע עם 2 אפשרויות, ו"מי אמר למי" מושבת (בזוג זה תמיד ברור).';
+  else if(na<5){ msg+='\n⚠️ רק '+na+' אנשים קיבלו שם — מלאו עוד שמות בשלב 2 (מספרים בלי שם לא הופכים לשאלות "מי אמר").'; isWarn=true; }
+  $('#anlog').innerHTML=isWarn?'<span class="warn">'+esc(msg)+'</span>':esc(msg);
   if(!$('#cGroup').value)$('#cGroup').focus();
 }
 const selected=id=>$$(`#review input[data-g="${id}"]`).filter(c=>c.checked).map(c=>+c.dataset.i);
@@ -1137,18 +1140,19 @@ function darken(hex,f){f=f||.88;const n=parseInt(hex.slice(1),16);let r=(n>>16)&
 
 /* ---------- generate ---------- */
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
-function pick3(pool,ex){const p=pool.filter(x=>!ex.includes(x)),out=[];
-  while(out.length<3&&p.length)out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);
-  while(out.length<3)out.push('—');return out;}
+function pickN(pool,ex,n){const p=pool.filter(x=>!ex.includes(x)),out=[];
+  while(out.length<n&&p.length)out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);
+  return out;}  /* returns up to n distractors — fewer if the pool is small (e.g. a 2-person chat) */
 $('#gen').onclick=()=>{
   try{
     const names=state.activeNames;
-    if(names.length<4){$('#genlog').innerHTML='<span class="warn">⚠️ צריך לפחות 4 שחקנים מזוהים.</span>';return;}
+    if(names.length<2){$('#genlog').innerHTML='<span class="warn">⚠️ צריך לפחות 2 אנשים מזוהים (עם שם).</span>';return;}
+    const duo=names.length<3; // צ'אט פרטי של 2 — "מי אמר את זה" עם 2 אפשרויות, בלי "מי אמר למי"
     const cfg={group:$('#cGroup').value.trim()||'הקבוצה',team:$('#cTeam').value.trim()||'',
       emoji:$('#cEmoji').value.trim()||'⚽',color:$('#cColor').value,
       file:($('#cFile').value.trim()||'game.html').replace(/[^\w.\-]/g,'_')};
-    const WHO=selected('who').map(i=>state.cand.who[i]).map(x=>({quote:x.quote,answer:x.answer,options:shuf([x.answer,...pick3(names,[x.answer])])}));
-    const TW=selected('toWhom').map(i=>state.cand.toWhom[i]).map(x=>{const correct=x.speaker+' ← '+x.target;const o=[];
+    const WHO=selected('who').map(i=>state.cand.who[i]).map(x=>({quote:x.quote,answer:x.answer,options:shuf([x.answer,...pickN(names,[x.answer],3)])}));
+    const TW=duo?[]:selected('toWhom').map(i=>state.cand.toWhom[i]).map(x=>{const correct=x.speaker+' ← '+x.target;const o=[];
       let guard=0;while(o.length<3&&guard++<200){const a=names[Math.floor(Math.random()*names.length)],b=names[Math.floor(Math.random()*names.length)];
         const s=a+' ← '+b;if(a!==b&&s!==correct&&!o.includes(s))o.push(s);}
       return{chat:[{side:'right',who:'❓',text:x.text}],speaker:x.speaker,target:x.target,options:shuf([correct,...o])};});
