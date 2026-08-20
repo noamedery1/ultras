@@ -903,8 +903,12 @@ const LAUGHEMO=/😂|🤣|😭|😆|💀|😅/g;
 /* roast / insult markers (drives "ירידות" style) */
 const CURSE=/(שרמוטה|זונה|מניאק|מפגר|אחושרמוטה|כוסאמק|כוס אמ|פסיכופת|מטומטם|בן זונה|תזדיין|מזיין|יזיין|חרא|זבל|טמבל|דביל|אפס\b|בהמה|יא |סתום)/g;
 const MEDIA=["<המדיה","<Media","הושמט","הודעה זו נמחקה","<ההודעה"];
+const letterCount=t=>(t.match(/[א-תa-zA-Z]/g)||[]).length;   /* real letters, ignoring emoji/punctuation */
+const wordCount=t=>t.trim().split(/\s+/).filter(w=>/[א-תa-zA-Z]/.test(w)).length;
 function substantive(t){if(!t)return false;if(MEDIA.some(m=>t.includes(m)))return false;
-  if(t.includes('http'))return false;if(isLaugh(t))return false;return t.length>=8&&t.length<=200;}
+  if(t.includes('http'))return false;if(isLaugh(t))return false;
+  if(letterCount(t)<9||wordCount(t)<3)return false;   /* must be readable written text — not emoji/one-word */
+  return t.length<=220;}
 
 /* ---------- file intake ---------- */
 const drop=$('#drop'),fileIn=$('#file');
