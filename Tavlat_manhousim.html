@@ -205,6 +205,72 @@ section.block{padding:64px 0}
 }
 .note.mine .who::after{content:" ★";color:var(--amber);font-size:1.1rem}
 
+/* ---------- מתג תצוגה ---------- */
+.viewtoggle{display:inline-flex;border:1px solid rgba(255,255,255,.16);border-radius:2px;overflow:hidden;margin-bottom:24px}
+.viewtoggle button{
+  border:0;background:transparent;color:var(--mute);cursor:pointer;
+  font-family:inherit;font-size:.83rem;font-weight:700;padding:9px 18px;
+  transition:background .16s ease,color .16s ease;
+}
+.viewtoggle button.on{background:var(--gold);color:#141414;font-weight:800}
+
+/* ---------- קיר הצעיפים ---------- */
+#board.scarves{display:flex;flex-direction:column;gap:15px;padding:4px 0 30px}
+.scarf-item{
+  display:grid;grid-template-columns:15px 13px 1fr 13px 15px;
+  min-height:90px;border:0;padding:0;background:none;cursor:pointer;
+  text-align:start;color:inherit;font-family:inherit;
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .2s cubic-bezier(.2,.8,.3,1), filter .2s ease;
+  filter:drop-shadow(0 12px 20px rgba(0,0,0,.5));
+}
+.scarf-item:hover,.scarf-item:focus-visible{
+  transform:rotate(0deg) translateY(-4px);
+  filter:drop-shadow(0 20px 30px rgba(0,0,0,.8));
+}
+/* פרנזים */
+.sc-fringe{
+  margin-block:15px;
+  background:repeating-linear-gradient(90deg,var(--gold) 0 2px,transparent 2px 5px);
+}
+/* קצה סרוג בפסים אלכסוניים */
+.sc-cap{background:repeating-linear-gradient(45deg,var(--gold) 0 7px,#0E0E10 7px 14px)}
+/* גוף הצעיף עם טקסטורת סריגה */
+.sc-body{
+  display:grid;gap:9px;align-content:center;padding:13px 15px;
+  border-block:1px solid rgba(245,197,24,.22);
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 4px),
+    linear-gradient(180deg,#17171B,#101012);
+}
+.sc-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sc-name{
+  font-family:'Suez One',serif;font-size:1.15rem;color:var(--gold);line-height:1.1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sc-badge{
+  flex:none;display:inline-flex;align-items:baseline;gap:5px;
+  background:var(--gold);color:#141414;border-radius:2px;
+  padding:5px 11px;font-size:.7rem;font-weight:800;white-space:nowrap;
+}
+.sc-badge b{font-family:'Suez One',serif;font-size:.95rem;line-height:1}
+.sc-badge.low{background:#3A3B40;color:var(--paper)}
+.sc-podium{display:flex;gap:6px;flex-wrap:wrap}
+.sc-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);
+  border-radius:2px;padding:5px 10px;font-size:.79rem;font-weight:600;
+}
+.sc-pill b{font-family:'Suez One',serif;color:var(--gold);font-size:.7rem}
+.sc-pill.beitar{background:rgba(245,197,24,.14);border-color:rgba(245,197,24,.5)}
+.scarf-item.mine .sc-body{border-color:rgba(245,197,24,.55)}
+.scarf-item.mine .sc-name::after{content:" ★";font-size:.85rem;color:var(--amber)}
+@media (max-width:560px){
+  .scarf-item{grid-template-columns:11px 10px 1fr 10px 11px;min-height:84px}
+  .sc-name{font-size:1.02rem}
+  .sc-pill{font-size:.74rem;padding:4px 8px}
+}
+
 /* מצב ריק */
 .empty{
   grid-column:1/-1;text-align:center;padding:60px 20px;
@@ -233,6 +299,29 @@ section.block{padding:64px 0}
 .crow .avg{font-size:.82rem;color:var(--mute);font-variant-numeric:tabular-nums}
 .crow.isb .nm{color:var(--gold);font-weight:800}
 
+.race{display:grid;gap:26px}
+@media (min-width:820px){ .race{grid-template-columns:1.35fr 1fr} }
+.race h3{
+  font-size:1rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 12px;font-family:'Assistant',sans-serif;font-weight:800;
+}
+.lrow{
+  display:grid;grid-template-columns:38px 1fr auto auto;align-items:center;gap:10px;
+  padding:12px 16px;border-top:1px solid rgba(255,255,255,.07);
+}
+.lrow:first-child{border-top:0}
+.lrow.first{background:linear-gradient(90deg,rgba(245,197,24,.16),transparent)}
+.lrow .rk{font-family:'Suez One',serif;font-size:1.05rem;color:var(--mute);text-align:center}
+.lrow.first .rk{color:var(--gold)}
+.lrow .who{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .who small{display:block;font-size:.72rem;color:var(--mute);font-weight:400}
+.lrow .sc{font-family:'Suez One',serif;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.mv{font-size:.8rem;font-weight:800;width:44px;text-align:end;font-variant-numeric:tabular-nums}
+.mv.up{color:#3FBF6A}
+.mv.dn{color:var(--blood)}
+.mv.same{color:#5F636B}
+.race .stamp{font-size:.78rem;color:var(--mute);margin:12px 0 0}
+
 /* ============================================================
    ספוטלייט בית"ר
    ============================================================ */
@@ -240,10 +329,25 @@ section.block{padding:64px 0}
   border:1px solid rgba(245,197,24,.3);border-radius:3px;padding:26px 22px;
   background:radial-gradient(90% 140% at 100% 0%,rgba(245,197,24,.1),transparent 65%);
 }
+/* בורר קבוצה */
+.teamtabs{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 6px}
+.tchip{
+  cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 12px;border-radius:2px;
+  border:1px solid rgba(255,255,255,.15);background:transparent;
+  color:#CFCBC0;font-family:inherit;font-size:.82rem;font-weight:600;
+  transition:border-color .16s ease,background .16s ease,color .16s ease;
+}
+.tchip:hover{border-color:var(--gold);color:var(--paper)}
+.tchip.on{background:var(--gold);border-color:var(--gold);color:#141414;font-weight:800}
+.tchip.on .dot{box-shadow:0 0 0 1.5px rgba(0,0,0,.45)}
+
 .hist{display:flex;align-items:flex-end;gap:5px;height:150px;margin-top:22px}
 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
 .bar i{
-  display:block;width:100%;background:linear-gradient(180deg,var(--gold),var(--amber));
+  display:block;width:100%;
+  background:linear-gradient(180deg,var(--spot,var(--gold)),rgba(0,0,0,.35));
   border-radius:2px 2px 0 0;min-height:3px;
   transition:height .5s cubic-bezier(.2,.8,.25,1);
 }
@@ -252,6 +356,100 @@ section.block{padding:64px 0}
 .bar em{font-style:normal;font-size:.7rem;color:var(--gold);height:14px}
 .spot .verdict{margin:0;font-size:1.05rem;color:#DFDACD;font-weight:300}
 .spot .verdict strong{color:var(--gold);font-weight:800}
+
+/* ============================================================
+   ניווט דביק
+   ============================================================ */
+.subnav{
+  position:sticky;top:0;z-index:40;
+  background:rgba(11,11,12,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.09);
+}
+.subnav .inner{display:flex;max-width:var(--maxw);margin:0 auto;padding:0 8px}
+.subnav a{
+  flex:1;text-align:center;padding:14px 6px;text-decoration:none;
+  font-size:.84rem;font-weight:700;color:var(--mute);
+  border-bottom:2px solid transparent;
+  transition:color .18s ease,border-color .18s ease;
+}
+.subnav a.on{color:var(--gold);border-bottom-color:var(--gold)}
+section.block{scroll-margin-top:54px}
+
+/* לשוניות סטטיסטיקה */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px}
+.tabs button{
+  border:1px solid rgba(255,255,255,.14);background:transparent;
+  color:#CFCBC0;font-family:inherit;font-size:.84rem;font-weight:700;
+  padding:9px 14px;border-radius:2px;cursor:pointer;
+  transition:border-color .16s ease,background .16s ease,color .16s ease;
+}
+.tabs button:hover{border-color:var(--gold);color:var(--paper)}
+.tabs button.on{background:var(--gold);border-color:var(--gold);color:#141414;font-weight:800}
+.panel{display:none;animation:appear .3s ease}
+.panel.on{display:block}
+.thin{color:var(--mute);font-weight:300;padding:26px 0}
+
+/* ============================================================
+   מפת חום
+   ============================================================ */
+.heatwrap{overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+.heatwrap::-webkit-scrollbar{height:6px}
+.heatwrap::-webkit-scrollbar-thumb{background:rgba(245,197,24,.3);border-radius:3px}
+.heat{
+  --cell:30px; --lbl:132px;
+  display:grid;grid-template-columns:var(--lbl) repeat(14,var(--cell));
+  gap:3px;width:max-content;
+}
+.heat .lbl{
+  position:sticky;inset-inline-start:0;z-index:2;
+  background:var(--ink);padding-inline-end:8px;
+  display:flex;align-items:center;gap:8px;
+  font-size:.8rem;font-weight:600;height:var(--cell);
+  overflow:hidden;white-space:nowrap;
+}
+.heat .lbl.isb{color:var(--gold);font-weight:800}
+.heat .hd{
+  height:22px;display:grid;place-items:center;
+  font-size:.68rem;color:var(--mute);font-weight:700;
+}
+.heat .hd.corner{position:sticky;inset-inline-start:0;background:var(--ink);z-index:2}
+.heat .cell{
+  height:var(--cell);display:grid;place-items:center;border-radius:2px;
+  font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums;
+  transition:transform .12s ease;
+}
+.heat .cell:hover{transform:scale(1.14);z-index:3}
+.heatnote{font-size:.78rem;color:var(--mute);margin:14px 0 0}
+
+/* ============================================================
+   מחלוקות ואומץ
+   ============================================================ */
+.split{display:grid;gap:22px}
+@media (min-width:820px){ .split{grid-template-columns:1fr 1fr} }
+.card{
+  border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:22px 20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent);
+}
+.card h3{
+  font-family:'Assistant',sans-serif;font-weight:800;font-size:.78rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 14px;
+}
+.card.cool h3{color:#6FB3FF}
+.bigteam{display:flex;align-items:center;gap:11px;font-family:'Suez One',serif;font-size:1.5rem;line-height:1.15}
+.bigteam .dot{width:13px;height:13px}
+.card p{margin:12px 0 0;color:#CFCBC0;font-weight:300;font-size:.95rem}
+.card p strong{color:var(--paper);font-weight:800}
+.runners{margin:16px 0 0;padding:14px 0 0;border-top:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--mute)}
+.runners span{display:block;padding:3px 0}
+
+.brow{display:grid;grid-template-columns:1fr 62px;align-items:center;gap:12px;padding:9px 0}
+.brow + .brow{border-top:1px solid rgba(255,255,255,.06)}
+.brow .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .track{height:7px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;margin-top:6px}
+.brow .track i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--amber));border-radius:4px}
+.brow .val{font-family:'Suez One',serif;font-size:1rem;text-align:end;color:var(--gold)}
+.brow.safe .track i{background:linear-gradient(90deg,#6FB3FF,#3A7BD5)}
+.brow.safe .val{color:#6FB3FF}
 
 /* ============================================================
    כלים / פוטר
@@ -402,11 +600,20 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:34px 0 60px;color:var(
     <div class="cta-row">
       <button class="btn btn-gold" id="open-editor">מלאו את הטבלה שלכם</button>
       <button class="btn btn-ghost" id="scroll-board">לצפייה בלוח</button>
+      <button class="btn btn-ghost" id="scroll-stats">לסטטיסטיקות</button>
     </div>
   </div>
 </header>
 
 <div class="scarf"></div>
+
+<nav class="subnav">
+  <div class="inner">
+    <a href="#sec-board" data-nav="sec-board" class="on">הלוח</a>
+    <a href="#sec-race" data-nav="sec-race" id="nav-race" hidden>מי מוביל</a>
+    <a href="#sec-stats" data-nav="sec-stats">סטטיסטיקות</a>
+  </div>
+</nav>
 
 <main>
   <section class="block wrap" id="sec-board">
@@ -415,20 +622,72 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:34px 0 60px;color:var(
       <span class="count" id="board-count"></span>
     </div>
     <p class="secsub">לחצו על פתק כדי לפתוח את הטבלה המלאה.</p>
+    <div class="viewtoggle" id="view-toggle">
+      <button type="button" class="on" data-view="notes">פתקים</button>
+      <button type="button" data-view="scarves">צעיפים</button>
+    </div>
     <div id="board"></div>
   </section>
 
-  <section class="block wrap">
-    <div class="sechead"><h2>הטבלה של כולם</h2></div>
-    <p class="secsub">הממוצע של כל הניחושים, מקום אחר מקום. זו התחזית של הקבוצה כולה.</p>
-    <div class="consensus" id="consensus"></div>
+  <section class="block wrap" id="sec-race" hidden>
+    <div class="sechead"><h2>מי מוביל</h2></div>
+    <p class="secsub">סכום הפרשי המקומות מול הטבלה האמיתית. נמוך יותר = קרוב יותר. מתעדכן כל יום שלישי בבוקר.</p>
+    <div class="race">
+      <div>
+        <h3>טבלת המנחשים</h3>
+        <div class="consensus" id="leaderboard"></div>
+        <p class="stamp" id="race-stamp"></p>
+      </div>
+      <div>
+        <h3>הטבלה האמיתית</h3>
+        <div class="consensus" id="realtable"></div>
+      </div>
+    </div>
   </section>
 
-  <section class="block wrap">
-    <div class="spot">
-      <div class="sechead"><h2>ואיפה שמים את בית"ר?</h2></div>
-      <p class="verdict" id="beitar-verdict">עוד אין ניחושים. תהיו הראשונים.</p>
-      <div class="hist" id="beitar-hist"></div>
+  <section class="block wrap" id="sec-stats">
+    <div class="sechead"><h2>סטטיסטיקות</h2></div>
+
+    <div class="tabs" id="stat-tabs">
+      <button type="button" class="on" data-panel="p-cons">טבלת הקבוצה</button>
+      <button type="button" data-panel="p-team">לפי קבוצה</button>
+      <button type="button" data-panel="p-heat">מפת חום</button>
+      <button type="button" data-panel="p-split">מחלוקות</button>
+    </div>
+
+    <div class="panel on" id="p-cons">
+      <p class="secsub">הממוצע של כל הניחושים, מקום אחר מקום. זו התחזית של הקבוצה כולה.</p>
+      <div class="consensus" id="consensus"></div>
+    </div>
+
+    <div class="panel" id="p-team">
+      <div class="spot">
+        <div class="sechead"><h2 id="spot-title">ואיפה שמים את בית"ר?</h2></div>
+        <div class="teamtabs" id="spot-tabs"></div>
+        <p class="verdict" id="beitar-verdict">עוד אין ניחושים. תהיו הראשונים.</p>
+        <div class="hist" id="beitar-hist"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-heat">
+      <p class="secsub">כל תא: כמה אנשים שמו את הקבוצה הזו במקום הזה. ככל שהצהוב חזק יותר, ההסכמה גדולה יותר.</p>
+      <div class="heatwrap"><div class="heat" id="heat"></div></div>
+      <p class="heatnote" id="heat-note"></p>
+    </div>
+
+    <div class="panel" id="p-split">
+      <div class="split">
+        <div>
+          <div class="card" id="card-div"></div>
+          <div style="height:22px"></div>
+          <div class="card cool" id="card-agree"></div>
+        </div>
+        <div class="card">
+          <h3>מי הולך נגד הזרם</h3>
+          <p style="margin:0 0 16px">מרחק הניחוש מטבלת הקונצנזוס. גבוה = דעה עצמאית, נמוך = הלך על בטוח.</p>
+          <div id="bold-list"></div>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -526,7 +785,23 @@ const Local = (() => {
    ============================================================ */
 let entries = [];                 // כל הניחושים
 let draft = TEAMS.map(t => t.n);  // הסדר בעורך
-let myIds = JSON.parse(Local.get('beitar_my_ids') || '[]');
+let editing = null;               // הפתק שנמצא כרגע בעריכה
+let race = null;                  // מעקב שבועי מול הטבלה האמיתית
+let spotTeam = BEITAR;            // הקבוצה שמוצגת בניתוח
+let boardView = 'notes';          // notes | scarves
+
+/* בעלות: לכל פתק שהזנתם נשמר טוקן אקראי בדפדפן. הוא נשלח לשרת
+   בעדכון ובמחיקה. המשתמש לא רואה אותו ולא מקליד כלום. */
+let myTokens = {};
+try { myTokens = JSON.parse(Local.get('beitar_tokens') || '{}'); } catch {}
+try {  // מיגרציה מהגרסה הקודמת ששמרה רק מזהים
+  JSON.parse(Local.get('beitar_my_ids') || '[]')
+    .forEach(id => { if (!(id in myTokens)) myTokens[id] = ''; });
+} catch {}
+const isMine     = id => Object.prototype.hasOwnProperty.call(myTokens, id);
+const saveTokens = () => Local.set('beitar_tokens', JSON.stringify(myTokens));
+const newToken   = () => (crypto.randomUUID ? crypto.randomUUID()
+                                            : String(Math.random()).slice(2) + Date.now());
 const $ = s => document.querySelector(s);
 const deadline = new Date(CONFIG.DEADLINE);
 const locked = () => Date.now() > deadline.getTime();
@@ -539,6 +814,7 @@ async function fetchAll(){
     const r = await fetch(CONFIG.API_URL + '?action=list&t=' + Date.now());
     if (!r.ok) throw new Error('שרת החזיר ' + r.status);
     const d = await r.json();
+    race = (d && d.race && d.race.board && d.race.board.length) ? d.race : null;
     return normalize(d);
   }
   // ללא שרת: קוראים את הקובץ הצמוד. אם אין — נופלים ל-SEED.
@@ -560,7 +836,8 @@ function normalize(d){
       id: String(e.id || crypto.randomUUID()),
       name: String(e.name).slice(0,22),
       table: e.table.map(String),
-      createdAt: e.createdAt || new Date().toISOString()
+      createdAt: e.createdAt || new Date().toISOString(),
+      updatedAt: e.updatedAt || ''
     }));
 }
 
@@ -572,30 +849,35 @@ function writeLocalEntries(list){
   Local.set('beitar_entries', JSON.stringify(list));
 }
 
+// text/plain כדי להימנע מ-preflight מול Apps Script
+async function call(payload){
+  const r = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(payload) });
+  if (!r.ok) throw new Error('השרת החזיר ' + r.status);
+  const d = await r.json();
+  if (d && d.error) throw new Error(d.error);
+  return d;
+}
+
 async function submit(entry){
-  if (CONFIG.API_URL){
-    // text/plain כדי להימנע מ-preflight מול Apps Script
-    const r = await fetch(CONFIG.API_URL, {
-      method:'POST',
-      body: JSON.stringify({ action:'add', entry })
-    });
-    if (!r.ok) throw new Error('שמירה נכשלה (' + r.status + ')');
-    const d = await r.json();
-    if (d && d.error) throw new Error(d.error);
-    return;
-  }
-  const list = readLocalEntries();
-  list.push(entry);
-  writeLocalEntries(list);
+  const token = newToken();
+  if (CONFIG.API_URL) await call({ action:'add', entry: Object.assign({}, entry, { token }) });
+  else                writeLocalEntries(readLocalEntries().concat([entry]));
+  myTokens[entry.id] = token;
+  saveTokens();
+}
+
+async function updateEntry(entry){
+  const token = myTokens[entry.id] || '';
+  if (CONFIG.API_URL) await call({ action:'update', entry, token });
+  else                writeLocalEntries(readLocalEntries().map(e => e.id === entry.id ? entry : e));
+  if (!myTokens[entry.id]){ myTokens[entry.id] = token || newToken(); saveTokens(); }
 }
 
 async function removeEntry(id){
-  if (CONFIG.API_URL){
-    await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify({ action:'delete', id }) });
-  }
+  if (CONFIG.API_URL) await call({ action:'delete', id, token: myTokens[id] || '' });
   writeLocalEntries(readLocalEntries().filter(e => e.id !== id));
-  myIds = myIds.filter(x => x !== id);
-  Local.set('beitar_my_ids', JSON.stringify(myIds));
+  delete myTokens[id];
+  saveTokens();
 }
 
 /* ============================================================
@@ -628,7 +910,22 @@ async function load(){
 /* ============================================================
    רינדור
    ============================================================ */
-function render(){ renderTicker(); renderBoard(); renderConsensus(); renderSpotlight(); }
+function render(){
+  renderTicker(); renderBoard(); renderRace(); renderConsensus();
+  renderHeat(); renderSplit(); renderSpotlight();
+}
+
+/* מקומות שקיבלה קבוצה אצל כל המנחשים */
+function posOf(team){
+  return entries.map(e => e.table.indexOf(team) + 1).filter(p => p > 0);
+}
+function statsOf(team){
+  const p = posOf(team);
+  if (!p.length) return null;
+  const mean = p.reduce((a,b) => a+b, 0) / p.length;
+  const sd = Math.sqrt(p.reduce((a,b) => a + (b-mean)**2, 0) / p.length);
+  return { mean, sd, min: Math.min(...p), max: Math.max(...p) };
+}
 
 function renderTicker(){
   $('#t-count').textContent = entries.length;
@@ -643,6 +940,9 @@ function renderTicker(){
     $('#open-editor').disabled = true;
     $('#open-editor').textContent = 'ההרשמה נעולה';
   }
+
+  if (!locked() && entries.some(e => isMine(e.id)))
+    $('#open-editor').textContent = 'עדכנו את הטבלה שלכם';
 
   const avg = averages();
   $('#t-champ').textContent = entries.length ? (SHORT[topPickChampion()] || topPickChampion()) : '—';
@@ -665,8 +965,10 @@ function averages(){
 
 function renderBoard(){
   const b = $('#board');
-  $('#board-count').textContent = entries.length ? entries.length + ' פתקים' : '';
+  $('#board-count').textContent = entries.length ? entries.length + ' ניחושים' : '';
+  b.className = boardView === 'scarves' ? 'scarves' : '';
   b.innerHTML = '';
+  if (boardView === 'scarves' && entries.length) return renderScarves(b);
 
   if (!entries.length){
     b.innerHTML = `<div class="empty">
@@ -680,13 +982,13 @@ function renderBoard(){
     const tilt = ((i * 37) % 9) - 4 + ((i % 3) * 0.4);      // -4..+4 יציב לכל פתק
     const bp = e.table.indexOf(BEITAR) + 1;
     const el = document.createElement('button');
-    el.className = 'note' + (myIds.includes(e.id) ? ' mine' : '');
+    el.className = 'note' + (isMine(e.id) ? ' mine' : '');
     el.style.cssText =
       `--tilt:${tilt.toFixed(2)}deg;--tape:${(tilt * -0.6).toFixed(2)}deg;` +
       `--dur:${(6 + (i % 5) * 0.9).toFixed(1)}s;--delay:${((i % 7) * 0.45).toFixed(2)}s`;
     el.innerHTML = `
       <div class="who">${esc(e.name)}</div>
-      <div class="stamp">${fmtDate(e.createdAt)}</div>
+      <div class="stamp">${e.updatedAt ? 'עודכן ' + fmtDate(e.updatedAt) : fmtDate(e.createdAt)}</div>
       <ol>
         ${e.table.slice(0,3).map((t,k) => `
           <li><span class="pos">${k+1}</span>
@@ -699,6 +1001,169 @@ function renderBoard(){
     b.appendChild(el);
   });
 }
+
+function renderRace(){
+  const sec = $('#sec-race');
+  $('#nav-race').hidden = !race;
+  if (!race){ sec.hidden = true; return; }
+  sec.hidden = false;
+
+  $('#leaderboard').innerHTML = race.board.map(p => {
+    const d = p.delta;
+    const mv = d === null ? '<span class="mv same">חדש</span>'
+             : d > 0      ? `<span class="mv up">▲ ${d}</span>`
+             : d < 0      ? `<span class="mv dn">▼ ${-d}</span>`
+             :              '<span class="mv same">—</span>';
+    return `<div class="lrow ${p.rank === 1 ? 'first' : ''}">
+      <span class="rk">${p.rank}</span>
+      <span class="who">${esc(p.name)}<small>${p.exact} במקום המדויק</small></span>
+      <span class="sc">${p.score}</span>
+      ${mv}
+    </div>`;
+  }).join('');
+
+  $('#realtable').innerHTML = race.table.map(t => {
+    const cls = t.rank === 1 ? 'champ' : (t.rank >= N - 1 ? 'drop' : '');
+    return `<div class="crow ${cls} ${t.team === BEITAR ? 'isb' : ''}">
+      <span class="rk">${t.rank}</span>
+      <span class="nm"><span class="dot" style="background:${COLOR[t.team] || '#999'}"></span>${esc(t.team)}</span>
+      <span class="avg">${t.points} נק'</span>
+    </div>`;
+  }).join('');
+
+  $('#race-stamp').textContent = 'עודכן ' + fmtDate(race.updatedAt) +
+    ' · ' + race.board.length + ' מנחשים';
+}
+
+function renderHeat(){
+  if (entries.length < 2){
+    $('#heat').innerHTML = '';
+    $('#heat-note').textContent = 'צריך לפחות שני ניחושים כדי לצייר מפה.';
+    return;
+  }
+
+  const order = consensusOrder();
+  const grid = order.map(t => {
+    const row = Array(N).fill(0);
+    entries.forEach(e => { const p = e.table.indexOf(t); if (p > -1) row[p]++; });
+    return row;
+  });
+  const max = Math.max(1, ...grid.flat());
+
+  let html = '<div class="hd corner"></div>' +
+    Array.from({length:N}, (_,i) => `<div class="hd">${i+1}</div>`).join('');
+
+  order.forEach((t,r) => {
+    html += `<div class="lbl ${t === BEITAR ? 'isb' : ''}">
+      <span class="dot" style="background:${COLOR[t]}"></span>${esc(SHORT[t])}</div>`;
+    grid[r].forEach((v, c) => {
+      const a = v ? 0.14 + 0.86 * (v / max) : 0;
+      html += `<div class="cell" title="${esc(t)} · מקום ${c+1} · ${v} מנחשים"
+        style="background:${v ? `rgba(245,197,24,${a.toFixed(3)})` : 'rgba(255,255,255,.035)'};
+               color:${a > .55 ? '#141414' : '#8A8D94'}">${v || ''}</div>`;
+    });
+  });
+  $('#heat').innerHTML = html;
+
+  const perfect = order.filter(t => { const s = statsOf(t); return s && s.sd === 0; });
+  $('#heat-note').textContent = perfect.length
+    ? 'הסכמה מוחלטת על: ' + perfect.map(t => SHORT[t]).join(', ') + '.'
+    : 'אין אף קבוצה שכולם מסכימים עליה במאה אחוז.';
+}
+
+function renderSplit(){
+  if (entries.length < 3){
+    $('#card-div').innerHTML   = '<p class="thin">צריך לפחות שלושה ניחושים.</p>';
+    $('#card-agree').innerHTML = '';
+    $('#bold-list').innerHTML  = '<p class="thin">עוד אין מספיק נתונים.</p>';
+    return;
+  }
+
+  // --- פיזור לפי קבוצה ---
+  const ranked = TEAMS.map(t => Object.assign({ n: t.n }, statsOf(t.n)))
+                      .filter(x => x.sd !== undefined)
+                      .sort((a,b) => b.sd - a.sd);
+  const hot = ranked[0], cold = ranked[ranked.length - 1];
+
+  const card = (el, x, title, line) => {
+    $(el).innerHTML = `<h3>${title}</h3>
+      <div class="bigteam"><span class="dot" style="background:${COLOR[x.n]}"></span>${esc(x.n)}</div>
+      <p>${line}</p>
+      <div class="runners">${
+        (title.includes('מחלוקת') ? ranked.slice(1,4) : ranked.slice(-4,-1).reverse())
+        .map(y => `<span>${esc(y.n)} · פיזור ${y.sd.toFixed(2)} · ${y.min}–${y.max}</span>`).join('')
+      }</div>`;
+  };
+
+  card('#card-div', hot, 'הכי שנוי במחלוקת',
+    hot.min === hot.max
+      ? `אין מחלוקת בכלל.`
+      : `יש שרואים אותה <strong>${hot.min}</strong> ויש שרואים אותה <strong>${hot.max}</strong>. הממוצע ${hot.mean.toFixed(1)}, והפיזור <strong>${hot.sd.toFixed(2)}</strong> — הגבוה בליגה.`);
+
+  card('#card-agree', cold, 'עליה כולם מסכימים',
+    cold.min === cold.max
+      ? `כל המנחשים בלי יוצא מן הכלל שמו אותה במקום <strong>${cold.min}</strong>.`
+      : `הכל מרוכז בין <strong>${cold.min}</strong> ל-<strong>${cold.max}</strong>. פיזור של <strong>${cold.sd.toFixed(2)}</strong> בלבד.`);
+
+  // --- נועזים מול שמרנים ---
+  const cons = consensusOrder();
+  const scored = entries.map(e => ({
+    name: e.name,
+    d: e.table.reduce((sum, t, i) => sum + Math.abs(i - cons.indexOf(t)), 0)
+  })).sort((a,b) => b.d - a.d);
+
+  const top = Math.max(1, scored[0].d);
+  $('#bold-list').innerHTML = scored.map((x,i) => `
+    <div class="brow ${i >= scored.length - 2 ? 'safe' : ''}">
+      <div>
+        <div class="nm">${esc(x.name)}</div>
+        <div class="track"><i style="width:${(x.d / top * 100).toFixed(1)}%"></i></div>
+      </div>
+      <div class="val">${x.d}</div>
+    </div>`).join('');
+}
+
+/* קיר הצעיפים: צעיף אופקי ברוחב מלא לכל ניחוש */
+function renderScarves(b){
+  entries.forEach((e, i) => {
+    const tilt = (i % 2 ? 0.35 : -0.35);
+    const bp = e.table.indexOf(BEITAR) + 1;
+
+    const podium = e.table.slice(0, 3).map((t, k) => `
+      <span class="sc-pill ${t === BEITAR ? 'beitar' : ''}">
+        <b>${k + 1}</b>
+        <span class="dot" style="background:${COLOR[t] || '#999'}"></span>
+        ${esc(t)}
+      </span>`).join('');
+
+    const el = document.createElement('button');
+    el.className = 'scarf-item' + (isMine(e.id) ? ' mine' : '');
+    el.style.setProperty('--tilt', tilt + 'deg');
+    el.innerHTML = `
+      <span class="sc-fringe"></span>
+      <span class="sc-cap"></span>
+      <span class="sc-body">
+        <span class="sc-top">
+          <span class="sc-name">${esc(e.name)}</span>
+          <span class="sc-badge ${bp > 6 ? 'low' : ''}">בית"ר <b>${bp || '?'}</b></span>
+        </span>
+        <span class="sc-podium">${podium}</span>
+      </span>
+      <span class="sc-cap"></span>
+      <span class="sc-fringe"></span>`;
+    el.onclick = () => openView(e);
+    b.appendChild(el);
+  });
+}
+
+$('#view-toggle').addEventListener('click', ev => {
+  const btn = ev.target.closest('[data-view]');
+  if (!btn) return;
+  boardView = btn.dataset.view;
+  document.querySelectorAll('#view-toggle button')
+    .forEach(x => x.classList.toggle('on', x === btn));
+  renderBoard();
+});
 
 function renderConsensus(){
   const c = $('#consensus');
@@ -719,12 +1184,22 @@ function renderConsensus(){
 }
 
 function renderSpotlight(){
-  const h = $('#beitar-hist');
+  const spot = document.querySelector('.spot');
+  spot.style.setProperty('--spot', COLOR[spotTeam] || 'var(--gold)');
+  $('#spot-title').textContent = 'ואיפה שמים את ' + spotTeam + '?';
+
+  // בורר קבוצות
+  $('#spot-tabs').innerHTML = TEAMS.map(t => `
+    <button type="button" class="tchip ${t.n === spotTeam ? 'on' : ''}" data-team="${esc(t.n)}">
+      <span class="dot" style="background:${t.c}"></span>${esc(t.s)}
+    </button>`).join('');
+
+  // התפלגות מקומות
   const counts = Array(N).fill(0);
-  entries.forEach(e => { const p = e.table.indexOf(BEITAR); if (p > -1) counts[p]++; });
+  entries.forEach(e => { const p = e.table.indexOf(spotTeam); if (p > -1) counts[p]++; });
   const max = Math.max(1, ...counts);
 
-  h.innerHTML = counts.map((v,i) => `
+  $('#beitar-hist').innerHTML = counts.map((v,i) => `
     <div class="bar" title="מקום ${i+1}: ${v}">
       <em>${v || ''}</em>
       <i class="${v ? '' : 'zero'}" style="height:${v ? (v/max*100) : 2}%"></i>
@@ -733,13 +1208,32 @@ function renderSpotlight(){
 
   const v = $('#beitar-verdict');
   if (!entries.length){ v.textContent = 'עוד אין ניחושים. תהיו הראשונים.'; return; }
+
+  const n     = entries.length;
+  const avg   = averages()[spotTeam];
+  const best  = counts.findIndex(c => c > 0) + 1;
+  const worst = counts.length - [...counts].reverse().findIndex(c => c > 0);
   const champs = counts[0];
-  const avg = averages()[BEITAR];
-  const pct = Math.round(champs / entries.length * 100);
-  v.innerHTML = champs
-    ? `<strong>${champs}</strong> מתוך ${entries.length} רואים אליפות (${pct}%), והממוצע עומד על מקום <strong>${avg.toFixed(1)}</strong>.`
-    : `אף אחד עוד לא העז לשים אליפות. הממוצע: מקום <strong>${avg.toFixed(1)}</strong>.`;
+  const drops  = counts[N-2] + counts[N-1];
+
+  const bits = [`הממוצע: מקום <strong>${avg.toFixed(1)}</strong>.`];
+  bits.push(best === worst
+    ? `כולם שמו אותה במקום <strong>${best}</strong>.`
+    : `הטווח נע בין <strong>${best}</strong> ל-<strong>${worst}</strong>.`);
+  if (champs) bits.push(`<strong>${champs}</strong> מתוך ${n} רואים אליפות.`);
+  if (drops)  bits.push(`<strong>${drops}</strong> רואים ירידה.`);
+  if (!champs && !drops) bits.push('אף אחד לא רואה אותה לא באליפות ולא בירידה.');
+
+  v.innerHTML = bits.join(' ');
 }
+
+$('#spot-tabs').addEventListener('click', ev => {
+  const c = ev.target.closest('[data-team]');
+  if (!c) return;
+  spotTeam = c.dataset.team;
+  renderSpotlight();
+  c.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+});
 
 /* ============================================================
    עורך
@@ -749,14 +1243,16 @@ function consensusOrder(){
   return TEAMS.map(t => t.n).sort((a,b) => avg[a] - avg[b]);
 }
 
-function openEditor(){
+function openEditor(target){
   if (locked()){ alert('ההרשמה נסגרה ב-' + deadline.toLocaleDateString('he-IL') + '.'); return; }
 
-  const mine = entries.find(e => myIds.includes(e.id));
+  const mine = target || entries.find(e => isMine(e.id));
+  editing = (mine && isMine(mine.id)) ? mine : null;
+
   let hint;
-  if (mine){
-    draft = mine.table.slice();
-    hint = 'התחלנו מהטבלה שכבר תליתם. שינוי יתלה פתק נוסף.';
+  if (editing){
+    draft = editing.table.slice();
+    hint = 'עריכת הפתק שלכם. השינוי מחליף את הטבלה הקיימת.';
   } else if (entries.length >= 3){
     draft = consensusOrder();
     hint = 'התחלנו מהממוצע של הקבוצה. גררו את ⠿ עד שזה נראה נכון.';
@@ -765,8 +1261,10 @@ function openEditor(){
     hint = 'גררו את ⠿ או השתמשו בחיצים. 1 = אלופה, 13–14 יורדות.';
   }
 
+  $('#edit-title').textContent = editing ? 'עריכת הטבלה' : 'הטבלה שלכם';
+  $('#save').textContent = editing ? 'עדכון הפתק' : 'תלו את הפתק';
   $('#edit-hint').textContent = hint;
-  $('#nm').value = Local.get('beitar_name') || '';
+  $('#nm').value = editing ? editing.name : (Local.get('beitar_name') || '');
   $('#err').textContent = '';
   renderPicks();
   $('#ov-edit').classList.add('open');
@@ -775,6 +1273,7 @@ function openEditor(){
 }
 function closeEditor(){
   $('#ov-edit').classList.remove('open');
+  editing = null;
   unlockScroll();
 }
 
@@ -889,8 +1388,33 @@ function swap(a,b){ [draft[a],draft[b]] = [draft[b],draft[a]]; renderPicks(); }
 
 $('#shuffle').onclick = () => { draft = shuffleArr(draft); renderPicks(); };
 $('#cancel').onclick = closeEditor;
-$('#open-editor').onclick = openEditor;
+$('#open-editor').onclick = () => openEditor();
 $('#scroll-board').onclick = () => $('#sec-board').scrollIntoView({behavior:'smooth'});
+$('#scroll-stats').onclick = () => $('#sec-stats').scrollIntoView({behavior:'smooth'});
+
+/* לשוניות */
+$('#stat-tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-panel]');
+  if (!b) return;
+  document.querySelectorAll('#stat-tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('#sec-stats .panel')
+    .forEach(p => p.classList.toggle('on', p.id === b.dataset.panel));
+});
+
+/* סימון הסעיף הפעיל בניווט */
+(function navSpy(){
+  const links = [...document.querySelectorAll('.subnav a')];
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(a => a.classList.toggle('on', a.dataset.nav === e.target.id));
+    });
+  }, { rootMargin: '-52px 0px -70% 0px' });
+  ['sec-board','sec-race','sec-stats'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
+  });
+})();
 
 $('#save').onclick = async () => {
   const name = $('#nm').value.trim();
@@ -898,28 +1422,25 @@ $('#save').onclick = async () => {
   if (name.length < 2){ err.textContent = 'צריך שם — אחרת לא נדע את מי לצחצח בסוף העונה.'; return; }
   if (new Set(draft).size !== N){ err.textContent = 'משהו השתבש בסדר. רעננו ונסו שוב.'; return; }
 
-  const entry = {
-    id: crypto.randomUUID(),
-    name,
-    table: draft.slice(),
-    createdAt: new Date().toISOString(),
-    season: CONFIG.SEASON
-  };
+  const isEdit = !!editing;
+  const entry = isEdit
+    ? Object.assign({}, editing, { name, table: draft.slice() })
+    : { id: crypto.randomUUID(), name, table: draft.slice(),
+        createdAt: new Date().toISOString(), season: CONFIG.SEASON };
 
   const btn = $('#save');
+  const label = btn.textContent;
   btn.disabled = true; btn.textContent = 'שומר…'; err.textContent = '';
   try {
-    await submit(entry);
+    await (isEdit ? updateEntry(entry) : submit(entry));
     Local.set('beitar_name', name);
-    myIds.push(entry.id);
-    Local.set('beitar_my_ids', JSON.stringify(myIds));
     closeEditor();
     await load();
     setTimeout(() => $('#sec-board').scrollIntoView({behavior:'smooth'}), 120);
   } catch (e){
     err.textContent = e.message || 'השמירה נכשלה. נסו שוב.';
   } finally {
-    btn.disabled = false; btn.textContent = 'תלו את הפתק';
+    btn.disabled = false; btn.textContent = label;
   }
 };
 
@@ -927,10 +1448,10 @@ $('#save').onclick = async () => {
    צפייה
    ============================================================ */
 function openView(e){
-  const mine = myIds.includes(e.id);
+  const mine = isMine(e.id);
   $('#slip').innerHTML = `
     <h3>${esc(e.name)}</h3>
-    <div class="meta">נתלה ב-${fmtDate(e.createdAt)} · עונת ${CONFIG.SEASON}</div>
+    <div class="meta">נתלה ב-${fmtDate(e.createdAt)}${e.updatedAt ? ' · עודכן ' + fmtDate(e.updatedAt) : ''}</div>
     <ol>${e.table.map((t,i) => `
       <li class="${i===0?'g1':''} ${i===5?'g6':''} ${i>=N-2?'gd':''}">
         <span class="p">${i+1}</span>
@@ -943,15 +1464,22 @@ function openView(e){
     </div>
     <div class="foot">
       <button class="btn btn-dark" onclick="closeView()">סגירה</button>
+      ${mine && !locked() ? `<button class="btn btn-gold" onclick="editEntry('${e.id}')">עריכה</button>` : ''}
       ${mine ? `<button class="btn btn-del" onclick="delEntry('${e.id}')">מחיקת הפתק שלי</button>` : ''}
     </div>`;
   $('#ov-view').classList.add('open');
   lockScroll();
 }
 function closeView(){ $('#ov-view').classList.remove('open'); unlockScroll(); }
+function editEntry(id){
+  const e = entries.find(x => x.id === id);
+  closeView();
+  if (e) setTimeout(() => openEditor(e), 120);
+}
 async function delEntry(id){
-  if (!confirm('למחוק את הפתק?')) return;
-  await removeEntry(id); closeView(); load();
+  if (!confirm('למחוק את הפתק? אי אפשר לשחזר.')) return;
+  try { await removeEntry(id); closeView(); load(); }
+  catch (e){ alert(e.message || 'המחיקה נכשלה.'); }
 }
 
 [['#ov-edit', closeEditor], ['#ov-view', closeView]].forEach(([sel, fn]) => {
@@ -982,7 +1510,8 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 function fmtDate(d){ try { return new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'}); } catch { return ''; } }
 function shuffleArr(a){ a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 
-window.openEditor = openEditor; window.closeView = closeView; window.delEntry = delEntry;
+window.openEditor = openEditor; window.closeView = closeView;
+window.delEntry = delEntry; window.editEntry = editEntry;
 load();
 </script>
 </body>
