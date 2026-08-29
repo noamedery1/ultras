@@ -164,6 +164,8 @@ h1{font-family:var(--disp);font-size:clamp(36px,12.5vw,56px);margin:2px 0 0;line
 .choice:active{transform:scale(.98)}
 .choice:hover{background:rgba(255,61,139,.22);border-color:rgba(255,61,139,.55)}
 .choice:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+.chq{font-family:var(--disp);font-size:16px;color:var(--gold);text-align:center;
+  padding:4px 0 2px;text-shadow:0 2px 10px rgba(0,0,0,.9)}
 #tapon{font-size:12px;color:var(--cream);text-align:center;padding:6px 0 calc(env(safe-area-inset-bottom) + 4px);
   text-shadow:0 2px 8px #000;animation:blink 1.6s infinite}
 @keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
@@ -173,6 +175,7 @@ h1{font-family:var(--disp);font-size:clamp(36px,12.5vw,56px);margin:2px 0 0;line
 .gtitle{font-family:var(--disp);font-size:19px}
 .gtimer{font-family:var(--disp);font-size:15px;color:var(--gold)}
 .gbarwrap{margin-bottom:8px}
+#gbox.danger{box-shadow:inset 0 0 0 3px rgba(255,61,139,.5);border-radius:20px}
 #gbox{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   padding-bottom:calc(env(safe-area-inset-bottom) + 2px)}
 #gbox canvas{width:100%;height:100%;border-radius:18px;background:rgba(0,0,0,.32);border:1px solid var(--line);display:block;touch-action:none}
@@ -222,14 +225,19 @@ h1{font-family:var(--disp);font-size:clamp(36px,12.5vw,56px);margin:2px 0 0;line
 @keyframes shk{0%,100%{transform:rotate(0) scale(1.06)}25%{transform:rotate(6deg) scale(1.08)}75%{transform:rotate(-6deg) scale(1.08)}}
 .zzz{position:absolute;top:6px;right:10px;font-size:26px;transition:opacity .3s;animation:zzf 2.4s ease-in-out infinite}
 @keyframes zzf{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-10px);opacity:1}}
-.slpstate{font-family:var(--disp);font-size:19px;padding:7px 16px;border-radius:99px;transition:all .18s}
+.slpstate{font-family:var(--disp);font-size:23px;padding:9px 20px;border-radius:99px;transition:all .18s}
 .slpstate.ok{background:rgba(63,224,190,.16);color:var(--mint);border:1px solid rgba(63,224,190,.4)}
 .slpstate.warn{background:rgba(255,201,60,.18);color:var(--gold);border:1px solid rgba(255,201,60,.5)}
 .slpstate.bad{background:rgba(255,61,139,.2);color:#FF9AC2;border:1px solid rgba(255,61,139,.55)}
-.slphold{width:min(88%,300px);touch-action:none;-webkit-user-select:none;text-align:center;font-family:var(--disp);font-size:19px;color:#2A0A18;
+.slphold{width:min(94%,330px);touch-action:none;-webkit-user-select:none;text-align:center;
+  font-family:var(--disp);font-size:23px;color:#2A0A18;display:flex;flex-direction:column;gap:2px;
+  animation:pulseb 1.6s ease-in-out infinite;
   background:linear-gradient(180deg,var(--gold),#FF9E2C);border-radius:18px;padding:18px;
   box-shadow:0 8px 0 #B4691A,0 14px 26px rgba(0,0,0,.45);user-select:none;cursor:pointer;transition:transform .07s}
-.slphold.on{transform:translateY(6px);box-shadow:0 2px 0 #B4691A;background:linear-gradient(180deg,#7BF0D6,var(--mint))}
+.slphold small{font-family:var(--body);font-size:12.5px;font-weight:700;opacity:.72}
+.slphold.on{animation:none;transform:translateY(5px);box-shadow:0 3px 0 #1E9C82;
+  background:linear-gradient(180deg,#7BF0D6,var(--mint))}
+@keyframes pulseb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .slpname{font-size:12.5px;color:var(--dim);margin-top:-4px}
 .vu{position:relative;width:min(94%,340px);height:38px;border-radius:12px;overflow:hidden;
   background:rgba(0,0,0,.42);border:1.5px solid var(--line);box-shadow:inset 0 2px 8px rgba(0,0,0,.5)}
@@ -244,11 +252,17 @@ h1{font-family:var(--disp);font-size:clamp(36px,12.5vw,56px);margin:2px 0 0;line
   justify-content:center;gap:10px;padding:24px;text-align:center;
   background:rgba(11,4,20,.93);backdrop-filter:blur(9px);animation:fade .28s ease both}
 .howto .hi{font-size:58px;filter:drop-shadow(0 10px 26px rgba(255,61,139,.5))}
-.howto h3{font-family:var(--disp);font-size:27px;margin:2px 0 0}
-.howto p{font-size:16px;line-height:1.6;color:var(--cream);max-width:18em;margin:0}
+.howto h3{font-family:var(--disp);font-size:31px;margin:2px 0 0}
+.howto p{font-size:18px;font-weight:700;line-height:1.5;color:var(--cream);max-width:17em;margin:0}
 .skipbtn{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 8px);
   z-index:19;font-size:13px;padding:9px 16px;background:rgba(11,4,20,.85);animation:fade .4s ease both}
-.howto .tips{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--dim);margin-top:4px}
+.howto .tips{display:flex;flex-direction:column;gap:8px;width:min(94%,340px);margin-top:8px}
+.howto .tips span{display:flex;align-items:center;gap:10px;text-align:right;
+  font-size:16px;font-weight:600;line-height:1.4;color:var(--cream);
+  background:linear-gradient(180deg,rgba(62,30,94,.85),rgba(28,11,46,.85));
+  border:1.5px solid rgba(255,241,228,.16);border-radius:14px;padding:12px 14px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.howto .tips b{color:var(--gold);font-weight:800}
 /* ---- איפה תהל? ---- */
 .find{position:relative;width:100%;flex:1;min-height:240px;border-radius:18px;overflow:hidden;
   background:radial-gradient(120% 80% at 50% 0,rgba(255,61,139,.12),rgba(0,0,0,.3));border:1px solid var(--line)}
@@ -450,7 +464,7 @@ const LEVELS = [
     {w:'achot', t:'נעם אין לי כח אלייך', pop:true},
     {w:'ach',   t:'ואבא ישן. תעירי אותו וזה נגמר.'}
   ],
-  game:{ type:'sleep', icon:'😴', how:'אבא נרדם על הספה — ואת רוצה להתאמן.', tips:'🟢 כשכתוב <b>ישן</b> — החזיקי את הכפתור ותשירי|🔴 כשכתוב <b>מתעורר</b> — עזבי מיד!|🎯 מלאי את מד הרעש ל־100%', title:'אל תעירו את אבא', hint:'ישן 😴 = החזיקי ושירי · מתעורר 😳 = עזבי מיד!', dur:55 },
+  game:{ type:'sleep', icon:'😴', dur:48, how:'שבי נרדם על הספה — ותהל רוצה להתאמן.', tips:'👇 <b>לחצי והחזיקי</b> את הכפתור הצהוב — תהל שרה|😳 ברגע שכתוב <b>מתעורר</b> — <b>שחררי</b> את האצבע!|🎯 מלאי את מד הרעש ל־<b>100%</b> לפני שנגמר הזמן', title:'אל תעירו את אבא', hint:'ישן 😴 = החזיקי ושירי · מתעורר 😳 = עזבי מיד!',  },
   win:{ i:'📈', t:'אבא לא התעורר.', x:'אבל מאור הקליט הכל והעלה. חמש מאות עוקבים תוך שעה, ושכן אחד שכתב "סוף סוף שקט, אבל היא שרה יפה".', fol:500 },
   lose:{ i:'😳', t:'אבא קם.', x:'הוא לא כעס. הוא רק עמד בפתח שלוש דקות בלי להגיד מילה. זה יותר גרוע.', fol:60 },
   outro:[
@@ -477,7 +491,7 @@ const LEVELS = [
     {w:'ima',   t:'טוב. אני חותמת. אבל אני רוצה פוסטר.'},
     {w:'tahel', t:'רגע, יש פה אלף תמונות של כולם. איפה אני?'}
   ],
-  game:{ type:'find', icon:'🔍', how:'כל תמונות המשפחה התערבבו על הקיר.', tips:'👆 הקישי על <b>תהל</b> בכל סבב|⏱ יש לך כמה שניות לכל סבב|📈 בכל סבב יש יותר פרצופים', title:'איפה תהל?', hint:'כל התמונות במשפחה מעורבבות. מצאי את תהל — מהר.', rounds:5 },
+  game:{ type:'find', icon:'🔍', how:'כל תמונות המשפחה התערבבו על הקיר.', tips:'👆 הקישי על <b>תהל</b> מתוך כל הפרצופים|⏱ יש כמה שניות בכל סבב|📈 חמישה סבבים, כל אחד קשה יותר', title:'איפה תהל?', hint:'כל התמונות במשפחה מעורבבות. מצאי את תהל — מהר.', rounds:5 },
   win:{ i:'🖼️', t:'מצאת את כולן.', x:'אמא הסתכלה עליו הרבה זמן, לא אמרה כלום, וצילמה. אחר כך שלחה לכל הקבוצות. גם לזאת של הוועד.', fol:250 },
   lose:{ i:'🖼️', t:'בחרו תמונה של מאור.', x:'הפוסטר נתלה בכניסה לבית הספר עם הפרצוף שלו. הוא קרא לזה "החשיפה הראשונה שלי".', fol:80 },
   outro:[
@@ -505,7 +519,7 @@ const LEVELS = [
     {w:'tahel', t:'אמא. אני על הבמה בעוד דקה.'},
     {w:'achot', t:'אזהרה: חצי מהאולם ישן. תעירי אותם.'}
   ],
-  game:{ type:'whack', icon:'😴', how:'חצי מהאולם נרדם באמצע ההופעה!', tips:'👆 הקישי על כל פרצוף שקופץ מהכיסא|🎤 חוץ מתהל — עליה <b>לא</b> להקיש|🎯 תעירי 11 אנשים', title:'תעירי את הקהל', hint:'הקהל נרדם. הקישי על כל מי שקופץ 😴 — אבל לא על תהל 🎤', dur:38, need:11 },
+  game:{ type:'whack', icon:'😴', how:'חצי מהאולם נרדם באמצע ההופעה!', tips:'👆 הקישי על <b>כל פרצוף</b> שקופץ מהכיסא|🎤 חוץ מ<b>תהל</b> — עליה אסור ללחוץ!|🎯 תעירי <b>11</b> אנשים', title:'תעירי את הקהל', hint:'הקהל נרדם. הקישי על כל מי שקופץ 😴 — אבל לא על תהל 🎤', dur:38, need:11 },
   win:{ i:'🌟', t:'האולם קם.', x:'מאה כיסאות פלסטיק חורקים בבת אחת. אמא בכתה בשורה הראשונה כמו שהבטיחה.', fol:3000 },
   lose:{ i:'😴', t:'חלק מהאולם המשיך לישון.', x:'אבל אלה שכן התעוררו קמו על הרגליים. וזה נחשב.', fol:900 },
   outro:[
@@ -527,7 +541,7 @@ const LEVELS = [
     {w:'tahel', t:'אף אחד פה לא מדבר על אותו דבר.'},
     {w:'tahel', t:'רגע — אם אזהה מי אמר מה, אולי הם יחזרו.'}
   ],
-  game:{ type:'whosaid', icon:'🕵️', how:'המשפחה השתגעה. מי אמר מה?', tips:'💬 קראי את המשפט שעל הכרטיס|👆 הקישי על מי שאמר אותו|✔ חמש שאלות', title:'מי אמר את זה?', hint:'קראי את המשפט והקישי על מי שאמר אותו.', rounds:5 },
+  game:{ type:'whosaid', icon:'🕵️', how:'המשפחה השתגעה. מי אמר מה?', tips:'💬 קראי את המשפט על הכרטיס הלבן|👆 הקישי על <b>הפרצוף</b> של מי שאמר אותו|✔ חמש שאלות, כל פעם אחרות', title:'מי אמר את זה?', hint:'קראי את המשפט והקישי על מי שאמר אותו.', rounds:5 },
   win:{ i:'💛', t:'הם חזרו.', x:'התברר שגם כשהם משתגעים, כל אחד נשאר בדיוק עצמו. תהל זיהתה את כולם.', fol:4000 },
   lose:{ i:'📵', t:'רובם חזרו.', x:'אבא עדיין קורא לסלון "הסטודיו", ואמא אומרת "אש" על מרק. אבל הם שם.', fol:1500 },
   outro:[
@@ -547,7 +561,7 @@ const LEVELS = [
     {w:'tahel', t:'מאור!! עכשיו?!'},
     {w:'ima',   t:'שאמא שלה שרופה', pop:true}
   ],
-  game:{ type:'memory', icon:'🃏', how:'המסך הענק מציג את המשפחה — מבולגן.', tips:'👆 הפכי שני קלפים|💛 אותה תמונה? הם נשארים פתוחים|🎯 מצאי את כל 5 הזוגות', title:'המסך הענק', hint:'הפכי שני ריבועים. אם זו אותה תמונה — הם נשארים פתוחים.', dur:90 },
+  game:{ type:'memory', icon:'🃏', how:'המסך הענק מציג את המשפחה — מבולגן.', tips:'👆 הקישי על קלף כדי להפוך אותו|💛 שני קלפים זהים — נשארים פתוחים|🎯 מצאי את כל <b>5 הזוגות</b>', title:'המסך הענק', hint:'הפכי שני ריבועים. אם זו אותה תמונה — הם נשארים פתוחים.', dur:90 },
   win:{ i:'🏆', t:'כל ההיכל שר איתה.', x:'בשורה הראשונה ישבו ארבעה אנשים שלא שרו בכלל. הם רק הסתכלו עליה.', fol:20000 },
   lose:{ i:'🎤', t:'המיקרופון נפל בסוף.', x:'כל ההיכל חשב שזה חלק מההופעה. אבא לקח על זה קרדיט.', fol:9000 },
   outro:[
@@ -855,6 +869,9 @@ function runDialogue(list, done){
     if(n.choose){
       $('tapon').style.display='none';
       $('choices').innerHTML='';
+      const q=document.createElement('div');
+      q.className='chq'; q.textContent=n.q||'👇 מה תהל תגיד?';
+      $('choices').appendChild(q);
       n.choose.forEach(c=>{
         const b=document.createElement('button');
         b.className='choice'; b.textContent=c.t;
@@ -977,61 +994,72 @@ function gameSleep(cfg, done){
     '<div class="slpname">'+C.aba.name+' ישן על הספה</div>'+
     '<div class="slpstate" id="slps">😴 ישן</div>'+
     '<div class="vu"><i id="vuf"></i><b id="vuv">0%</b></div>'+
-    '<div class="slphold" id="slph">👆 הקישי או החזיקי כדי לשיר</div></div>';
+    '<div class="slphold" id="slph"></div></div>';
   const face=$('slpf'), st=$('slps'), hold=$('slph');
-  let fill=0, lives=3, holding=false, safe=true, live=true, t=performance.now(), t00=t, flip=t+2200, warned=false;
+  let fill=0, caught=0, held=false, safe=true, live=true,
+      t=performance.now(), t00=t, flip=t+2800, warned=false, grace=0;
+
+  const sing=on=>{ held=on; hold.classList.toggle('on',on);
+    hold.innerHTML = on ? '🎤 <b>שרה!</b><small>אל תשחררי</small>'
+                        : '👇 <b>לחצי והחזיקי</b><small>כל עוד האצבע למטה — היא שרה</small>'; };
+  sing(false);
+
+  /* pointer capture: the release is delivered even if the finger slides off the button */
+  const press=e=>{ if(e.cancelable) e.preventDefault();
+    try{ hold.setPointerCapture(e.pointerId); }catch(_){}
+    if(!held) sing(true); };
+  const release=()=>{ if(held) sing(false); };
+  if(window.PointerEvent){
+    hold.addEventListener('pointerdown',press);
+    hold.addEventListener('pointerup',release);
+    hold.addEventListener('pointercancel',release);
+    hold.addEventListener('lostpointercapture',release);
+  } else {
+    hold.addEventListener('touchstart',e=>{ e.preventDefault(); if(!held) sing(true); },{passive:false});
+    hold.addEventListener('touchend',release);
+    hold.addEventListener('touchcancel',release);
+    hold.addEventListener('mousedown',e=>{ e.preventDefault(); if(!held) sing(true); });
+  }
+  window.addEventListener('mouseup',release);
+  window.addEventListener('touchend',release);
+  window.addEventListener('blur',release);
+
   const setState=()=>{
-    st.textContent = safe ? '😴 ישן — שירי!' : '😳 מתעורר — עצרי!';
+    st.textContent = safe ? '😴 ישן — שירי!' : '😳 מתעורר — שחררי!';
     st.className = 'slpstate '+(safe?'ok':'bad');
     face.classList.toggle('awake', !safe);
     $('zzz').style.opacity = safe?1:0;
+    box.classList.toggle('danger', !safe);
   };
-  let pressT=0, latched=false;
-  const sing=on=>{ holding=on; hold.classList.toggle('on',on);
-    hold.textContent = on ? '🎤 שרה... (הקישי לעצור)' : '👆 הקישי או החזיקי כדי לשיר'; };
-  const down=e=>{ if(e.cancelable) e.preventDefault();
-    if(latched){ latched=false; sing(false); pressT=0; return; }
-    pressT=performance.now(); sing(true); };
-  const up=()=>{ if(!pressT) return;
-    if(performance.now()-pressT < 220){ latched=true; return; }   /* short tap = keep singing */
-    pressT=0; latched=false; sing(false); };
-  const kill=()=>{ pressT=0; latched=false; sing(false); };
-  hold.addEventListener('pointerdown',down);
-  hold.addEventListener('pointerup',up);
-  hold.addEventListener('pointercancel',kill);
-  window.addEventListener('pointerup',up);
-  hold.addEventListener('touchstart',down,{passive:false});
-  hold.addEventListener('touchend',up);
-  hold.addEventListener('touchcancel',kill);
-  hold.addEventListener('mousedown',down);
-  window.addEventListener('mouseup',up);
   setState();
+
   (function loop(now){
     if(!live) return;
     try{
-    const dt=Math.min(60,now-t)/1000; t=now;
-    if(now>flip){
-      safe=!safe; warned=false; setState();
-      flip = now + (safe ? 1800+Math.random()*2200 : 1100+Math.random()*900);
-      if(safe) tone(300,.12,'sine',.08); else tone(180,.2,'sawtooth',.1);
-    }
-    if(safe && !warned && flip-now<520){ warned=true; st.textContent='😳 זהירות...'; st.className='slpstate warn'; tone(420,.08,'triangle',.1); }
-    if(holding){
-      if(safe){ fill+=dt*17; if(Math.random()<.06) tone(500+Math.random()*300,.06,'sine',.05); }
-      else {
-        lives--; fill=Math.max(0,fill-14); kill();
-        sfx.bad(); toast('אבא זז! 😳','pink'); face.classList.add('shake');
-        setTimeout(()=>face.classList.remove('shake'),400);
-        if(lives<=0){ live=false; return done(false); }
+      const dt=Math.min(60,now-t)/1000; t=now;
+      if(now>flip){
+        safe=!safe; warned=false; grace = safe?0:now+550; setState();
+        flip = now + (safe ? 2400+Math.random()*2000 : 1300+Math.random()*700);
+        tone(safe?300:170,.16,safe?'sine':'sawtooth',.09);
       }
-    }
-    const left=(cfg.dur||55)-(now-t00)/1000;
-    $('gtimer').textContent='⏱ '+Math.max(0,Math.ceil(left))+'  ·  ❤ '+lives;
-    prog(fill/100);
-    $('vuf').style.width=Math.min(100,fill)+'%';
-    $('vuv').textContent=Math.round(Math.min(100,fill))+'%';
-    if(left<=0){ live=false; return done(fill>=65); }
-    if(fill>=100){ live=false; sfx.win(); return done(true); }
+      if(safe && !warned && flip-now<800){
+        warned=true; st.textContent='😳 זהירות... הוא זז!'; st.className='slpstate warn'; tone(430,.09,'triangle',.12);
+      }
+      if(held){
+        if(safe){ fill+=dt*22; if(Math.random()<.07) tone(520+Math.random()*300,.06,'sine',.05); }
+        else if(now>grace){
+          caught++; fill=Math.max(0,fill-18); sing(false);
+          sfx.bad(); toast('אבא זז! 😳','pink');
+          face.classList.add('shake'); setTimeout(()=>face.classList.remove('shake'),400);
+        }
+      }
+      const left=(cfg.dur||48)-(now-t00)/1000;
+      $('gtimer').textContent='⏱ '+Math.max(0,Math.ceil(left))+(caught?'  ·  😳 '+caught:'');
+      prog(fill/100);
+      $('vuf').style.width=Math.min(100,fill)+'%';
+      $('vuv').textContent=Math.round(Math.min(100,fill))+'%';
+      if(fill>=100){ live=false; release(); sfx.win(); return done(true); }
+      if(left<=0){ live=false; release(); return done(fill>=70); }
     }catch(err){ console.error(err); }
     requestAnimationFrame(loop);
   })(t);
@@ -1145,7 +1173,7 @@ function gameWhoSaid(cfg, done){
   const rounds=Math.min(cfg.rounds||5, pool.length);
   const who=['tahel','ima','aba','ach','achot'];
   const wrap=document.createElement('div'); wrap.className='who';
-  wrap.innerHTML='<div class="quote" id="wq"></div><div class="whorow" id="wr"></div>';
+  wrap.innerHTML='<div class="quote" id="wq"></div><div class="chq">👇 מי אמר את זה?</div><div class="whorow" id="wr"></div>';
   box.appendChild(wrap);
   let r=0, right=0, lock=false, nextT=null, watch=null;
   function round(){
