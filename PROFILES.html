@@ -1,0 +1,3467 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תיקי המנחוסים 🔎</title>
+<style>
+  :root{--yellow:#ffd200;--yellow-dark:#e6bd00;--black:#111;--card:#1c1c1c;--gray:#2a2a2a;--white:#fff;
+    --c-football:#38b000;--c-politics:#4361ee;--c-humor:#ff6d00;--c-extra:#9d4edd;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(circle at 50% 0%,#333,#0c0c0c 65%);
+    color:var(--white);min-height:100vh;padding:16px;}
+  .wrap{max-width:480px;margin:0 auto;}
+  header{text-align:center;margin-bottom:16px;}
+  header .logo{font-size:38px;}
+  header h1{color:var(--yellow);font-size:26px;margin-top:2px;}
+  header .sub{color:#bbb;font-size:13px;margin-top:2px;}
+  .demo{background:#3a2f00;border:1px solid var(--yellow-dark);color:#ffe98a;font-size:12px;
+    border-radius:10px;padding:8px 12px;text-align:center;margin-bottom:14px;}
+  .picker{margin-bottom:16px;}
+  .picker label{display:block;font-size:13px;color:#aaa;margin-bottom:6px;}
+  select{width:100%;background:var(--gray);color:var(--white);border:2px solid var(--yellow);
+    border-radius:14px;padding:14px;font-size:18px;font-weight:700;font-family:inherit;text-align:center;}
+  .card{background:linear-gradient(135deg,#242424,#181818);border:2px solid #333;border-radius:18px;
+    padding:20px;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .who-name{font-size:30px;font-weight:800;color:var(--yellow);}
+  .who-msgs{font-size:12px;color:#888;margin-bottom:10px;}
+  .headline{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .sketch{font-size:16px;line-height:1.65;background:#20200f;border-right:4px solid var(--yellow);
+    border-radius:10px;padding:14px 16px;margin-bottom:16px;font-weight:600;}
+  .badges{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+  .badge{background:var(--yellow);color:#000;font-weight:800;font-size:13px;border-radius:999px;padding:6px 12px;}
+  .sec-title{font-size:13px;color:#888;font-weight:700;margin:14px 0 8px;}
+  .bar{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:14px;}
+  .bar .lbl{flex:0 0 130px;font-weight:700;}
+  .bar .track{flex:1;background:var(--gray);border-radius:8px;height:22px;overflow:hidden;position:relative;}
+  .bar .fill{height:100%;border-radius:8px;min-width:2px;}
+  .bar .pct{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;color:#eee;}
+  .lines{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+  .lines li{background:var(--gray);border-radius:10px;padding:11px 13px;font-size:14px;line-height:1.45;}
+  .quote{border-right:3px solid var(--yellow);background:#20200f;border-radius:8px;padding:10px 12px;
+    margin-top:8px;font-size:14px;line-height:1.5;}
+  .quote .qtop{font-size:11px;color:var(--yellow);font-weight:700;margin-bottom:3px;}
+  .fp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:var(--gray);border-radius:10px;padding:9px 12px;margin-bottom:6px;font-size:14px;}
+  .fp-row .fp-k{color:#999;font-weight:700;flex:0 0 auto;}
+  .fp-row .fp-v{font-weight:700;text-align:left;}
+  .chip2{display:inline-block;background:#3a3520;color:#ffe98a;border-radius:999px;
+    padding:3px 10px;font-size:12px;font-weight:700;margin:2px 0 2px 4px;}
+  .foot{text-align:center;font-size:12px;color:#666;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🔎🟡⚫</div>
+    <h1>תיקי המנחוסים</h1>
+    <div class="sub" id="sub">ביתר ירושלים • ניתוח חברים</div>
+  </header>
+
+
+  <div class="picker">
+    <label>בחרו חבר לתיק:</label>
+    <select id="who"></select>
+  </div>
+
+  <div class="card" id="card"></div>
+
+  <div class="foot">📸 בחרו שם, צלמו את התיק, ותייגו בקבוצה 😈</div>
+</div>
+
+<script>
+/* ===== נתונים — placeholder לדוגמה. יוחלף ב-profiles.json האמיתי ===== */
+const PROFILES = {
+ "window": {
+  "from": "10.07.2026",
+  "to": "08.09.2026"
+ },
+ "extraTopic": {
+  "key": "ai",
+  "label": "AI / טכנולוגיה",
+  "counts": {
+   "ai": 872,
+   "army": 249,
+   "food": 354,
+   "money": 713,
+   "dating": 428,
+   "cars": 508
+  }
+ },
+ "people": [
+  {
+   "name": "יצחק נגר",
+   "msgs": 5784,
+   "headline": "יצחק נגר — ינשוף הלילה של הקבוצה.",
+   "badges": [
+    "🦉 ינשוף הלילה",
+    "📸 מלך הפורוורדים",
+    "🤡 מלך הצחוקים",
+    "💬 הפטפטן הראשי"
+   ],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 57
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 22
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 10
+    }
+   ],
+   "lines": [
+    "🤬 קילל 202 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 57% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 973 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "עשיתם היסטוריה! 🦁 בפעם הראשונה אי פעם - SOLD OUT מנויים בטדי! מחכים לראות את כולכם בצהוב שחור 🤩"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "שמתי 1-1 לא מאמין למה שיניתי"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "goals",
+     "Romano",
+     "משטח",
+     "בוקבזה",
+     "Elad"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 34
+    },
+    "sparring": {
+     "name": "אליאור",
+     "count": 19
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 4,
+     "night": 1,
+     "msgs": 1,
+     "laugh": 1,
+     "total": 44
+    }
+   },
+   "sketch": "תחנת השידור 24/7 של הקבוצה — ראשון בהודעות, בצחוקים ובשעות הקטנות. מפציץ פורוורדים בלי סוף, גורר את כולם לפוליטיקה, ומתכתש בעיקר עם אליאור."
+  },
+  {
+   "name": "מתן לוגסי",
+   "msgs": 4618,
+   "headline": "מתן לוגסי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 62
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 20
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 217 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 62% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 737 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "יש להם שוער חלש למה לא מנסים לבעוט?"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "יש להם שוער חלש למה לא מנסים לבעוט?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "אלמוגבול",
+     "אולה",
+     "בקסטר",
+     "אלמןג",
+     "הפיזיות"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 54
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 10
+    },
+    "peak": "22:00",
+    "nightPct": 6,
+    "ranks": {
+     "curse": 3,
+     "night": 3,
+     "msgs": 2,
+     "laugh": 2,
+     "total": 44
+    }
+   },
+   "sketch": "העיתונאי של הקבוצה — טורי דעה באורך מגילה. אובססיבי לאלמוג (54 אזכורים) ולפוליטיקה, ומנתח שלוש שנים אחורה בזמן שכולם רק צורחים."
+  },
+  {
+   "name": "נועם",
+   "msgs": 3644,
+   "headline": "נועם — אלוף הקללות של הקבוצה.",
+   "badges": [
+    "🤬 אלוף הקללות"
+   ],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 59
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 23
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 8
+    }
+   ],
+   "lines": [
+    "🤬 קילל 279 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 59% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 257 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "סילבה לך הביתה בן זונה שוטר"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "בש נגד הכוכב?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "באוטובוס",
+     "כיאילו",
+     "האא",
+     "בעייה",
+     "מנייק"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 56
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 6
+    },
+    "peak": "21:00",
+    "nightPct": 4,
+    "ranks": {
+     "curse": 1,
+     "night": 10,
+     "msgs": 3,
+     "laugh": 3,
+     "total": 44
+    }
+   },
+   "sketch": "המצפון המלוכלך — מקום 1 בקללות בקבוצה. האובססיה שלו היא אלמוג כהן (56 אזכורים), שחוטף ׳בן זונה׳ באופן קבוע. 59% כדורגל, 100% עצבים."
+  },
+  {
+   "name": "בוקבוזה",
+   "msgs": 3255,
+   "headline": "בוקבוזה חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 68
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 16
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 228 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 68% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 98 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "למה זבש לא משחק??? איפה אנסה או וייסמן????"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אני לא משתתף תהיה רגוע"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "מדיי",
+     "מקקי",
+     "ירך",
+     "גנדרני",
+     "הסירטון"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 42
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 12
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 2,
+     "night": 5,
+     "msgs": 4,
+     "laugh": 4,
+     "total": 44
+    }
+   },
+   "sketch": "המנהל הספורטיבי בהתנדבות. מדבר על ורקו יותר מכל אחד (42), מפרסם שוב ושוב תוכניות רכש (׳שחרר את קאלו, תביא בלם זר׳), ומקום 2 בקללות."
+  },
+  {
+   "name": "עומרי",
+   "msgs": 3215,
+   "headline": "עומרי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 69
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 16
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 137 פעמים בחודשיים — שיא אישי בערך סביב 23:00.",
+    "⚽ 69% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 120 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "@Noam תגיד לו שיזרוק חתכת נייר בוערת לגחלים זה יקצר לו רבע שעה להדליק"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "תן חי שקלים לבית הכנסת"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "שבאר",
+     "ניצחת",
+     "תמוח",
+     "ברצף",
+     "בפיגור"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 55
+    },
+    "sparring": {
+     "name": "אביב",
+     "count": 8
+    },
+    "peak": "23:00",
+    "nightPct": 10,
+    "ranks": {
+     "curse": 7,
+     "night": 2,
+     "msgs": 5,
+     "laugh": 6,
+     "total": 44
+    }
+   },
+   "sketch": "כדורגל, כדורגל, כדורגל (69%). מזכיר את אלמוג 55 פעם, ומחזיק מקום 2 בשעות הקטנות — ישן כשהמשחק נגמר, לא רגע לפני."
+  },
+  {
+   "name": "אורון",
+   "msgs": 2699,
+   "headline": "אורון חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 57
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 23
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 15
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 69 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 57% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 233 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "כרגיל ביתר באירופה..."
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "בלומפילד זה רק אם אחת מ3 תודח"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "יןדע",
+     "מחדר",
+     "מאוהב",
+     "כנסת",
+     "Noam"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 16
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 18
+    },
+    "peak": "22:00",
+    "nightPct": 9,
+    "ranks": {
+     "curse": 16,
+     "night": 6,
+     "msgs": 6,
+     "laugh": 5,
+     "total": 44
+    }
+   },
+   "sketch": "סוכנות הידיעות שגם מכבה שריפות. מביא כתבות, מתכתש עם יצחק יותר מכולם, ומצחיק מספיק בשביל מקום 5 בצחוקים."
+  },
+  {
+   "name": "אלעד",
+   "msgs": 2231,
+   "headline": "אלעד חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 73
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 84 פעמים בחודשיים — שיא אישי בערך סביב 23:00.",
+    "⚽ 73% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 80 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "הבוגרים פה... אתם זוכרים את התבוסות שהיינו אוכלים מהפועל בעשור הראשון של שנות ה-2000? ככה זה הרגיש היום"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "הבוגרים פה... אתם זוכרים את התבוסות שהיינו אוכלים מהפועל בעשור הראשון של שנות ה-2000? ככה זה הרגיש היום"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "בונא",
+     "יסנדלו",
+     "בלגאן",
+     "עמרי",
+     "לורד"
+    ],
+    "obsession": {
+     "name": "קאלו",
+     "count": 15
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 14
+    },
+    "peak": "23:00",
+    "nightPct": 10,
+    "ranks": {
+     "curse": 14,
+     "night": 8,
+     "msgs": 7,
+     "laugh": 14,
+     "total": 44
+    }
+   },
+   "sketch": "73% כדורגל, אפס פילטר. אובססיה לקאלו, זיכרון של פיל לכל תבוסה מהפועל בשנות ה-2000, ומתכתש בעיקר עם יוני."
+  },
+  {
+   "name": "דודי",
+   "msgs": 2064,
+   "headline": "דודי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 62
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 18
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 14
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 7
+    }
+   ],
+   "lines": [
+    "🤬 קילל 121 פעמים בחודשיים — שיא אישי בערך סביב 20:00.",
+    "⚽ 62% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 85 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "הפסד אך ורק על גיל כהן החלש הזה ששוב זייף פציעה כי איזו סיבה יש לבלם להיות מוחלף היום? חילוף שמנע ממוצ׳ה להיכנס במקום וורקו שהיה גמור"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "הפסד אך ורק על גיל כהן החלש הזה ששוב זייף פציעה כי איזו סיבה יש לבלם להיות מוחלף היום? חילוף שמנע ממוצ׳ה להיכנס במקום וורקו שהיה גמור"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "מקובע",
+     "תסיים",
+     "נניח",
+     "וכאלה",
+     "קיצר"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 23
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 17
+    },
+    "peak": "20:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 9,
+     "night": 20,
+     "msgs": 8,
+     "laugh": 8,
+     "total": 44
+    }
+   },
+   "sketch": "האנליסט של הקבוצה. מדבר במילים כמו ׳מקובע׳, ׳מזייף׳, ׳מתחזה׳, מביא מספרים, וכמעט לא נראה אחרי חצות — מנתח, לא צורח."
+  },
+  {
+   "name": "אופיר",
+   "msgs": 2037,
+   "headline": "אופיר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 76
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 11
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 141 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 76% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 248 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "איזה בעיטה אבל הוא דפק"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אתה אמרת כמה תזכיר לי? אמרת 12-13?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "פגענו",
+     "וחסר",
+     "באלוהים",
+     "פסיכית",
+     "תומר"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 38
+    },
+    "sparring": {
+     "name": "אביב",
+     "count": 26
+    },
+    "peak": "21:00",
+    "nightPct": 5,
+    "ranks": {
+     "curse": 6,
+     "night": 11,
+     "msgs": 9,
+     "laugh": 11,
+     "total": 44
+    }
+   },
+   "sketch": "76% כדורגל ומזג חם. מזכיר את אלמוג 38 פעם (רובן לא במחמאות), ומדלג בין ׳שיא מנויים סולד אאוט׳ ל׳בן שרמוטה מאמן׳."
+  },
+  {
+   "name": "פדידה",
+   "msgs": 1877,
+   "headline": "פדידה חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 70
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 17
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 131 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 70% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 100 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "קבוצה של מלשינים"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "זה הזייה כמו הסקרים של ערוץ 14"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "אימאלה",
+     "מחריד",
+     "ואי",
+     "פספוס",
+     "כביכול"
+    ],
+    "obsession": {
+     "name": "עזו",
+     "count": 27
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 17
+    },
+    "peak": "22:00",
+    "nightPct": 4,
+    "ranks": {
+     "curse": 8,
+     "night": 17,
+     "msgs": 10,
+     "laugh": 10,
+     "total": 44
+    }
+   },
+   "sketch": "סמנכ״ל הכספים. אובססיבי לעזו (27), סקפטי בכל דיווח (׳כמו הסקרים של ערוץ 14׳), ומודד כל רכש בשקלים."
+  },
+  {
+   "name": "ניב שחר",
+   "msgs": 1708,
+   "headline": "ניב שחר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 68
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 19
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 103 פעמים בחודשיים — שיא אישי בערך סביב 23:00.",
+    "⚽ 68% מההודעות שלו על כדורגל — לא מתבייש.",
+    "🦉 15% מההודעות שלו נשלחו בין חצות ל-5 — מתי הוא ישן?",
+    "📸 שלח 71 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "הכי טוב אנטווי בקבוצה"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "פה הוא מפחד לתקוף"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "ישלהם",
+     "כפיים",
+     "למשהו",
+     "שמה",
+     "לילדים"
+    ],
+    "obsession": {
+     "name": "עזו",
+     "count": 16
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 4
+    },
+    "peak": "23:00",
+    "nightPct": 15,
+    "ranks": {
+     "curse": 11,
+     "night": 4,
+     "msgs": 11,
+     "laugh": 12,
+     "total": 44
+    }
+   },
+   "sketch": "היועץ השיווקי — ומהערים בקבוצה (מקום 4 בלילות). במקום דילים לבוקרשט הוא ימלא את טדי, ותוך כדי גם יתקן את כלכלת האוהדים."
+  },
+  {
+   "name": "ליאו",
+   "msgs": 1670,
+   "headline": "ליאו חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 63
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 25
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 7
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 38 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 63% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 64 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "וואלה החולצות הייצוגיות של הקבוצה נדירות"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "רק שלא תנחסו אותי גם שם"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "אחריו",
+     "ניחושים",
+     "קיץ",
+     "הספורט",
+     "מתוך"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 10
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 5
+    },
+    "peak": "21:00",
+    "nightPct": 4,
+    "ranks": {
+     "curse": 23,
+     "night": 16,
+     "msgs": 12,
+     "laugh": 7,
+     "total": 44
+    }
+   },
+   "sketch": "הליצן של הקבוצה — 25% מההודעות שלו בדיחות ומקום 7 בצחוקים, עם מעט קללות יחסית. עוקץ יותר משמקלל."
+  },
+  {
+   "name": "שחר",
+   "msgs": 1626,
+   "headline": "שחר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 68
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 18
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 142 פעמים בחודשיים — שיא אישי בערך סביב 23:00.",
+    "⚽ 68% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 98 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "זה יהיה הגול"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "מאחל לו ערמונית קופי כמו של ביבי"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "באשמת",
+     "סקאוט",
+     "השביעי",
+     "לאל",
+     "דינמו"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 27
+    },
+    "sparring": {
+     "name": "אביב",
+     "count": 15
+    },
+    "peak": "23:00",
+    "nightPct": 14,
+    "ranks": {
+     "curse": 5,
+     "night": 7,
+     "msgs": 13,
+     "laugh": 17,
+     "total": 44
+    }
+   },
+   "sketch": "חצי שולחן ספורט, חצי פאנל פוליטי (18%!). לא שולח הרכב בלי עצירת ביניים אצל ביבי, ומקום 5 בקללות בדרך."
+  },
+  {
+   "name": "נילי",
+   "msgs": 1462,
+   "headline": "נילי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 66
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 23
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 6
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 79 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 66% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 59 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "תחזור בך בזריז"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "תחזור בך בזריז"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "כוסמק",
+     "מבינה",
+     "כלכך",
+     "יודעת",
+     "המסריח"
+    ],
+    "obsession": {
+     "name": "סילבה",
+     "count": 24
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 10
+    },
+    "peak": "22:00",
+    "nightPct": 12,
+    "ranks": {
+     "curse": 15,
+     "night": 9,
+     "msgs": 14,
+     "laugh": 9,
+     "total": 44
+    }
+   },
+   "sketch": "הקול הנשי החד של הקבוצה. אובססיה לסילבה (24), מקום 9 בצחוקים, ומחסלת שחקנים גרועים — אבל באהבה."
+  },
+  {
+   "name": "משה אזולאי",
+   "msgs": 1423,
+   "headline": "משה אזולאי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 69
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 14
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 99 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 69% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 209 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "@+972 52-827-5757 הקבוצה הזו דפקה לי ת'וואצפ חח.. אני יוצא ותחזיר אותי עם 100 הודעות אחרונות שנשלחו, שזה יאפס לי את הצ'ט חח"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "חוץ מהאדם המחליא והמבאיש @~EA"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "הבוכרי",
+     "הצלם",
+     "השוקו",
+     "הפורטוגלי",
+     "ביצה"
+    ],
+    "obsession": {
+     "name": "אברמוב",
+     "count": 24
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 5
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 12,
+     "night": 13,
+     "msgs": 15,
+     "laugh": 18,
+     "total": 44
+    }
+   },
+   "sketch": "מפעיל הכאוס. אובססיבי לאברמוב הבעלים (24 אזכורים), מתייג חצי קבוצה, וגורר את כולם לשרשור."
+  },
+  {
+   "name": "אליאור",
+   "msgs": 1321,
+   "headline": "אליאור חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 64
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 23
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 59 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 64% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 172 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "מה יש לכם הם לא אותה קבוצה מלפני כמה שנים"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "@~Yoni Saadon למה הוא מדבר כמוך"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "כול",
+     "הכול",
+     "מפגר",
+     "שמה",
+     "שרמוטות"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 9
+    },
+    "sparring": {
+     "name": "ניב",
+     "count": 3
+    },
+    "peak": "21:00",
+    "nightPct": 6,
+    "ranks": {
+     "curse": 17,
+     "night": 15,
+     "msgs": 16,
+     "laugh": 13,
+     "total": 44
+    }
+   },
+   "sketch": "צופה מעבר לים ומתכתש עם ניב יותר מכל אחד. ׳מאמן אפססס׳, הרבה צחוקים, וזעם של מקומי בשעון של חו״ל."
+  },
+  {
+   "name": "ניב לא השוטר",
+   "msgs": 1215,
+   "headline": "ניב לא השוטר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 78
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 15
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 6
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 1
+    }
+   ],
+   "lines": [
+    "🤬 קילל 86 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 78% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "עד שיש קבוצה לאליפות"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "כאילו זה משפיע עליך?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "ואר",
+     "שרמוטה",
+     "ביטחון",
+     "בינתיים",
+     "תגידו"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 21
+    },
+    "sparring": {
+     "name": "חיים",
+     "count": 3
+    },
+    "peak": "21:00",
+    "nightPct": 3,
+    "ranks": {
+     "curse": 13,
+     "night": 22,
+     "msgs": 17,
+     "laugh": 16,
+     "total": 44
+    }
+   },
+   "sketch": "78% כדורגל — הכי ממוקד בקבוצה. וכשהוא מקלל (אלמוג, גרינפלד, לוקה) זה תותח חד-כיווני של ׳בן שרמוטה׳."
+  },
+  {
+   "name": "מתן מלכה",
+   "msgs": 1096,
+   "headline": "מתן מלכה חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 65
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 18
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 53 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 65% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 115 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "טעות גדולה הוא מאמן לא טוב"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "טעות גדולה הוא מאמן לא טוב"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "נתקן",
+     "דסה",
+     "מנהיג",
+     "ליציע",
+     "זבש"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 26
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 7
+    },
+    "peak": "21:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 18,
+     "night": 27,
+     "msgs": 18,
+     "laugh": 15,
+     "total": 44
+    }
+   },
+   "sketch": "ועדת החוקה. ממציא שיטת ניקוד לאוהדים, מנתח ניהול משחק בקור רוח, וכמעט לא ער בלילה — כולו ראש."
+  },
+  {
+   "name": "חי",
+   "msgs": 1079,
+   "headline": "חי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 75
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 48 פעמים בחודשיים — שיא אישי בערך סביב 13:00.",
+    "⚽ 75% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 119 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "יש שידור עכשיו משחק אימון של לרנקה נגד אייאקס"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "יש שידור עכשיו משחק אימון של לרנקה נגד אייאקס"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "אנטבי",
+     "ארבעה",
+     "שלושה",
+     "ואללה",
+     "חמות"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 32
+    },
+    "sparring": {
+     "name": "נילי",
+     "count": 5
+    },
+    "peak": "13:00",
+    "nightPct": 6,
+    "ranks": {
+     "curse": 19,
+     "night": 18,
+     "msgs": 19,
+     "laugh": 19,
+     "total": 44
+    }
+   },
+   "sketch": "הוותיק שמדבר על ורקו יותר מכולם (32) ועוד זוכר את הפורום הישן. פעיל דווקא בצהריים, ומאמין ב׳קארמה טובה׳ עד שנכנס גול."
+  },
+  {
+   "name": "שחר תורג'מן",
+   "msgs": 942,
+   "headline": "שחר תורג'מן חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 72
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 107 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 72% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 42 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "איזה מאמן חלש"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "עשר שניות מעליה לדעתי זה ישפיע על כל העונה"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "הבועל",
+     "יפו",
+     "במידה",
+     "בסין",
+     "מליון"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 28
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 4
+    },
+    "peak": "22:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 10,
+     "night": 29,
+     "msgs": 20,
+     "laugh": 20,
+     "total": 44
+    }
+   },
+   "sketch": "רואה החשבון הזועם. אובססיה לורקו (28) ולתקציב — ׳שברנו כל שיא ומוציא פחות מ-700 אלף!!!׳. מקום 10 בקללות."
+  },
+  {
+   "name": "ברק",
+   "msgs": 872,
+   "headline": "ברק חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 71
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 18
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 9
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 43 פעמים בחודשיים — שיא אישי בערך סביב 20:00.",
+    "⚽ 71% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 26 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "ראש פינה יושבת על צומת מחניים כניסה לאמת הגולן"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "ימינה רמת הגולן שמאלה עליות לצפת"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "מלחץ",
+     "טכני",
+     "תנועות",
+     "ללחוץ",
+     "שיודע"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 32
+    },
+    "sparring": {
+     "name": "גיל",
+     "count": 6
+    },
+    "peak": "20:00",
+    "nightPct": 0,
+    "ranks": {
+     "curse": 20,
+     "night": 41,
+     "msgs": 21,
+     "laugh": 27,
+     "total": 44
+    }
+   },
+   "sketch": "המגן בנשמה — דורש הגנה קשוחה ו׳לסבול׳. מדבר על ורקו לא פחות מ-32 פעם, ואף פעם לא ער בלילה."
+  },
+  {
+   "name": "צח",
+   "msgs": 732,
+   "headline": "צח חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 72
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 16
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 1
+    }
+   ],
+   "lines": [
+    "🤬 קילל 32 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 72% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "תכננתי על הצפון מזרחי"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "תכננתי על הצפון מזרחי"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "טבראש",
+     "הכול",
+     "ארד",
+     "נקווה",
+     "מנסה"
+    ],
+    "obsession": {
+     "name": "קאלו",
+     "count": 20
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 6
+    },
+    "peak": "22:00",
+    "nightPct": 1,
+    "ranks": {
+     "curse": 24,
+     "night": 34,
+     "msgs": 22,
+     "laugh": 26,
+     "total": 44
+    }
+   },
+   "sketch": "חסר-הסבלנות התורן. הפסד אחד ו׳זהו, נגמרה העונה׳. אובססיבי לקאלו (20), ומקלל מאמן ובעלים באותה נשימה."
+  },
+  {
+   "name": "גיא",
+   "msgs": 705,
+   "headline": "גיא חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 77
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 39 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 77% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "לא יודע אם טוב או לא טוב הגול באלוהים"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אז לדעתי פה צריך להיגמר הדיון וזה מוכיח שהמעמד הזה ניתן לה בחסד בגלל עצם היותה אישה והיא מקצועית אין ספק"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "הארגון",
+     "בנתיים",
+     "אמן",
+     "ביציע",
+     "גמר"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 8
+    },
+    "sparring": {
+     "name": "נילי",
+     "count": 4
+    },
+    "peak": "22:00",
+    "nightPct": 5,
+    "ranks": {
+     "curse": 22,
+     "night": 21,
+     "msgs": 23,
+     "laugh": 25,
+     "total": 44
+    }
+   },
+   "sketch": "77% כדורגל, ומספר סיפורים. הופך כל סאגה לנטפליקס ואז חוזר לקלל את השחקנים. מתכתש בעיקר עם נילי."
+  },
+  {
+   "name": "אביאל",
+   "msgs": 663,
+   "headline": "אביאל חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 65
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 22
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 40 פעמים בחודשיים — שיא אישי בערך סביב 20:00.",
+    "⚽ 65% מההודעות שלו על כדורגל — לא מתבייש.",
+    "🦉 16% מההודעות שלו נשלחו בין חצות ל-5 — מתי הוא ישן?",
+    "📸 שלח 34 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "איזה בלם חלש הם הביאו חחחח"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "יאאלה זהו שיגמר ככה"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "הלוואי",
+     "כרגע",
+     "חלוץ",
+     "שנים",
+     "חלש"
+    ],
+    "obsession": {
+     "name": "סילבה",
+     "count": 5
+    },
+    "sparring": {
+     "name": "יוסף",
+     "count": 2
+    },
+    "peak": "20:00",
+    "nightPct": 16,
+    "ranks": {
+     "curse": 21,
+     "night": 12,
+     "msgs": 24,
+     "laugh": 21,
+     "total": 44
+    }
+   },
+   "sketch": "רואה חשבון של דמי העברה, וער עד מאוחר (16% אחרי חצות). מקלל שופטים ומסיים ויכוחים ב-🤣🤣🤣."
+  },
+  {
+   "name": "מיכאל",
+   "msgs": 658,
+   "headline": "מיכאל חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 80
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 14
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 5
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 1
+    }
+   ],
+   "lines": [
+    "🤬 קילל 20 פעמים בחודשיים — שיא אישי בערך סביב 20:00.",
+    "⚽ 80% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "שנמצאת כרגע הליגה הקפריסאית"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אדום מוצדק לאמבולו?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "אירו",
+     "לודוגורץ",
+     "הצעה",
+     "הקיץ",
+     "בואנה"
+    ],
+    "obsession": {
+     "name": "וייסמן",
+     "count": 7
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 8
+    },
+    "peak": "20:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 31,
+     "night": 31,
+     "msgs": 25,
+     "laugh": 30,
+     "total": 44
+    }
+   },
+   "sketch": "80% כדורגל — האיש הכי רגוע בחדר. כולו תקציבים והשוואות (׳אלונה ב-1.7 מיליון, אתה ב-200 אלף׳), ובשקט בדרך כלל צודק."
+  },
+  {
+   "name": "עידן",
+   "msgs": 641,
+   "headline": "עידן חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 67
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 18
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 15 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 67% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 44 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אלמוג כהן זה המאמן הראשון עם כיפה?"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "יצחק תעשה עליי"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "קראבלי",
+     "אנטווי",
+     "מוזי",
+     "שועה",
+     "ליגה"
+    ],
+    "obsession": {
+     "name": "שועה",
+     "count": 20
+    },
+    "sparring": {
+     "name": "מתן",
+     "count": 3
+    },
+    "peak": "21:00",
+    "nightPct": 8,
+    "ranks": {
+     "curse": 33,
+     "night": 19,
+     "msgs": 26,
+     "laugh": 23,
+     "total": 44
+    }
+   },
+   "sketch": "השתיק את הקבוצה אבל מפעיל בוט ששולח ׳צודק׳ פעמיים ביום כדי להישאר רלוונטי. אובססיבי לשועה (20), עצלן וחד."
+  },
+  {
+   "name": "סהר",
+   "msgs": 498,
+   "headline": "סהר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 64
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 14
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 14
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    }
+   ],
+   "lines": [
+    "🤬 קילל 22 פעמים בחודשיים — שיא אישי בערך סביב 23:00.",
+    "⚽ 64% מההודעות שלו על כדורגל — לא מתבייש.",
+    "🦉 17% מההודעות שלו נשלחו בין חצות ל-5 — מתי הוא ישן?",
+    "📸 שלח 29 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "כשאוהדי מכבי הותקפו פתחו פה מהדורות"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "כשאוהדי מכבי הותקפו פתחו פה מהדורות"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "נבחרות",
+     "מדורגים",
+     "דירוג",
+     "בראגה",
+     "לעבור"
+    ],
+    "obsession": {
+     "name": "סילבה",
+     "count": 3
+    },
+    "sparring": {
+     "name": "רועי",
+     "count": 1
+    },
+    "peak": "23:00",
+    "nightPct": 17,
+    "ranks": {
+     "curse": 28,
+     "night": 14,
+     "msgs": 27,
+     "laugh": 28,
+     "total": 44
+    }
+   },
+   "sketch": "האסטרטג של הקבוצה. 14% מההודעות שלו על טכנולוגיה/AI, עוקב אחרי כל תוצאה באירופה, ומבין בהגרלות ובניקוד יותר מכולם."
+  },
+  {
+   "name": "יוני סעדון",
+   "msgs": 488,
+   "headline": "יוני סעדון חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 62
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 27
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 7 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 62% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "מזל שאין משחקים של קש או אוקזר עכשיו"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "הוא חישב מה שלא נפתח כמכור"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "בית",
+     "הפועל",
+     "חיפה",
+     "מכבי",
+     "משחק"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 2
+    },
+    "sparring": {
+     "name": "אליאור",
+     "count": 1
+    },
+    "peak": "21:00",
+    "nightPct": 6,
+    "ranks": {
+     "curse": 39,
+     "night": 26,
+     "msgs": 28,
+     "laugh": 22,
+     "total": 44
+    }
+   },
+   "sketch": "27% בדיחות — מהמצחיקים בקבוצה. אבל לפעמים מתעניין בבחירות וברכבת הקלה יותר מבהרכב, ותמיד עם ׳בעיה בניקוד׳."
+  },
+  {
+   "name": "ניב האמריקאי",
+   "msgs": 467,
+   "headline": "ניב האמריקאי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 75
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 17
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 6
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 31 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 75% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 37 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "דיי חברים אלמוג המאמן הטוב בארץ תיהיו סבלניים"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "דיי חברים אלמוג המאמן הטוב בארץ תיהיו סבלניים"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "ליהיות",
+     "וויסמן",
+     "רציני",
+     "אחי",
+     "עזוב"
+    ],
+    "obsession": {
+     "name": "עזו",
+     "count": 7
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 6
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 25,
+     "night": 23,
+     "msgs": 29,
+     "laugh": 24,
+     "total": 44
+    }
+   },
+   "sketch": "עורך הדין של אלמוג מעבר לים. ׳תהיו סבלניים, ניקח אליפות׳ — ובאותה נשימה ׳נספוג גול בעוד 3 דקות לפי הנתונים׳."
+  },
+  {
+   "name": "שמוליק",
+   "msgs": 447,
+   "headline": "שמוליק חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 75
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 17
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 7
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 28 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 75% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 26 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "שמישהו יעדכן אותם שזה לא משחק אימון"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "וואי לא סובל אותה!!!"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "וואי",
+     "וואלה",
+     "יאללה",
+     "אגב",
+     "יוני"
+    ],
+    "obsession": {
+     "name": "סילבה",
+     "count": 8
+    },
+    "sparring": {
+     "name": "יוני",
+     "count": 5
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 27,
+     "night": 24,
+     "msgs": 30,
+     "laugh": 34,
+     "total": 44
+    }
+   },
+   "sketch": "נביא הזעם. כל עונה ׳שכר לימוד׳, אובססיה לסילבה, ׳טובים לחרב לעצמנו את המשחק׳ — ובכל זאת מגיע בשביל הילד."
+  },
+  {
+   "name": "אושר",
+   "msgs": 403,
+   "headline": "אושר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 75
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 13
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 29 פעמים בחודשיים — שיא אישי בערך סביב 13:00.",
+    "⚽ 75% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אם העונה הזאת נגמרת באליפות, נצטרך להגדיל את טדי"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "זה הדבר הכי הזוי שאפשר להגיד שמוליק"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "תהייה",
+     "התקציב",
+     "בפועל",
+     "ריגה",
+     "שיטה"
+    ],
+    "obsession": {
+     "name": "יצחקי",
+     "count": 7
+    },
+    "sparring": {
+     "name": "ניב",
+     "count": 2
+    },
+    "peak": "13:00",
+    "nightPct": 1,
+    "ranks": {
+     "curse": 26,
+     "night": 37,
+     "msgs": 31,
+     "laugh": 32,
+     "total": 44
+    }
+   },
+   "sketch": "הפרופסור — בעל המגילות. מסות סבלניות שמגנות על המועדון, מזכיר את יצחקי המאמן לשעבר, וכותב דווקא בצהריים."
+  },
+  {
+   "name": "מתן רפאלי",
+   "msgs": 350,
+   "headline": "מתן רפאלי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 60
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 18
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 16
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 6
+    }
+   ],
+   "lines": [
+    "🤬 קילל 13 פעמים בחודשיים — שיא אישי בערך סביב 15:00.",
+    "⚽ 60% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 20 מדיה/פורוורדים. חלקם אפילו נפתחו.",
+    "📜 ממוצע 124 תווים להודעה — נואם, לא כותב."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אתמול לדעתי איזה רבע משחק אם לא שליש לא באמת לחצנו"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "הבעיה תיהיה האכיפה"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "באמצע",
+     "לקנות",
+     "לדעתי",
+     "כרטיס",
+     "אתמול"
+    ],
+    "obsession": {
+     "name": "שועה",
+     "count": 5
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 2
+    },
+    "peak": "15:00",
+    "nightPct": 0,
+    "ranks": {
+     "curse": 36,
+     "night": 43,
+     "msgs": 32,
+     "laugh": 35,
+     "total": 44
+    }
+   },
+   "sketch": "איש הסקופים. יודע מתי הטיסה ומה הקבוצה תעשה לפני שהיא יודעת, ומערבב פוליטיקה (16%) לתוך הכדורגל."
+  },
+  {
+   "name": "סתיו",
+   "msgs": 324,
+   "headline": "סתיו חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 79
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 10
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 14 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 79% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "עובדת איתי אוהדת הפועל שאומרת שאין להם סיכוי"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "עובדת איתי אוהדת הפועל שאומרת שאין להם סיכוי"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "מחאה",
+     "בעלים",
+     "כדי",
+     "הקהל",
+     "אחת"
+    ],
+    "obsession": {
+     "name": "יצחקי",
+     "count": 5
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 2
+    },
+    "peak": "22:00",
+    "nightPct": 7,
+    "ranks": {
+     "curse": 34,
+     "night": 28,
+     "msgs": 33,
+     "laugh": 36,
+     "total": 44
+    }
+   },
+   "sketch": "הפילוסוף. 79% כדורגל של ׳מה זו קבוצה גדולה׳ עם דוגמאות מאנגליה, ומטיף לסבלנות בזמן שכולם רוצים לשרוף הכל."
+  },
+  {
+   "name": "אלעד רומנו",
+   "msgs": 270,
+   "headline": "אלעד רומנו חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 65
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 25
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 6
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 4
+    }
+   ],
+   "lines": [
+    "🤬 קילל 7 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 65% מההודעות שלו על כדורגל — לא מתבייש.",
+    "📸 שלח 31 מדיה/פורוורדים. חלקם אפילו נפתחו."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "לא בטוח פנדל"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "וואו מרציאנו הציל אותם"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "יום",
+     "ראשון",
+     "כרטיסים",
+     "מלא",
+     "שעברה"
+    ],
+    "obsession": {
+     "name": "יונה",
+     "count": 6
+    },
+    "sparring": {
+     "name": "שחר",
+     "count": 1
+    },
+    "peak": "22:00",
+    "nightPct": 12,
+    "ranks": {
+     "curse": 40,
+     "night": 25,
+     "msgs": 34,
+     "laugh": 29,
+     "total": 44
+    }
+   },
+   "sketch": "מכור לשיטת הניקוד של המשחק — ׳יש לי 130 נקודות ועוד לא עדכנו משחקי חוץ!׳. מוכן לבוא ברגל מנס ציונה."
+  },
+  {
+   "name": "אביב",
+   "msgs": 216,
+   "headline": "אביב חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 73
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 18
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 7
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 18 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 73% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "מזל אין וואר"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "מזל אין וואר"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "גרוע",
+     "ביתר",
+     "שועה",
+     "שחקנים",
+     "המשחק"
+    ],
+    "obsession": {
+     "name": "שועה",
+     "count": 12
+    },
+    "sparring": {
+     "name": "גיל",
+     "count": 2
+    },
+    "peak": "21:00",
+    "nightPct": 5,
+    "ranks": {
+     "curse": 32,
+     "night": 33,
+     "msgs": 35,
+     "laugh": 31,
+     "total": 44
+    }
+   },
+   "sketch": "216 הודעות, כמעט כולן ׳אפס׳. אובססיה לשועה (12), ׳כוס עמק עם האפסים׳ — הענן השחור התורן של הקבוצה, ובגאווה."
+  },
+  {
+   "name": "גיל",
+   "msgs": 190,
+   "headline": "גיל חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 70
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 16
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 14 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 70% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "איבדנו את המשחק"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "זה לא על 90 דקות?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "וואי",
+     "מאמן",
+     "קבוצה",
+     "לנו"
+    ],
+    "obsession": {
+     "name": "אצילי",
+     "count": 2
+    },
+    "sparring": {
+     "name": "יצחק",
+     "count": 2
+    },
+    "peak": "21:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 35,
+     "night": 38,
+     "msgs": 36,
+     "laugh": 33,
+     "total": 44
+    }
+   },
+   "sketch": "פרשן השופטים הראשי. כל החלטה היא ׳זה חייב אדום!׳, וכל משחק נגמר ב׳איך הפכנו לקבוצה כזאת בדיחה׳."
+  },
+  {
+   "name": "אלעד אהרוני",
+   "msgs": 172,
+   "headline": "אלעד אהרוני חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 68
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 16
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 11
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 21 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 68% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "עונה אחרונה לחוזה השחקן רצה לעזוב לריאל ולא להאריך חוזה אז עדיף לקבל גרושים"
+    },
+    {
+     "topic": "AI / טכנולוגיה",
+     "emoji": "🤖",
+     "text": "כל העונה הקודמת היה סולד אאוט"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "זונה",
+     "הבן",
+     "אברמוב",
+     "משחק"
+    ],
+    "obsession": {
+     "name": "אברמוב",
+     "count": 10
+    },
+    "sparring": {
+     "name": "אורון",
+     "count": 1
+    },
+    "peak": "21:00",
+    "nightPct": 8,
+    "ranks": {
+     "curse": 29,
+     "night": 30,
+     "msgs": 37,
+     "laugh": 37,
+     "total": 44
+    }
+   },
+   "sketch": "יש לו אויב אחד: אברמוב (10 אזכורים, כולם ׳בן זונה׳). דורש ועדת חקירה, ו׳20,000 מנויים והוא מביא לי את אנסה?!׳."
+  },
+  {
+   "name": "אבי שניר",
+   "msgs": 145,
+   "headline": "אבי שניר — בעל המגילות של הקבוצה.",
+   "badges": [
+    "📜 בעל המגילות"
+   ],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 81
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 12
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 5
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 20 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 81% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "מצד אחד ב מאוד מאומנים אבל יש להם אירופה מכבי תל אביב מאמן לא משהו אבל אין אירופה על הראש"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "וזן הסיבה שאיבדנו את האליפות בגלל המאצ'אפ  בננו אם לא היינו מפסידים מולם בשני המשחקים היינו אלופים לא רואה את ביתר מביאה קשר שיכול לתת להפ פ"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "לטעמי",
+     "קוזוק",
+     "האליפות",
+     "שאלה",
+     "ועדיין"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 20
+    },
+    "sparring": {
+     "name": "אביב",
+     "count": 6
+    },
+    "peak": "22:00",
+    "nightPct": 4,
+    "ranks": {
+     "curse": 30,
+     "night": 35,
+     "msgs": 38,
+     "laugh": 43,
+     "total": 44
+    }
+   },
+   "sketch": "81% כדורגל, נביא עם תוכניות גדולות. רשימות רכש שלמות ונבואות זעם — ׳מכבי אלופה כבר במרץ׳."
+  },
+  {
+   "name": "רועי",
+   "msgs": 122,
+   "headline": "רועי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 64
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 23
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 11
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 2
+    }
+   ],
+   "lines": [
+    "🤬 קילל 9 פעמים בחודשיים — שיא אישי בערך סביב 13:00.",
+    "⚽ 64% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אם יונה במכבי מזמן הוא בmsl סכום העברה דו ספרתי"
+    },
+    {
+     "topic": "פוליטי",
+     "emoji": "🏛️",
+     "text": "רצו לחסוך כסף מגן שמאל ראינו מה קרה"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "לעלות"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 4
+    },
+    "sparring": {
+     "name": "דודי",
+     "count": 2
+    },
+    "peak": "13:00",
+    "nightPct": 0,
+    "ranks": {
+     "curse": 38,
+     "night": 42,
+     "msgs": 39,
+     "laugh": 40,
+     "total": 44
+    }
+   },
+   "sketch": "כלכלן זועם עם 23% פוליטיקה. ׳אני מניאק אם השמן מוציא שקל׳, ומתעצבן מהחילוף-ראשון-בדקה-60 של אלמוג בכל משחק."
+  },
+  {
+   "name": "מיכאל אלפסי",
+   "msgs": 114,
+   "headline": "מיכאל אלפסי חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 66
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 12
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 10
+    }
+   ],
+   "lines": [
+    "🤬 קילל 6 פעמים בחודשיים — שיא אישי בערך סביב 15:00.",
+    "⚽ 66% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "משחק שני בחוץ??"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "משחק שני בחוץ??"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "מוכר",
+     "חוץ",
+     "כרטיסים",
+     "משחק"
+    ],
+    "obsession": null,
+    "sparring": {
+     "name": "אביב",
+     "count": 1
+    },
+    "peak": "15:00",
+    "nightPct": 2,
+    "ranks": {
+     "curse": 41,
+     "night": 39,
+     "msgs": 40,
+     "laugh": 38,
+     "total": 44
+    }
+   },
+   "sketch": "המנוי הוותיק (25 שנה!) שנוסע לכל משחק חוץ ׳כמו מניאק׳, ועוקב אחרי טבלת הניקוד — ׳הא, אני על 150 😂׳."
+  },
+  {
+   "name": "חיים",
+   "msgs": 80,
+   "headline": "חיים חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 81
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 9
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 6
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 3
+    }
+   ],
+   "lines": [
+    "🤬 קילל 9 פעמים בחודשיים — שיא אישי בערך סביב 12:00.",
+    "⚽ 81% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אם אברמוב לא מנחית רכש הוא בן זונהההההה"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אם אברמוב לא מנחית רכש הוא בן זונהההההה"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "גדראני",
+     "תהיה",
+     "בלם"
+    ],
+    "obsession": {
+     "name": "ורקו",
+     "count": 4
+    },
+    "sparring": {
+     "name": "ליאו",
+     "count": 1
+    },
+    "peak": "12:00",
+    "nightPct": 6,
+    "ranks": {
+     "curse": 37,
+     "night": 36,
+     "msgs": 41,
+     "laugh": 42,
+     "total": 44
+    }
+   },
+   "sketch": "חצי כדורגל, חצי לוח זמנים של רכבת ישראל. ׳אם אברמוב לא מנחית רכש הוא בן זונהההה׳ — ותכף גם באיזו רכבת חוזרים מהמשחק."
+  },
+  {
+   "name": "עדן",
+   "msgs": 78,
+   "headline": "עדן חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 80
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 12
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 0
+    }
+   ],
+   "lines": [
+    "🤬 קילל 5 פעמים בחודשיים — שיא אישי בערך סביב 22:00.",
+    "⚽ 80% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "שרמוטה מי שנתן לו חוזה חדש"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "שאלות חשובות, אעדכן מיד"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [],
+    "obsession": {
+     "name": "אנסה",
+     "count": 3
+    },
+    "sparring": {
+     "name": "גיל",
+     "count": 1
+    },
+    "peak": "22:00",
+    "nightPct": 3,
+    "ranks": {
+     "curse": 43,
+     "night": 40,
+     "msgs": 42,
+     "laugh": 44,
+     "total": 44
+    }
+   },
+   "sketch": "העוקץ הקצר. ׳סילבה האפס׳, ׳שרמוטה מי שנתן לו חוזה חדש׳ — משפט אחד, סכין אחת, והלאה למשפט הבא."
+  },
+  {
+   "name": "טל",
+   "msgs": 63,
+   "headline": "טל חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 40
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 40
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 20
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 0
+    }
+   ],
+   "lines": [
+    "⚽ 40% מההודעות שלו על כדורגל — לא מתבייש.",
+    "🦉 17% מההודעות שלו נשלחו בין חצות ל-5 — מתי הוא ישן?",
+    "📸 שלח 21 מדיה/פורוורדים. חלקם אפילו נפתחו.",
+    "📜 ממוצע 128 תווים להודעה — נואם, לא כותב."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "עוד שעתיים נצא למגרש"
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "וואלה זה אומר שאנחנו מדורגים לסיבוב הבא בזכות לרנקה?"
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 1
+    },
+    "sparring": {
+     "name": "אליאור",
+     "count": 1
+    },
+    "peak": "08:00",
+    "nightPct": 17,
+    "ranks": {
+     "curse": 44,
+     "night": 32,
+     "msgs": 43,
+     "laugh": 41,
+     "total": 44
+    }
+   },
+   "sketch": "צופה מארה״ב עם טבלת תרחישים בראש. ׳מדורגים לסיבוב הבא בזכות לרנקה?׳, תמיד על איזו טיסה — וחצי מההודעות שלו בדיחות."
+  },
+  {
+   "name": "דביר",
+   "msgs": 62,
+   "headline": "דביר חי בשביל כדורגל.",
+   "badges": [],
+   "topics": [
+    {
+     "key": "football",
+     "emoji": "⚽",
+     "label": "כדורגל",
+     "pct": 68
+    },
+    {
+     "key": "humor",
+     "emoji": "😂",
+     "label": "בדיחות/צחוקים",
+     "pct": 20
+    },
+    {
+     "key": "politics",
+     "emoji": "🏛️",
+     "label": "פוליטי",
+     "pct": 8
+    },
+    {
+     "key": "ai",
+     "emoji": "🤖",
+     "label": "AI / טכנולוגיה",
+     "pct": 5
+    }
+   ],
+   "lines": [
+    "🤬 קילל 6 פעמים בחודשיים — שיא אישי בערך סביב 21:00.",
+    "⚽ 68% מההודעות שלו על כדורגל — לא מתבייש."
+   ],
+   "quotes": [
+    {
+     "topic": "כדורגל",
+     "emoji": "⚽",
+     "text": "אופיר.. עם איך שהסגל כרגע נראה וזה שאלמוג עדיין לא בשל מספיק טוב להיות מאמן.. אתה לא שווה יותר ממקומות 4-5.."
+    },
+    {
+     "topic": "בדיחות/צחוקים",
+     "emoji": "😂",
+     "text": "אופיר.. עם איך שהסגל כרגע נראה וזה שאלמוג עדיין לא בשל מספיק טוב להיות מאמן.. אתה לא שווה יותר ממקומות 4-5.."
+    }
+   ],
+   "fingerprint": {
+    "sigWords": [
+     "כרגע",
+     "מאמן",
+     "לעשות",
+     "אלמוג",
+     "להיות"
+    ],
+    "obsession": {
+     "name": "אלמוג",
+     "count": 7
+    },
+    "sparring": {
+     "name": "אופיר",
+     "count": 1
+    },
+    "peak": "21:00",
+    "nightPct": 0,
+    "ranks": {
+     "curse": 42,
+     "night": 44,
+     "msgs": 44,
+     "laugh": 39,
+     "total": 44
+    }
+   },
+   "sketch": "המבקר המדוד. ׳אלמוג איש מקצוע מצוין — אבל לא מאמן׳, ומסכם בחיוך מריר: ׳ביתר ירושלים, מודל אלמוג כהן׳."
+  }
+ ]
+};
+
+const COLORS={football:'var(--c-football)',politics:'var(--c-politics)',humor:'var(--c-humor)'};
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function colorFor(k){return COLORS[k]||'var(--c-extra)';}
+
+function fpHtml(f){
+  if(!f)return'';
+  const rk=f.ranks||{};
+  const rc=[];
+  if(rk.curse&&rk.curse<=3)rc.push('🤬 קללות #'+rk.curse);
+  if(rk.msgs&&rk.msgs<=3)rc.push('💬 הודעות #'+rk.msgs);
+  if(rk.night&&rk.night<=3)rc.push('🦉 לילה #'+rk.night);
+  if(rk.laugh&&rk.laugh<=3)rc.push('🤡 צחוקים #'+rk.laugh);
+  const rows=[];
+  if(f.obsession)rows.push(`<div class="fp-row"><span class="fp-k">🎯 אובססיה</span><span class="fp-v">${esc(f.obsession.name)} · ${f.obsession.count} אזכורים</span></div>`);
+  if(f.sparring)rows.push(`<div class="fp-row"><span class="fp-k">🥊 מתכתש עם</span><span class="fp-v">${esc(f.sparring.name)}</span></div>`);
+  rows.push(`<div class="fp-row"><span class="fp-k">🕐 שעת שיא</span><span class="fp-v">${esc(f.peak||'')} · ${f.nightPct||0}% אחרי חצות</span></div>`);
+  const sig=(f.sigWords||[]).slice(0,4).map(w=>`<span class="chip2">${esc(w)}</span>`).join('');
+  return `<div class="sec-title">🧬 טביעת אצבע</div>
+    ${rc.length?`<div class="badges">${rc.map(c=>`<span class="badge">${c}</span>`).join('')}</div>`:''}
+    ${rows.join('')}
+    ${sig?`<div class="fp-row"><span class="fp-k">🗣️ מילים שחוזרות</span><span class="fp-v">${sig}</span></div>`:''}`;
+}
+function render(idx){
+  const p=PROFILES.people[idx];if(!p)return;
+  const bars=p.topics.map(t=>`<div class="bar">
+     <span class="lbl">${t.emoji} ${esc(t.label)}</span>
+     <div class="track"><div class="fill" style="width:${Math.max(2,t.pct)}%;background:${colorFor(t.key)}"></div>
+       <span class="pct">${t.pct}%</span></div></div>`).join('');
+  const badges=(p.badges||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join('');
+  const lines=(p.lines||[]).map(l=>`<li>${esc(l)}</li>`).join('');
+  const seenQ=new Set();
+  const quotes=(p.quotes||[]).filter(q=>{const k=(q.text||'').slice(0,25);if(seenQ.has(k))return false;seenQ.add(k);return true;})
+    .map(q=>`<div class="quote"><div class="qtop">${q.emoji} ${esc(q.topic)}</div>״${esc(q.text)}״</div>`).join('');
+  document.getElementById('card').innerHTML=
+   `<div class="who-name">${esc(p.name)}</div>
+    <div class="who-msgs">${p.msgs.toLocaleString('he-IL')} הודעות בחודשיים האחרונים</div>
+    ${p.sketch?`<div class="sketch">${esc(p.sketch)}</div>`:(p.headline?`<div class="headline">${esc(p.headline)}</div>`:'')}
+    ${badges?`<div class="badges">${badges}</div>`:''}
+    <div class="sec-title">על מה הוא מדבר</div>${bars}
+    ${fpHtml(p.fingerprint)}
+    ${lines?`<div class="sec-title">עובדות מהתיק</div><ul class="lines">${lines}</ul>`:''}
+    ${quotes?`<div class="sec-title">מוצג לראיה</div>${quotes}`:''}`;
+}
+(function init(){
+  const sel=document.getElementById('who');
+  sel.innerHTML=PROFILES.people.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join('');
+  sel.onchange=()=>render(+sel.value);
+  const w=PROFILES.window||{};
+  if(w.from&&w.from!=='—')document.getElementById('sub').textContent=`ביתר ירושלים • ${w.from}–${w.to}`;
+  render(0);
+})();
+</script>
+</body>
+</html>
