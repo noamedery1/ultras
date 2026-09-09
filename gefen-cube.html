@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>הקובייה של גפן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#FFD500; --w:#FCFCFC; --g:#00A651; --b:#0051BA; --o:#FF5800; --r:#D3132F;
+  --night:#1A1140; --night2:#0E0926; --card:#ffffff; --ink:#1A1140; --muted:#7a72a6;
+  --empty:#332B5C; --s:52px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{touch-action:manipulation;font-family:'Rubik','Heebo','Arial Hebrew',system-ui,sans-serif;
+  background:var(--night2);color:var(--ink);overflow-x:hidden}
+#app{min-height:100%;
+  background:radial-gradient(900px 500px at 50% -10%,#3B2A8C 0%,transparent 60%),
+             linear-gradient(180deg,var(--night) 0%,var(--night2) 100%);
+  background-attachment:fixed;padding:14px 14px 28px;max-width:560px;margin:0 auto}
+.screen{display:none;animation:pop .35s ease both}
+.screen.on{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-weight:900;font-size:34px;line-height:1.1;color:#fff;margin:6px 0 4px;letter-spacing:-.5px}
+h2{font-weight:800;font-size:21px;color:#fff;margin:0 0 8px}
+p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;cursor:pointer;
+  font-family:inherit;font-size:20px;font-weight:800;color:var(--ink);background:var(--y);
+  padding:17px 18px;border-radius:20px;box-shadow:0 6px 0 #C9A800;
+  transition:transform .08s,box-shadow .08s;margin-bottom:12px}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #C9A800}
+.btn.ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:2px solid rgba(255,255,255,.22);font-size:17px;padding:14px}
+.btn.ghost:active{transform:translateY(2px)}
+.btn.green{background:var(--g);color:#fff;box-shadow:0 6px 0 #007a3d}
+.btn.green:active{box-shadow:0 2px 0 #007a3d}
+.row{display:flex;gap:10px}
+.row .btn{flex:1;min-width:0}
+.row.small .btn{font-size:15px;padding:13px 4px}
+.stage{perspective:1400px;height:calc(var(--s)*5.2);display:flex;align-items:center;justify-content:center;
+  position:relative;margin:4px 0 10px;touch-action:none}
+.stage::after{content:'';position:absolute;left:50%;top:50%;width:calc(var(--s)*5.6);height:calc(var(--s)*5.6);
+  transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.13) 0%,transparent 62%);pointer-events:none}
+.holder{position:relative;width:var(--s);height:var(--s);transform-style:preserve-3d;
+  transform:rotateX(-22deg) rotateY(-32deg)}
+.holder.smooth{transition:transform .45s cubic-bezier(.3,.9,.3,1)}
+.spin{animation:idle 16s linear infinite}
+@keyframes idle{from{transform:rotateX(-22deg) rotateY(-32deg)}to{transform:rotateX(-22deg) rotateY(328deg)}}
+.pivot{position:absolute;inset:0;transform-style:preserve-3d}
+.cubie{position:absolute;inset:0;transform-style:preserve-3d;transition:opacity .25s}
+.cubie.dim{opacity:1}
+.face{position:absolute;width:var(--s);height:var(--s);background:#120E24;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;backface-visibility:hidden;pointer-events:none}
+.face i{display:block;width:82%;height:82%;border-radius:18%;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.35)}
+.paintable .face i{cursor:pointer}
+.face{transition:background .2s}
+.cubie.hot .face{background:#fff}
+.cubie.hot .face i{box-shadow:inset 0 -3px 0 rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.35),0 0 0 2px #fff,0 0 14px 3px rgba(255,255,255,.55)}
+.card{background:var(--card);border-radius:26px;padding:18px;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.dots{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:10px;min-height:12px}
+.dot2{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .2s}
+.dot2.done{background:var(--g)}
+.dot2.now{background:var(--y);transform:scale(1.5)}
+.headline{text-align:center;color:#fff;font-weight:800;font-size:17px;margin-bottom:8px;min-height:20px}
+.move{display:flex;align-items:center;gap:14px}
+.glyph{position:relative;flex:0 0 104px;height:104px;border-radius:24px;display:flex;align-items:center;
+  justify-content:center;font-size:52px;font-weight:900;color:#fff;line-height:1}
+.glyph svg{width:76%;height:76%;display:block}
+.x2{position:absolute;left:-8px;bottom:-8px;background:#1A1140;color:#fff;border-radius:16px;
+  padding:3px 11px;font-size:21px;font-weight:900;box-shadow:0 3px 8px rgba(0,0,0,.35);letter-spacing:.5px}
+.face i.empty{box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 6px,transparent 6px 12px)}
+.face i.pulse{animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+  50%{box-shadow:inset 0 0 0 3px #fff,0 0 14px 4px rgba(255,255,255,.7)}}
+.movetext{font-size:23px;font-weight:800;line-height:1.25}
+.movesub{font-size:15px;color:var(--muted);font-weight:600;margin-top:4px}
+.counter{text-align:center;color:#C8BFF2;font-size:14px;font-weight:600;margin:12px 0 8px}
+.track{height:10px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin-bottom:14px}
+.track b{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--y));border-radius:99px;transition:width .3s}
+.upnext{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:6px 10px;font-size:13px;font-weight:700}
+.palette{display:flex;gap:8px;justify-content:center;padding:12px 8px;background:rgba(255,255,255,.07);
+  border-radius:22px;margin:6px 0 12px}
+.swatch{width:46px;height:46px;border-radius:15px;border:3px solid transparent;cursor:pointer;padding:0}
+.swatch.sel{border-color:#fff;transform:scale(1.1)}
+.hint{color:#C8BFF2;font-size:15px;font-weight:700;text-align:center;margin:0 0 10px}
+.note{color:#9C93CC;font-size:13px;line-height:1.5;text-align:center;margin:14px 0 0}
+.alert{background:#FFE8E8;color:#8B1A1A;border-radius:16px;padding:12px 14px;font-weight:700;font-size:15px;margin-bottom:12px}
+.holdgrid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.holdchip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border-radius:14px;padding:9px 13px;color:#fff;font-weight:700;font-size:15px}
+.dot{width:20px;height:20px;border-radius:6px;display:inline-block}
+.confetti{position:fixed;top:-20px;width:11px;height:16px;border-radius:2px;z-index:99;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}.confetti{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section class="screen on" id="scr-home">
+    <div class="stage"><div id="heroCube" class="holder spin"></div></div>
+    <h1>הקובייה של גפן</h1>
+    <p class="lead">אני אגיד לך בדיוק מה לסובב, סיבוב אחרי סיבוב, עד שכל צד יהיה בצבע אחד. בדרך כלל זה לוקח בערך 20 סיבובים.</p>
+    <button class="btn" id="goScramble">🎲 בואי נערבב ביחד</button>
+    <button class="btn ghost" id="goInput">🎨 הקובייה שלי כבר מעורבבת</button>
+    <p class="note">טיפ להורה: המדריך בנוי לקובייה בצבעים הרגילים — צהוב מול לבן, ירוק מול כחול, כתום מול אדום.</p>
+  </section>
+
+  <section class="screen" id="scr-hold">
+    <h2>קודם כל — איך מחזיקים</h2>
+    <div class="stage"><div id="holdCube" class="holder"></div></div>
+    <div class="holdgrid">
+      <span class="holdchip"><i class="dot" style="background:var(--y)"></i> צהוב למעלה</span>
+      <span class="holdchip"><i class="dot" style="background:var(--w)"></i> לבן למטה</span>
+      <span class="holdchip"><i class="dot" style="background:var(--g)"></i> ירוק מולך</span>
+    </div>
+    <p class="lead">תחזיקי ככה כל הזמן. את הקובייה שעל המסך אפשר לסובב עם האצבע — היא רק מראה, לא זזה באמת.</p>
+    <button class="btn green" id="holdNext">הבנתי, ממשיכים</button>
+    <button class="btn ghost" id="holdBack">חזרה</button>
+  </section>
+
+  <section class="screen" id="scr-input">
+    <h2>צבעי את הקובייה שלך</h2>
+    <p class="hint" id="paintHint"></p>
+    <div id="inputAlert"></div>
+    <div class="stage"><div id="paintCube" class="holder paintable"></div></div>
+    <div class="row small">
+      <button class="btn ghost" id="rotL">⟲</button>
+      <button class="btn ghost" id="rotFlip">🔃 למעלה / למטה</button>
+      <button class="btn ghost" id="rotR">⟳</button>
+    </div>
+    <div class="palette" id="palette"></div>
+    <button class="btn green" id="solveBtn">✨ תפתרי לי!</button>
+    <div class="row small">
+      <button class="btn ghost" id="clearBtn">🧽 לנקות הכול</button>
+      <button class="btn ghost" id="inputBack">חזרה</button>
+    </div>
+    <p class="note">גררי את הקובייה כדי להגיע לצדדים האחרים. אפשר לצבוע רק את מה שרואים.</p>
+  </section>
+
+  <section class="screen" id="scr-player">
+    <div class="dots" id="dots"></div>
+    <div class="headline" id="headline"></div>
+    <div class="stage"><div id="cube" class="holder"></div></div>
+    <div class="track"><b id="bar" style="width:0%"></b></div>
+    <div class="card">
+      <div class="move">
+        <div class="glyph" id="glyph">↑</div>
+        <div>
+          <div class="movetext" id="moveText"></div>
+          <div class="movesub" id="moveSub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="counter" id="counter"></div>
+    <button class="btn green" id="nextBtn">סובבתי! ➜</button>
+    <div class="row small">
+      <button class="btn ghost" id="demoBtn">👀 הראי לי שוב</button>
+      <button class="btn ghost" id="againBtn">↺ אחורה</button>
+    </div>
+    <div class="row small">
+      <button class="btn ghost" id="speedBtn">🐢 לאט</button>
+      <button class="btn ghost" id="autoBtn">▶︎ נגן</button>
+      <button class="btn ghost" id="quitBtn">התחלה</button>
+    </div>
+    <div class="upnext" id="upnext"></div>
+  </section>
+
+  <section class="screen" id="scr-done">
+    <div class="stage"><div id="doneCube" class="holder spin"></div></div>
+    <h1>כל הכבוד גפן! 🎉</h1>
+    <p class="lead">פתרת את הקובייה ההונגרית. רוצה עוד סיבוב?</p>
+    <button class="btn" id="againAll">🎲 עוד פעם</button>
+  </section>
+
+</div>
+
+<script>
+/* ===== Rubik's cube engine (cubie model) ===== */
+const FACES = ['U','D','F','B','R','L'];
+const VEC = {U:[0,1,0], D:[0,-1,0], F:[0,0,1], B:[0,0,-1], R:[1,0,0], L:[-1,0,0]};
+const ROT = {
+  U: p => [-p[2], p[1],  p[0]],
+  D: p => [ p[2], p[1], -p[0]],
+  R: p => [ p[0], p[2], -p[1]],
+  L: p => [ p[0],-p[2],  p[1]],
+  F: p => [ p[1],-p[0],  p[2]],
+  B: p => [-p[1], p[0],  p[2]],
+};
+const LAYER = {U:[1,1], D:[1,-1], R:[0,1], L:[0,-1], F:[2,1], B:[2,-1]};
+// yellow up, white down, green front, blue back, orange right, red left  (valid standard scheme)
+const CENTER = {U:'Y', D:'W', F:'G', B:'L', R:'O', L:'R'}; // 'L' = bLue, 'R' = Red, 'O' = Orange
+
+function vname(v){
+  for (const f of FACES){ const u = VEC[f]; if (u[0]===v[0]&&u[1]===v[1]&&u[2]===v[2]) return f; }
+  throw new Error('bad vec '+v);
+}
+
+function solvedCube(){
+  const c = [];
+  for (let x=-1;x<=1;x++) for (let y=-1;y<=1;y++) for (let z=-1;z<=1;z++){
+    if (!x && !y && !z) continue;
+    const col = {};
+    if (y===1) col.U = CENTER.U;
+    if (y===-1) col.D = CENTER.D;
+    if (z===1) col.F = CENTER.F;
+    if (z===-1) col.B = CENTER.B;
+    if (x===1) col.R = CENTER.R;
+    if (x===-1) col.L = CENTER.L;
+    c.push({p:[x,y,z], c:col});
+  }
+  return c;
+}
+
+function cloneCube(cube){
+  return cube.map(cu => ({p:[cu.p[0],cu.p[1],cu.p[2]], c:Object.assign({},cu.c)}));
+}
+
+function turn(cube, face, n){
+  const rot = ROT[face], lay = LAYER[face];
+  n = ((n%4)+4)%4;
+  for (let t=0;t<n;t++){
+    for (const cu of cube){
+      if (cu.p[lay[0]] !== lay[1]) continue;
+      cu.p = rot(cu.p);
+      const nc = {};
+      for (const d in cu.c) nc[vname(rot(VEC[d]))] = cu.c[d];
+      cu.c = nc;
+    }
+  }
+}
+
+function parseMove(m){
+  const f = m[0];
+  const n = m.length===1 ? 1 : (m[1]==="'" ? 3 : 2);
+  return [f, n];
+}
+function applyMoves(cube, moves){
+  for (const m of moves){ const [f,n] = parseMove(m); turn(cube, f, n); }
+  return cube;
+}
+const ALL_MOVES = [];
+for (const f of FACES) for (const s of ['', "'", '2']) ALL_MOVES.push(f+s);
+
+/* ---- facelet mapping (for input / rendering) ---- */
+// grid coords: row 0 = top of that face as seen looking straight at it, col 0 = left
+function faceletPos(face, r, c){
+  switch(face){
+    case 'U': return [c-1,  1, r-1];
+    case 'D': return [c-1, -1, 1-r];
+    case 'F': return [c-1, 1-r,  1];
+    case 'B': return [1-c, 1-r, -1];
+    case 'R': return [1, 1-r, 1-c];
+    case 'L': return [-1, 1-r, c-1];
+  }
+}
+function cubieAt(cube, p){
+  for (const cu of cube) if (cu.p[0]===p[0]&&cu.p[1]===p[1]&&cu.p[2]===p[2]) return cu;
+  return null;
+}
+function getFacelet(cube, face, r, c){
+  return cubieAt(cube, faceletPos(face,r,c)).c[face];
+}
+function faceletsOf(cube){
+  const o = {};
+  for (const f of FACES){ o[f] = []; for (let r=0;r<3;r++){ const row=[]; for(let c=0;c<3;c++) row.push(getFacelet(cube,f,r,c)); o[f].push(row);} }
+  return o;
+}
+function cubeFromFacelets(g){ // g = {U:[[..]],...}
+  const cube = solvedCube();
+  for (const cu of cube) cu.c = {};
+  for (const f of FACES) for (let r=0;r<3;r++) for (let c=0;c<3;c++){
+    const cu = cubieAt(cube, faceletPos(f,r,c));
+    cu.c[f] = g[f][r][c];
+  }
+  return cube;
+}
+
+/* ---- piece helpers ---- */
+function pieceKey(cu){ return Object.values(cu.c).slice().sort().join(''); }
+function findPiece(cube, colors){
+  const key = colors.slice().sort().join('');
+  for (const cu of cube) if (Object.keys(cu.c).length===colors.length && pieceKey(cu)===key) return cu;
+  return null;
+}
+function pieceSolved(cube, colors){
+  const cu = findPiece(cube, colors);
+  if (!cu) return false;
+  for (const d in cu.c) if (cu.c[d] !== CENTER[d]) return false;
+  return true;
+}
+
+/* ---- validation ---- */
+function validate(g){
+  const count = {};
+  for (const f of FACES) for (let r=0;r<3;r++) for (let c=0;c<3;c++){
+    const v = g[f][r][c];
+    if (!v) return {ok:false, code:'empty'};
+    count[v] = (count[v]||0)+1;
+  }
+  for (const k of ['Y','W','G','L','O','R']) if (count[k]!==9) return {ok:false, code:'count', color:k, n:count[k]||0};
+  for (const f of FACES) if (g[f][1][1] !== CENTER[f]) return {ok:false, code:'center'};
+
+  const cube = cubeFromFacelets(g);
+  const solved = solvedCube();
+  const keyOf = cu => pieceKey(cu);
+  // every edge/corner must exist exactly once
+  for (const kind of [2,3]){
+    const want = solved.filter(cu=>Object.keys(cu.c).length===kind).map(keyOf).sort();
+    const have = cube.filter(cu=>Object.keys(cu.c).length===kind).map(keyOf).sort();
+    if (want.join('|') !== have.join('|')) return {ok:false, code:'pieces'};
+  }
+  // orientation parity (standard UD-axis definition)
+  const label = (p, d) => (p[1] !== 0) ? ((d==='U'||d==='D') ? 0 : 1) : ((d==='F'||d==='B') ? 0 : 1);
+  let flip = 0;
+  for (const cu of cube.filter(c=>Object.keys(c.c).length===2)){
+    const cols = Object.values(cu.c);
+    // reference sticker colour: the U/D colour, else the F/B colour
+    let ref = cols.find(x => x===CENTER.U || x===CENTER.D);
+    if (ref === undefined) ref = cols.find(x => x===CENTER.F || x===CENTER.B);
+    const d = Object.keys(cu.c).find(k => cu.c[k]===ref);
+    flip += label(cu.p, d);
+  }
+  if (flip % 2) return {ok:false, code:'flip'};
+  let twist = 0;
+  for (const cu of cube.filter(c=>Object.keys(c.c).length===3)){
+    const p = cu.p;
+    const fy = p[1]===1 ? 'U' : 'D', fx = p[0]===1 ? 'R' : 'L', fz = p[2]===1 ? 'F' : 'B';
+    const cw = (p[0]*p[1]*p[2] === 1) ? [fy,fx,fz] : [fy,fz,fx];
+    const cols = Object.values(cu.c);
+    const ref = cols.find(x => x===CENTER.U || x===CENTER.D);
+    const d = Object.keys(cu.c).find(k => cu.c[k]===ref);
+    twist += cw.indexOf(d);
+  }
+  if (twist % 3) return {ok:false, code:'twist'};
+  // permutation parity
+  const perm = [];
+  const cornersSolved = solved.filter(c=>Object.keys(c.c).length===3);
+  const edgesSolved = solved.filter(c=>Object.keys(c.c).length===2);
+  const posKey = p => p.join(',');
+  function permParity(list){
+    const idx = new Map(); list.forEach((s,i)=>idx.set(pieceKey(s), i));
+    const arr = list.map(s => idx.get(pieceKey(cubieAt(cube, s.p))));
+    let par = 0; const seen = new Array(arr.length).fill(false);
+    for (let i=0;i<arr.length;i++){ if (seen[i]) continue; let j=i, len=0; while(!seen[j]){seen[j]=true;j=arr[j];len++;} par += len-1; }
+    return par%2;
+  }
+  if (permParity(cornersSolved) !== permParity(edgesSolved)) return {ok:false, code:'parity'};
+  return {ok:true};
+}
+
+/* ===== solver ===== */
+const MAP_Y = {R:'F', F:'L', L:'B', B:'R', U:'U', D:'D'};
+function rotAlg(alg, k){
+  let out = alg.slice();
+  for (let i=0;i<k;i++) out = out.map(m => MAP_Y[m[0]] + m.slice(1));
+  return out;
+}
+function inv(alg){ return alg.slice().reverse().map(m => m.length===1 ? m+"'" : (m[1]==='2'? m : m[0])); }
+
+function searchBasic(cube, goal, maxDepth){
+  // DFS over single moves
+  const path = [];
+  function dfs(state, depth, lastFace){
+    if (goal(state)) return true;
+    if (depth===0) return false;
+    for (const f of FACES){
+      if (f===lastFace) continue;
+      for (let n=1;n<=3;n++){
+        const s = cloneCube(state);
+        turn(s, f, n);
+        path.push(f + (n===1?'':n===2?'2':"'"));
+        if (dfs(s, depth-1, f)) return true;
+        path.pop();
+      }
+    }
+    return false;
+  }
+  for (let d=0; d<=maxDepth; d++){
+    path.length = 0;
+    const s = cloneCube(cube);
+    if (dfs(s, d, null)) return path.slice();
+  }
+  return null;
+}
+
+function searchMacros(cube, macros, goal, maxDepth){
+  const path = [];
+  function dfs(state, depth){
+    if (goal(state)) return true;
+    if (depth===0) return false;
+    for (const mac of macros){
+      const s = cloneCube(state);
+      applyMoves(s, mac);
+      path.push(mac);
+      if (dfs(s, depth-1)) return true;
+      path.pop();
+    }
+    return false;
+  }
+  for (let d=0; d<=maxDepth; d++){
+    path.length = 0;
+    if (dfs(cloneCube(cube), d)) return [].concat.apply([], path);
+  }
+  return null;
+}
+
+const W = CENTER.D, Y = CENTER.U;
+const SIDES = ['F','R','B','L'];
+const CROSS_EDGES = SIDES.map(f => [W, CENTER[f]]);
+const WHITE_CORNERS = [['F','R'],['R','B'],['B','L'],['L','F']].map(pr => [W, CENTER[pr[0]], CENTER[pr[1]]]);
+const MID_EDGES = [['F','R'],['R','B'],['B','L'],['L','F']].map(pr => [CENTER[pr[0]], CENTER[pr[1]]]);
+const YELLOW_EDGES = SIDES.map(f => [Y, CENTER[f]]);
+const YELLOW_CORNERS = [['F','R'],['R','B'],['B','L'],['L','F']].map(pr => [Y, CENTER[pr[0]], CENTER[pr[1]]]);
+
+const allSolved = list => st => list.every(p => pieceSolved(st, p));
+
+const SEXY = ['R','U',"R'","U'"];
+const INSERTS = [['R','U',"R'"], ['R',"U'","R'"], ['R','U2',"R'"], SEXY];
+const MID_R = ['U','R',"U'","R'","U'","F'",'U','F'];
+const MID_L = ["U'","L'",'U','L','U','F',"U'","F'"];
+const OLL_EDGE = ['F','R','U',"R'","U'","F'"];
+const SUNE = ['R','U',"R'",'U','R','U2',"R'"];
+const ANTISUNE = ['R','U2',"R'","U'",'R',"U'","R'"];
+const APERM = ["R'",'F',"R'",'B2','R',"F'","R'",'B2','R2'];
+const UPERM = ['R',"U'",'R','U','R','U','R',"U'","R'","U'",'R2'];
+
+function solveCube(cube){
+  const st = cloneCube(cube);
+  const stages = [];
+  const rec = (name, moves) => { if (moves && moves.length) stages.push({name, moves: moves.slice()}); if (moves) applyMoves(st, moves); };
+
+  // 1. white cross
+  let crossMoves = [];
+  const done = [];
+  for (const e of CROSS_EDGES){
+    done.push(e);
+    if (allSolved(done)(st)) continue;
+    let mv = searchBasic(st, allSolved(done), 5);
+    if (!mv) mv = searchBasic(st, allSolved(done), 7);
+    if (!mv) return null;
+    applyMoves(st, mv);
+    crossMoves = crossMoves.concat(mv);
+  }
+  if (crossMoves.length) stages.push({name:'cross', moves:crossMoves});
+
+  // 2. white corners
+  const cornerMacros = [];
+  for (let k=0;k<4;k++) for (const a of INSERTS) cornerMacros.push(rotAlg(a,k));
+  cornerMacros.push(['U'],["U'"],['U2']);
+  let cm = [];
+  const doneC = CROSS_EDGES.slice();
+  for (const c of WHITE_CORNERS){
+    doneC.push(c);
+    if (allSolved(doneC)(st)) continue;
+    let mv = searchMacros(st, cornerMacros, allSolved(doneC), 3);
+    if (!mv) mv = searchMacros(st, cornerMacros, allSolved(doneC), 5);
+    if (!mv) return null;
+    applyMoves(st, mv); cm = cm.concat(mv);
+  }
+  if (cm.length) stages.push({name:'corners', moves:cm});
+
+  // 3. middle layer
+  const midMacros = [];
+  for (let k=0;k<4;k++){ midMacros.push(rotAlg(MID_R,k)); midMacros.push(rotAlg(MID_L,k)); }
+  midMacros.push(['U'],["U'"],['U2']);
+  let mm = [];
+  const doneM = doneC.slice();
+  for (const e of MID_EDGES){
+    doneM.push(e);
+    if (allSolved(doneM)(st)) continue;
+    let mv = searchMacros(st, midMacros, allSolved(doneM), 3);
+    if (!mv) mv = searchMacros(st, midMacros, allSolved(doneM), 4);
+    if (!mv) return null;
+    applyMoves(st, mv); mm = mm.concat(mv);
+  }
+  if (mm.length) stages.push({name:'middle', moves:mm});
+
+  // 4. yellow cross (orientation of U edges)
+  const ollEdgeGoal = s => YELLOW_EDGES.every(e => findPiece(s,e).c.U === Y) && allSolved(doneM)(s);
+  if (!ollEdgeGoal(st)){
+    const mv = searchMacros(st, [OLL_EDGE, ['U'], ["U'"], ['U2']], ollEdgeGoal, 7);
+    if (!mv) return null;
+    applyMoves(st, mv); stages.push({name:'ycross', moves:mv});
+  }
+
+  // 5. yellow face (orientation of U corners)
+  const ollGoal = s => ollEdgeGoal(s) && YELLOW_CORNERS.every(c => findPiece(s,c).c.U === Y);
+  if (!ollGoal(st)){
+    const mv = searchMacros(st, [SUNE, ANTISUNE, ['U'], ["U'"], ['U2']], ollGoal, 7);
+    if (!mv) return null;
+    applyMoves(st, mv); stages.push({name:'yface', moves:mv});
+  }
+
+  // 6. permute corners
+  const pcGoal = s => ollGoal(s) && YELLOW_CORNERS.every(c => pieceSolved(s,c));
+  if (!pcGoal(st)){
+    const mv = searchMacros(st, [APERM, ['U'], ["U'"], ['U2']], pcGoal, 5);
+    if (!mv) return null;
+    applyMoves(st, mv); stages.push({name:'pcorners', moves:mv});
+  }
+
+  // 7. permute edges
+  const finalGoal = s => s.every(cu => Object.keys(cu.c).every(d => cu.c[d]===CENTER[d]));
+  if (!finalGoal(st)){
+    const mv = searchMacros(st, [UPERM, ['U'], ["U'"], ['U2']], finalGoal, 5);
+    if (!mv) return null;
+    applyMoves(st, mv); stages.push({name:'pedges', moves:mv});
+  }
+
+  // tidy each stage
+  for (const s of stages) s.moves = simplify(s.moves);
+  return stages.filter(s => s.moves.length);
+}
+
+function simplify(moves){
+  const out = [];
+  const val = m => m.length===1 ? 1 : (m[1]==='2' ? 2 : 3);
+  const str = (f,n) => n===1 ? f : n===2 ? f+'2' : f+"'";
+  for (const m of moves){
+    if (out.length && out[out.length-1][0] === m[0]){
+      const n = (val(out.pop()) + val(m)) % 4;
+      if (n) out.push(str(m[0], n));
+    } else out.push(m);
+  }
+  return out;
+}
+
+function randomScramble(n){
+  const s = [];
+  let last = '';
+  while (s.length < n){
+    const m = ALL_MOVES[Math.floor(Math.random()*ALL_MOVES.length)];
+    if (m[0] === last) continue;
+    last = m[0]; s.push(m);
+  }
+  return s;
+}
+/* ===== two-phase (Kociemba) solver =====
+   Move tables are derived from the geometric engine, so they cannot drift. */
+const KC = (function(){
+
+const CORNER_POS = [[1,1,1],[-1,1,1],[-1,1,-1],[1,1,-1],[1,-1,1],[-1,-1,1],[-1,-1,-1],[1,-1,-1]];
+const EDGE_POS   = [[1,1,0],[0,1,1],[-1,1,0],[0,1,-1],[1,-1,0],[0,-1,1],[-1,-1,0],[0,-1,-1],[1,0,1],[-1,0,1],[-1,0,-1],[1,0,-1]];
+const FACE_ORDER = ['U','R','F','D','L','B'];
+const AXIS_OPP   = [3,4,5,0,1,2];
+
+function ckey(c){ return Object.values(c).slice().sort().join(''); }
+let CORNER_ID = null, EDGE_ID = null;
+function buildIds(){
+  CORNER_ID = {}; EDGE_ID = {};
+  const s = solvedCube();
+  const at = p => s.find(cu => cu.p[0]===p[0]&&cu.p[1]===p[1]&&cu.p[2]===p[2]);
+  CORNER_POS.forEach((p,i) => CORNER_ID[ckey(at(p).c)] = i);
+  EDGE_POS.forEach((p,i)   => EDGE_ID[ckey(at(p).c)] = i);
+}
+
+function toCoords(cube){
+  if (!CORNER_ID) buildIds();
+  const at = p => cube.find(cu => cu.p[0]===p[0]&&cu.p[1]===p[1]&&cu.p[2]===p[2]);
+  const cp = [], co = [], ep = [], eo = [];
+  CORNER_POS.forEach((p,i) => {
+    const cu = at(p);
+    cp[i] = CORNER_ID[ckey(cu.c)];
+    const fy = p[1]===1?'U':'D', fx = p[0]===1?'R':'L', fz = p[2]===1?'F':'B';
+    const cw = (p[0]*p[1]*p[2]===1) ? [fy,fx,fz] : [fy,fz,fx];
+    const d = Object.keys(cu.c).find(k => cu.c[k]===CENTER.U || cu.c[k]===CENTER.D);
+    co[i] = cw.indexOf(d);
+  });
+  EDGE_POS.forEach((p,i) => {
+    const cu = at(p);
+    ep[i] = EDGE_ID[ckey(cu.c)];
+    const cols = Object.values(cu.c);
+    let ref = cols.find(x => x===CENTER.U || x===CENTER.D);
+    if (ref === undefined) ref = cols.find(x => x===CENTER.F || x===CENTER.B);
+    const d = Object.keys(cu.c).find(k => cu.c[k]===ref);
+    eo[i] = (p[1] !== 0) ? ((d==='U'||d==='D') ? 0 : 1) : ((d==='F'||d==='B') ? 0 : 1);
+  });
+  return {cp, co, ep, eo};
+}
+
+function idCube(){ return {cp:[0,1,2,3,4,5,6,7], co:[0,0,0,0,0,0,0,0], ep:[0,1,2,3,4,5,6,7,8,9,10,11], eo:[0,0,0,0,0,0,0,0,0,0,0,0]}; }
+function mult(a, b){
+  const cp = [], co = [], ep = [], eo = [];
+  for (let i=0;i<8;i++){ cp[i] = a.cp[b.cp[i]]; co[i] = (a.co[b.cp[i]] + b.co[i]) % 3; }
+  for (let i=0;i<12;i++){ ep[i] = a.ep[b.ep[i]]; eo[i] = (a.eo[b.ep[i]] + b.eo[i]) % 2; }
+  return {cp, co, ep, eo};
+}
+
+let MOVE = null, MOVEP = null;
+function buildMoves(){
+  MOVE = FACE_ORDER.map(f => { const c = solvedCube(); turn(c, f, 1); return toCoords(c); });
+  MOVEP = [];
+  for (let f=0; f<6; f++){
+    let acc = idCube();
+    for (let p=1; p<=3; p++){ acc = mult(acc, MOVE[f]); MOVEP[f*3+p-1] = acc; }
+  }
+}
+
+function getTwist(c){ let t=0; for (let i=0;i<7;i++) t = t*3 + c.co[i]; return t; }
+function setTwist(c, t){ let s=0; for (let i=6;i>=0;i--){ const r=t%3; c.co[i]=r; s+=r; t=(t/3)|0; } c.co[7]=(3-s%3)%3; }
+function getFlip(c){ let t=0; for (let i=0;i<11;i++) t = t*2 + c.eo[i]; return t; }
+function setFlip(c, t){ let s=0; for (let i=10;i>=0;i--){ const r=t%2; c.eo[i]=r; s+=r; t=(t/2)|0; } c.eo[11]=s%2; }
+
+const SLICE_SUB = [], SLICE_IDX = new Int16Array(4096).fill(-1);
+for (let m=0;m<4096;m++){ let n=0; for (let b=0;b<12;b++) if (m>>b & 1) n++;
+  if (n===4){ SLICE_IDX[m] = SLICE_SUB.length; SLICE_SUB.push(m); } }
+const SLICE_SOLVED = SLICE_IDX[0xF00];
+function getSlice(c){ let m=0; for (let i=0;i<12;i++) if (c.ep[i] >= 8) m |= 1<<i; return SLICE_IDX[m]; }
+function setSlice(c, idx){ const m = SLICE_SUB[idx]; let s=8, o=0;
+  for (let i=0;i<12;i++) c.ep[i] = (m>>i & 1) ? s++ : o++; }
+
+const FACT = [1,1,2,6,24,120,720,5040,40320];
+function permIndex(a){ const n=a.length; let idx=0;
+  for (let i=0;i<n;i++){ let c=0; for (let j=i+1;j<n;j++) if (a[j]<a[i]) c++; idx = idx*(n-i)+c; } return idx; }
+function indexPerm(idx, n){ const avail=[]; for (let i=0;i<n;i++) avail.push(i); const out=[];
+  for (let i=0;i<n;i++){ const f=FACT[n-1-i]; const k=Math.floor(idx/f); idx%=f; out.push(avail.splice(k,1)[0]); } return out; }
+function getCornPerm(c){ return permIndex(c.cp); }
+function getEdge8(c){ return permIndex(c.ep.slice(0,8)); }
+function getSlicePerm(c){ return permIndex(c.ep.slice(8,12).map(x=>x-8)); }
+
+const P2M = [0,1,2, 4, 7, 9,10,11, 13, 16];
+const MOVE_NAME = [];
+for (const f of FACE_ORDER) for (const s of ['', '2', "'"]) MOVE_NAME.push(f+s);
+
+let T = null;
+function buildTables(){
+  if (T) return T;
+  buildMoves();
+  const t0 = (typeof performance!=='undefined'?performance.now():Date.now());
+  const twistMove = new Int16Array(2187*18), flipMove = new Int16Array(2048*18), sliceMove = new Int16Array(495*18);
+  let c = idCube();
+  for (let i=0;i<2187;i++){ setTwist(c,i); for (let m=0;m<18;m++) twistMove[i*18+m] = getTwist(mult(c, MOVEP[m])); }
+  c = idCube();
+  for (let i=0;i<2048;i++){ setFlip(c,i); for (let m=0;m<18;m++) flipMove[i*18+m] = getFlip(mult(c, MOVEP[m])); }
+  c = idCube();
+  for (let i=0;i<495;i++){ setSlice(c,i); for (let m=0;m<18;m++) sliceMove[i*18+m] = getSlice(mult(c, MOVEP[m])); }
+
+  const cornMove = new Uint16Array(40320*10), edge8Move = new Uint16Array(40320*10), slicePMove = new Uint16Array(24*10);
+  for (let i=0;i<40320;i++){
+    const p = indexPerm(i,8);
+    for (let k=0;k<10;k++){
+      const mvv = MOVEP[P2M[k]]; const np=[], ne=[];
+      for (let j=0;j<8;j++){ np[j] = p[mvv.cp[j]]; ne[j] = p[mvv.ep[j]]; }
+      cornMove[i*10+k] = permIndex(np);
+      edge8Move[i*10+k] = permIndex(ne);
+    }
+  }
+  for (let i=0;i<24;i++){
+    const p = indexPerm(i,4);
+    for (let k=0;k<10;k++){
+      const mvv = MOVEP[P2M[k]]; const np=[];
+      for (let j=0;j<4;j++) np[j] = p[mvv.ep[j+8]-8];
+      slicePMove[i*10+k] = permIndex(np);
+    }
+  }
+
+  function bfs(size, nmoves, step, startIdx){
+    const pr = new Uint8Array(size).fill(255);
+    pr[startIdx] = 0;
+    let frontier = [startIdx], d = 0;
+    while (frontier.length){
+      const next = [];
+      for (let q=0;q<frontier.length;q++){
+        const s = frontier[q];
+        for (let m=0;m<nmoves;m++){
+          const ns = step(s, m);
+          if (pr[ns] === 255){ pr[ns] = d+1; next.push(ns); }
+        }
+      }
+      frontier = next; d++;
+    }
+    return pr;
+  }
+  const prTwist = bfs(2187*495, 18, (s,m) => twistMove[((s/495)|0)*18+m]*495 + sliceMove[(s%495)*18+m], SLICE_SOLVED);
+  const prFlip  = bfs(2048*495, 18, (s,m) => flipMove[((s/495)|0)*18+m]*495 + sliceMove[(s%495)*18+m], SLICE_SOLVED);
+  const prCorn  = bfs(40320*24, 10, (s,m) => cornMove[((s/24)|0)*10+m]*24 + slicePMove[(s%24)*10+m], 0);
+  const prEdge  = bfs(40320*24, 10, (s,m) => edge8Move[((s/24)|0)*10+m]*24 + slicePMove[(s%24)*10+m], 0);
+
+  T = {twistMove, flipMove, sliceMove, cornMove, edge8Move, slicePMove, prTwist, prFlip, prCorn, prEdge,
+       ms: (typeof performance!=='undefined'?performance.now():Date.now()) - t0};
+  return T;
+}
+
+function solveFast(cube, budgetMs, target){
+  buildTables();
+  budgetMs = budgetMs || 350; target = target === undefined ? 23 : target;
+  const {twistMove, flipMove, sliceMove, cornMove, edge8Move, slicePMove, prTwist, prFlip, prCorn, prEdge} = T;
+  const start = toCoords(cube);
+  if (start.cp.every((v,i)=>v===i) && start.co.every(v=>!v) && start.ep.every((v,i)=>v===i) && start.eo.every(v=>!v)) return [];
+  const t0 = Date.now();
+  let best = null;
+
+  const tw = new Int32Array(22), fl = new Int32Array(22), sl = new Int32Array(22), mv = new Int32Array(22);
+  tw[0] = getTwist(start); fl[0] = getFlip(start); sl[0] = getSlice(start);
+
+  function phase2(cc, maxLen){
+    const sa = new Int32Array(22), sb = new Int32Array(22), ss = new Int32Array(22), sm = new Int32Array(22);
+    sa[0] = getCornPerm(cc); sb[0] = getEdge8(cc); ss[0] = getSlicePerm(cc);
+    let found = null;
+    function dfs(n, limit, lastFace, prevFace){
+      if (sa[n]===0 && sb[n]===0 && ss[n]===0){ found = Array.prototype.slice.call(sm, 0, n); return true; }
+      if (n === limit) return false;
+      const h = Math.max(prCorn[sa[n]*24+ss[n]], prEdge[sb[n]*24+ss[n]]);
+      if (n + h > limit) return false;
+      for (let k=0;k<10;k++){
+        const m = P2M[k], f = (m/3)|0;
+        if (f === lastFace) continue;
+        if (AXIS_OPP[f] === lastFace && f > lastFace) continue;
+        sa[n+1] = cornMove[sa[n]*10+k];
+        sb[n+1] = edge8Move[sb[n]*10+k];
+        ss[n+1] = slicePMove[ss[n]*10+k];
+        sm[n] = m;
+        if (dfs(n+1, limit, f, lastFace)) return true;
+      }
+      return false;
+    }
+    for (let lim=0; lim<=maxLen; lim++) if (dfs(0, lim, -1, -1)) return found;
+    return null;
+  }
+
+  function tryPhase2(n){
+    let cc = start;
+    for (let i=0;i<n;i++) cc = mult(cc, MOVEP[mv[i]]);
+    const cap = Math.min((best ? best.length - n - 1 : 20), 18);
+    if (cap < 0) return false;
+    const p2 = phase2(cc, cap);
+    if (p2){
+      const sol = Array.prototype.slice.call(mv, 0, n).concat(p2);
+      if (!best || sol.length < best.length) best = sol;
+      return best.length <= target;
+    }
+    return false;
+  }
+
+  function dfs1(n, limit, lastFace, prevFace){
+    if (tw[n]===0 && fl[n]===0 && sl[n]===SLICE_SOLVED){
+      if (n === limit){ if (tryPhase2(n)) return true; }
+      return false;
+    }
+    if (n === limit) return false;
+    const h = Math.max(prTwist[tw[n]*495+sl[n]], prFlip[fl[n]*495+sl[n]]);
+    if (n + h > limit) return false;
+    if (best && n >= best.length - 1) return false;
+    if ((n & 3) === 0 && Date.now() - t0 > budgetMs && best) return true;
+    for (let m=0;m<18;m++){
+      const f = (m/3)|0;
+      if (f === lastFace) continue;
+      if (AXIS_OPP[f] === lastFace && f > lastFace) continue;
+      tw[n+1] = twistMove[tw[n]*18+m];
+      fl[n+1] = flipMove[fl[n]*18+m];
+      sl[n+1] = sliceMove[sl[n]*18+m];
+      mv[n] = m;
+      if (dfs1(n+1, limit, f, lastFace)) return true;
+    }
+    return false;
+  }
+
+  for (let lim=0; lim<=13; lim++){
+    if (best && lim >= best.length) break;
+    if (lim === 0){ if (tw[0]===0 && fl[0]===0 && sl[0]===SLICE_SOLVED && tryPhase2(0)) break; continue; }
+    if (dfs1(0, lim, -1, -1)) break;
+    if (best && (best.length <= target || Date.now() - t0 > budgetMs)) break;
+  }
+  return best ? best.map(m => MOVE_NAME[m]) : null;
+}
+
+return {solveFast, buildTables, toCoords, ready: () => !!T};
+})();
+
+/* =================== UI =================== */
+const HEX = {Y:'#FFD500', W:'#FCFCFC', G:'#00A651', L:'#0051BA', O:'#FF5800', R:'#D3132F'};
+const CNAME = {Y:'צהוב', W:'לבן', G:'ירוק', L:'כחול', O:'כתום', R:'אדום'};
+const FACE_HE = {U:'למעלה', D:'למטה', F:'מולך', B:'מאחור', R:'ימין', L:'שמאל'};
+const FACE_TF = {U:'rotateX(90deg)', D:'rotateX(-90deg)', F:'', B:'rotateY(180deg)', R:'rotateY(90deg)', L:'rotateY(-90deg)'};
+const $ = id => document.getElementById(id);
+
+let S = 52;
+function sizeCube(){
+  S = Math.max(28, Math.min(52, Math.floor(Math.min(window.innerWidth, 560) / 7.8)));
+  document.documentElement.style.setProperty('--s', S + 'px');
+}
+sizeCube();
+
+function renderCubeEl(el, colorAt){
+  const view = el._view;
+  el.innerHTML = '';
+  const h = S/2 - 0.6, map = {};
+  for (let x=-1;x<=1;x++) for (let y=-1;y<=1;y++) for (let z=-1;z<=1;z++){
+    if (!x && !y && !z) continue;
+    const d = document.createElement('div');
+    d.className = 'cubie';
+    d._p = [x,y,z]; d._faces = {};
+    d.style.transform = 'translate3d(' + (x*S) + 'px,' + (-y*S) + 'px,' + (z*S) + 'px)';
+    for (const f of FACES){
+      const fe = document.createElement('div');
+      fe.className = 'face';
+      fe.style.transform = FACE_TF[f] + ' translateZ(' + h + 'px)';
+      d.appendChild(fe); d._faces[f] = fe;
+    }
+    map[[x,y,z]] = d; el.appendChild(d);
+  }
+  for (const f of FACES) for (let r=0;r<3;r++) for (let c=0;c<3;c++){
+    const d = map[faceletPos(f,r,c)];
+    const col = colorAt(f,r,c);
+    const i = document.createElement('i');
+    i.style.background = col ? HEX[col] : 'var(--empty)';
+    i._f = f; i._r = r; i._c = c;
+    d._faces[f].appendChild(i);
+  }
+  if (view) el._view = view;
+  applyFacing(el);
+}
+
+function applyFacing(el){
+  const v = el._view || {yaw:-32, pitch:-22};
+  const ry = v.yaw*Math.PI/180, rx = v.pitch*Math.PI/180;
+  const vis = {};
+  for (const f of FACES){
+    const n = VEC[f], nx = n[0], ny = -n[1], nz = n[2];
+    const az = -nx*Math.sin(ry) + nz*Math.cos(ry);
+    const bz = ny*Math.sin(rx) + az*Math.cos(rx);
+    vis[f] = bz > 0.25;
+  }
+  for (const st of el.querySelectorAll('.face i')) st.style.pointerEvents = vis[st._f] ? 'auto' : 'none';
+}
+function setView(el, yaw, pitch, smooth){
+  el._view = {yaw: yaw, pitch: Math.max(-75, Math.min(75, pitch))};
+  el.classList.toggle('smooth', !!smooth);
+  el.style.transform = 'rotateX(' + el._view.pitch + 'deg) rotateY(' + el._view.yaw + 'deg)';
+  applyFacing(el);
+}
+let dragged = false;
+function makeDraggable(el){
+  const stage = el.parentElement;
+  let px = 0, py = 0, sx = 0, sy = 0, down = false;
+  stage.addEventListener('pointerdown', function(e){
+    down = true; px = sx = e.clientX; py = sy = e.clientY; dragged = false;
+    el.classList.remove('smooth');
+  });
+  stage.addEventListener('pointermove', function(e){
+    if (!down) return;
+    const dx = e.clientX - px, dy = e.clientY - py;
+    if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 7) dragged = true;
+    px = e.clientX; py = e.clientY;
+    setView(el, el._view.yaw - dx*0.7, el._view.pitch - dy*0.7, false);
+  });
+  const up = function(){ down = false; };
+  stage.addEventListener('pointerup', up);
+  stage.addEventListener('pointercancel', up);
+  stage.addEventListener('pointerleave', up);
+}
+
+const PIVOT = {U:['Y',-1], D:['Y',1], R:['X',1], L:['X',-1], F:['Z',1], B:['Z',-1]};
+function highlight(el, face){
+  for (const c of el.querySelectorAll('.cubie')){
+    const inLayer = face && c._p[LAYER[face][0]] === LAYER[face][1];
+    c.classList.toggle('hot', !!face && inLayer);
+  }
+}
+
+/* speed control */
+const SPEEDS = [{ms:1900, label:'🐢 לאט מאוד'}, {ms:1250, label:'🐢 לאט'}, {ms:750, label:'🐇 רגיל'}];
+let speedIdx = 1;
+function turnMs(){ return SPEEDS[speedIdx].ms; }
+
+/* layer preview: the layer to turn rocks gently in the right direction */
+let previewPivot = null, previewAnim = null;
+function grabLayer(el, face){
+  const lay = LAYER[face];
+  const pivot = document.createElement('div');
+  pivot.className = 'pivot';
+  el.appendChild(pivot);
+  const kids = [].slice.call(el.querySelectorAll('.cubie'));
+  for (const c of kids) if (c._p[lay[0]] === lay[1]) pivot.appendChild(c);
+  return pivot;
+}
+function clearPreview(el){
+  if (previewAnim){ try { previewAnim.cancel(); } catch(e){} previewAnim = null; }
+  if (previewPivot){
+    if (previewPivot.parentElement === el){
+      while (previewPivot.firstChild) el.appendChild(previewPivot.firstChild);
+      previewPivot.remove();
+    }
+    previewPivot = null;
+  }
+}
+function showPreview(el, move){
+  clearPreview(el);
+  const f = move[0], n = parseMove(move)[1];
+  const pivot = grabLayer(el, f);
+  previewPivot = pivot;
+  const ax = PIVOT[f][0], sign = PIVOT[f][1], q = (n === 3 ? -1 : 1);
+  const a = sign * q * 15;
+  if (pivot.animate){
+    try {
+      previewAnim = pivot.animate([
+        {transform:'rotate' + ax + '(0deg)'},
+        {transform:'rotate' + ax + '(' + a + 'deg)'},
+        {transform:'rotate' + ax + '(0deg)'}
+      ], {duration: 1900, iterations: Infinity, easing: 'ease-in-out'});
+    } catch(e){}
+  }
+}
+let busy = false;
+function animateTurn(el, cube, face, n, ms, done){
+  busy = true;
+  clearPreview(el);
+  const pivot = grabLayer(el, face);
+  const ax = PIVOT[face][0], sign = PIVOT[face][1], q = (n === 3 ? -1 : n);
+  requestAnimationFrame(function(){
+    pivot.style.transition = 'transform ' + ms + 'ms cubic-bezier(.4,.1,.3,1)';
+    pivot.style.transform = 'rotate' + ax + '(' + (sign*90*q) + 'deg)';
+  });
+  setTimeout(function(){
+    turn(cube, face, n);
+    renderCubeEl(el, function(f,r,c){ return getFacelet(cube,f,r,c); });
+    busy = false; if (done) done();
+  }, ms + 40);
+}
+
+const WORD = {
+  U:['השכבה העליונה','זזה שמאלה','←','left'],   "U'":['השכבה העליונה','זזה ימינה','→','right'],
+  D:['השכבה התחתונה','זזה ימינה','→','right'],  "D'":['השכבה התחתונה','זזה שמאלה','←','left'],
+  R:['הצד הימני','עולה למעלה','↑','up'],        "R'":['הצד הימני','יורד למטה','↓','down'],
+  L:['הצד השמאלי','יורד למטה','↓','down'],      "L'":['הצד השמאלי','עולה למעלה','↑','up'],
+  F:['הצד שמולך','מסתובב ימינה','↻','cw'],      "F'":['הצד שמולך','מסתובב שמאלה','↺','ccw'],
+  B:['הצד האחורי','מסתובב שמאלה','↺','ccw'],    "B'":['הצד האחורי','מסתובב ימינה','↻','cw']
+};
+const ROT_DEG = {up:0, right:90, down:180, left:270};
+function arrowSVG(kind){
+  const head = '<g stroke="currentColor" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">';
+  if (kind === 'cw' || kind === 'ccw'){
+    const inner =
+      '<path d="M50 20 A30 30 0 1 1 20 50" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>' +
+      '<polygon points="43,4 43,34 72,19" fill="currentColor"/>';
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+      (kind === 'cw' ? inner : '<g transform="translate(100,0) scale(-1,1)">' + inner + '</g>') + '</svg>';
+  }
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+    '<g transform="rotate(' + ROT_DEG[kind] + ' 50 50)">' + head +
+    '<path d="M50 86 L50 24"/><path d="M28 46 L50 22 L72 46"/></g></g></svg>';
+}
+function setGlyph(color, ink, kind, dbl){
+  const g = $('glyph');
+  g.style.background = color;
+  g.style.color = ink;
+  g.innerHTML = arrowSVG(kind) + (dbl ? '<span class="x2">×2</span>' : '');
+}
+const FACE_COLOR = {U:'Y', D:'W', F:'G', B:'L', R:'O', L:'R'};
+function describe(m){
+  const f = m[0], dbl = (m[1] === '2');
+  const w = WORD[dbl ? f : m];
+  return {
+    title: w[0] + ' ' + w[1] + (dbl ? ' פעמיים' : ''),
+    sub: 'הצד ה' + CNAME[FACE_COLOR[f]] + ' (' + FACE_HE[f] + ') · ' + (dbl ? 'שני סיבובים' : 'סיבוב אחד'),
+    arrow: w[2], kind: w[3], dbl: dbl, color: HEX[FACE_COLOR[f]]
+  };
+}
+
+let state = solvedCube();
+let queue = [], idx = 0, auto = false, mode = 'solve';
+
+function show(id){
+  const all = document.querySelectorAll('.screen');
+  for (const s of all) s.classList.remove('on');
+  $(id).classList.add('on');
+  if (window.scrollTo) window.scrollTo(0,0);
+}
+function drawState(){
+  previewPivot = null; previewAnim = null;
+  renderCubeEl($('cube'), function(f,r,c){ return getFacelet(state,f,r,c); });
+}
+
+function startQueue(moves, m){
+  mode = m; queue = moves.slice(); idx = 0; auto = false;
+  $('autoBtn').textContent = '▶︎ נגן';
+  $('nextBtn').textContent = 'סובבתי! ➜';
+  $('nextBtn').onclick = doStep;
+  drawState(); show('scr-player'); paintStep();
+}
+function paintStep(){
+  const dots = $('dots'); dots.innerHTML = '';
+  for (let i=0;i<queue.length;i++){
+    const d = document.createElement('div');
+    d.className = 'dot2' + (i < idx ? ' done' : (i === idx ? ' now' : ''));
+    dots.appendChild(d);
+  }
+  $('bar').style.width = (100*idx/Math.max(queue.length,1)) + '%';
+  if (idx >= queue.length){ finish(); return; }
+  const left = queue.length - idx;
+  $('headline').textContent = (mode === 'scramble' ? 'מערבבים · ' : '') + (left === 1 ? 'הסיבוב האחרון!' : 'עוד ' + left + ' סיבובים');
+  const d = describe(queue[idx]);
+  setGlyph(d.color, (queue[idx][0] === 'U' || queue[idx][0] === 'D') ? '#1A1140' : '#fff', d.kind, d.dbl);
+  $('moveText').textContent = d.title;
+  $('moveSub').textContent = d.sub;
+  $('counter').textContent = 'צעד ' + (idx+1) + ' מתוך ' + queue.length;
+  highlight($('cube'), queue[idx][0]);
+  showPreview($('cube'), queue[idx]);
+  const up = $('upnext'); up.innerHTML = '';
+  for (let i = idx+1; i < Math.min(idx+4, queue.length); i++){
+    const c = document.createElement('span');
+    c.className = 'chip';
+    const dd = describe(queue[i]);
+    c.textContent = dd.arrow + ' ' + dd.title.split(' ').slice(0,3).join(' ') + (dd.dbl ? ' ×2' : '');
+    up.appendChild(c);
+  }
+}
+function doStep(){
+  if (busy || idx >= queue.length) return;
+  const pm = parseMove(queue[idx]);
+  highlight($('cube'), null);
+  animateTurn($('cube'), state, pm[0], pm[1], turnMs(), function(){
+    idx++; paintStep();
+    if (auto && idx < queue.length) setTimeout(doStep, 700);
+    else auto = false;
+  });
+}
+function finish(){
+  clearPreview($('cube'));
+  highlight($('cube'), null);
+  if (mode === 'scramble'){
+    $('headline').textContent = 'הקובייה מעורבבת!';
+    $('glyph').innerHTML = '✓'; $('glyph').style.background = '#00A651'; $('glyph').style.color = '#fff';
+    $('moveText').textContent = 'עכשיו נפתור אותה';
+    $('moveSub').textContent = 'בכמה שפחות סיבובים';
+    $('counter').textContent = ''; $('upnext').innerHTML = '';
+    $('nextBtn').textContent = 'בואי נפתור! ✨';
+    $('nextBtn').onclick = solveNow;
+    return;
+  }
+  show('scr-done'); confetti();
+}
+function confetti(){
+  const cols = ['#FFD500','#FCFCFC','#00A651','#0051BA','#FF5800','#D3132F'];
+  for (let i=0;i<46;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (Math.random()*100) + 'vw';
+    c.style.background = cols[i % cols.length];
+    c.style.animationDuration = (1.6 + Math.random()*1.6) + 's';
+    c.style.animationDelay = (Math.random()*0.7) + 's';
+    document.body.appendChild(c);
+    setTimeout(function(){ c.remove(); }, 4200);
+  }
+}
+function solveNow(){
+  show('scr-player');
+  drawState(); highlight($('cube'), null);
+  $('dots').innerHTML = ''; $('upnext').innerHTML = ''; $('counter').textContent = '';
+  $('bar').style.width = '0%'; $('headline').textContent = '';
+  $('glyph').innerHTML = '🤔'; $('glyph').style.background = '#EFECFB'; $('glyph').style.color = '#1A1140';
+  $('moveText').textContent = 'חושבת...';
+  $('moveSub').textContent = 'מחפשת את הדרך הכי קצרה';
+  $('nextBtn').textContent = 'חושבת...';
+  $('nextBtn').onclick = null;
+  setTimeout(function(){
+    let sol = null;
+    try { sol = KC.solveFast(state, 800, 21); } catch(e){ sol = null; }
+    if (!sol){
+      const st = solveCube(state);
+      sol = st ? [].concat.apply([], st.map(function(s){ return s.moves; })) : [];
+    }
+    if (!sol.length){ show('scr-done'); confetti(); return; }
+    startQueue(sol, 'solve');
+  }, 60);
+}
+
+let picked = 'Y';
+let paint = null;
+function newPaint(){
+  paint = {};
+  for (const f of FACES){
+    paint[f] = [[null,null,null],[null,null,null],[null,null,null]];
+    paint[f][1][1] = CENTER[f];
+  }
+}
+function remaining(){
+  let n = 0;
+  for (const f of FACES) for (let r=0;r<3;r++) for (let c=0;c<3;c++) if (!paint[f][r][c]) n++;
+  return n;
+}
+function markEmpties(pulse){
+  for (const st of $('paintCube').querySelectorAll('.face i')){
+    const isEmpty = !paint[st._f][st._r][st._c];
+    st.classList.toggle('empty', isEmpty);
+    st.classList.toggle('pulse', isEmpty && !!pulse);
+  }
+}
+function emptyByFace(){
+  const out = [];
+  for (const f of FACES){
+    let n = 0;
+    for (let r=0;r<3;r++) for (let c=0;c<3;c++) if (!paint[f][r][c]) n++;
+    if (n) out.push({f: f, n: n});
+  }
+  return out;
+}
+const FACE_VIEW = {F:[0,-18], B:[180,-18], R:[-90,-18], L:[90,-18], U:[-25,-68], D:[-25,68]};
+function focusFace(f){
+  const v = FACE_VIEW[f];
+  setView($('paintCube'), v[0], v[1], true);
+}
+function updateHint(){
+  const n = remaining();
+  if (!n){ $('paintHint').textContent = 'הכול צבוע! אפשר לפתור 🎉'; markEmpties(false); return; }
+  const list = emptyByFace();
+  const worst = list[0];
+  $('paintHint').textContent = 'נשארו ' + n + ' משבצות · ' + worst.n + ' בצד ה' +
+    CNAME[CENTER[worst.f]] + ' (' + FACE_HE[worst.f] + ')';
+  markEmpties(false);
+}
+function buildPaint(){
+  const el = $('paintCube');
+  renderCubeEl(el, function(f,r,c){ return paint[f][r][c]; });
+  updateHint();
+}
+function showMissing(){
+  const list = emptyByFace();
+  if (!list.length) return;
+  focusFace(list[0].f);
+  markEmpties(true);
+  setTimeout(function(){ markEmpties(false); }, 6000);
+}
+function buildPalette(){
+  const pal = $('palette'); pal.innerHTML = '';
+  const keys = ['Y','W','G','L','O','R'];
+  for (const k of keys){
+    const b = document.createElement('button');
+    b.className = 'swatch' + (k === picked ? ' sel' : '');
+    b.style.background = HEX[k];
+    b.title = CNAME[k];
+    b.onclick = function(){
+      picked = k;
+      for (const s of pal.children) s.classList.remove('sel');
+      b.classList.add('sel');
+    };
+    pal.appendChild(b);
+  }
+}
+const ERR = {
+  empty: 'סובבתי אותך לצד שחסר בו צבע — המשבצות שמהבהבות עדיין ריקות.',
+  count: function(c){ return 'יש ' + c.n + ' משבצות בצבע ' + CNAME[c.color] + ', וצריך בדיוק 9.'; },
+  pieces: 'יש קובייה קטנה שמופיעה פעמיים. כדאי לבדוק שוב את הצבעים.',
+  flip: 'משהו בצבעים לא מסתדר — אולי צלע אחת הפוכה. בואי נבדוק שוב.',
+  twist: 'משהו בצבעים לא מסתדר — אולי פינה אחת מסובבת. בואי נבדוק שוב.',
+  parity: 'הצבעים האלה לא יכולים להיות על קובייה אמיתית. כדאי לעבור עוד פעם צד־צד.',
+  center: 'האמצעים לא תואמים — צריך להחזיק צהוב למעלה וירוק מולך.'
+};
+
+let pendingAfterHold = 'scramble';
+function warmUp(){ setTimeout(function(){ try { KC.buildTables(); } catch(e){} }, 500); }
+$('goScramble').onclick = function(){ pendingAfterHold = 'scramble'; show('scr-hold'); warmUp(); };
+$('goInput').onclick = function(){ pendingAfterHold = 'input'; show('scr-hold'); warmUp(); };
+$('holdBack').onclick = function(){ show('scr-home'); };
+$('holdNext').onclick = function(){
+  if (pendingAfterHold === 'scramble'){
+    state = solvedCube();
+    startQueue(randomScramble(18), 'scramble');
+  } else {
+    newPaint(); buildPalette(); buildPaint();
+    $('inputAlert').innerHTML = '';
+    setView($('paintCube'), -32, -22, false);
+    show('scr-input');
+  }
+};
+$('inputBack').onclick = function(){ show('scr-home'); };
+$('clearBtn').onclick = function(){ newPaint(); buildPaint(); $('inputAlert').innerHTML = ''; };
+$('rotL').onclick = function(){ setView($('paintCube'), $('paintCube')._view.yaw + 90, $('paintCube')._view.pitch, true); };
+$('rotR').onclick = function(){ setView($('paintCube'), $('paintCube')._view.yaw - 90, $('paintCube')._view.pitch, true); };
+$('rotFlip').onclick = function(){
+  const v = $('paintCube')._view;
+  setView($('paintCube'), v.yaw, v.pitch > 0 ? -22 : 62, true);
+};
+$('solveBtn').onclick = function(){
+  const v = validate(paint);
+  if (!v.ok){
+    if (v.code === 'empty') showMissing();
+    const e = ERR[v.code];
+    $('inputAlert').innerHTML = '<div class="alert">' + (typeof e === 'function' ? e(v) : e) + '</div>';
+    if (window.scrollTo) window.scrollTo({top:0, behavior:'smooth'});
+    return;
+  }
+  $('inputAlert').innerHTML = '';
+  state = cubeFromFacelets(paint);
+  solveNow();
+};
+$('nextBtn').onclick = doStep;
+$('againBtn').onclick = function(){
+  if (busy || idx === 0) return;
+  idx--;
+  const pm = parseMove(queue[idx]);
+  turn(state, pm[0], (4-pm[1])%4);
+  drawState(); paintStep();
+};
+$('demoBtn').onclick = function(){
+  if (busy || idx >= queue.length) return;
+  busy = true;
+  const el = $('cube');
+  clearPreview(el);
+  const pm = parseMove(queue[idx]);
+  const pivot = grabLayer(el, pm[0]);
+  const ax = PIVOT[pm[0]][0], sign = PIVOT[pm[0]][1], q = (pm[1] === 3 ? -1 : pm[1]);
+  const ms = turnMs();
+  requestAnimationFrame(function(){
+    pivot.style.transition = 'transform ' + ms + 'ms cubic-bezier(.4,.1,.3,1)';
+    pivot.style.transform = 'rotate' + ax + '(' + (sign*90*q) + 'deg)';
+  });
+  setTimeout(function(){
+    pivot.style.transition = 'transform ' + ms + 'ms cubic-bezier(.4,.1,.3,1)';
+    pivot.style.transform = 'rotate' + ax + '(0deg)';
+    setTimeout(function(){ busy = false; drawState(); paintStep(); }, ms + 80);
+  }, ms + 500);
+};
+$('speedBtn').onclick = function(){
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  $('speedBtn').textContent = SPEEDS[speedIdx].label;
+};
+$('autoBtn').onclick = function(){
+  auto = !auto;
+  $('autoBtn').textContent = auto ? '❚❚ עצרי' : '▶︎ נגן';
+  if (auto) doStep();
+};
+$('quitBtn').onclick = function(){ state = solvedCube(); show('scr-home'); };
+$('againAll').onclick = function(){ state = solvedCube(); show('scr-home'); };
+
+function boot(){
+  const solved = solvedCube();
+  renderCubeEl($('heroCube'), function(f,r,c){ return getFacelet(solved,f,r,c); });
+  renderCubeEl($('holdCube'), function(f,r,c){ return getFacelet(solved,f,r,c); });
+  renderCubeEl($('doneCube'), function(f,r,c){ return getFacelet(solved,f,r,c); });
+  if (!paint) newPaint();
+  buildPalette(); buildPaint(); drawState();
+  setView($('holdCube'), -32, -22, false);
+  setView($('cube'), -32, -22, false);
+  if (!$('paintCube')._view) setView($('paintCube'), -32, -22, false);
+}
+boot();
+makeDraggable($('holdCube'));
+makeDraggable($('paintCube'));
+makeDraggable($('cube'));
+$('paintCube').addEventListener('click', function(e){
+  const t = e.target;
+  if (!t._f || dragged) return;
+  if (t._r === 1 && t._c === 1) return;
+  paint[t._f][t._r][t._c] = picked;
+  t.style.background = HEX[picked];
+  t.classList.remove('empty', 'pulse');
+  updateHint();
+});
+addEventListener('resize', function(){ sizeCube(); boot(); });
+</script>
+</body>
+</html>
