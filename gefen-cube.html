@@ -93,6 +93,96 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
 .holdgrid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
 .holdchip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border-radius:14px;padding:9px 13px;color:#fff;font-weight:700;font-size:15px}
 .dot{width:20px;height:20px;border-radius:6px;display:inline-block}
+.lesson{display:flex;align-items:center;gap:12px;width:100%;text-align:right;cursor:pointer;
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.14);border-radius:20px;
+  padding:12px 14px;margin-bottom:10px;font-family:inherit;color:#fff}
+.lesson:active{transform:translateY(2px)}
+.lesson .num{flex:0 0 40px;height:40px;border-radius:50%;background:var(--y);color:var(--ink);
+  font-weight:900;font-size:19px;display:flex;align-items:center;justify-content:center}
+.lesson .nm{flex:1;font-weight:800;font-size:17px}
+.lesson .st{font-size:15px;letter-spacing:2px}
+.lwhat{font-size:17px;line-height:1.5;font-weight:600;margin-bottom:10px}
+.steps{margin:0;padding-inline-start:20px;font-size:16px;line-height:1.65;color:#3a3363}
+.steps li{margin-bottom:4px}
+.fstrip{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;direction:ltr;align-items:center}
+.fstart{display:inline-flex;align-items:center;gap:5px;background:#00A651;color:#fff;font-size:12px;
+  font-weight:900;border-radius:13px;padding:7px 10px;white-space:nowrap;direction:rtl}
+.fm{position:relative;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.fm svg{width:64%;height:64%}
+.fm b{position:absolute;bottom:-5px;right:-5px;background:#1A1140;color:#fff;font-size:11px;
+  border-radius:8px;padding:1px 5px;font-weight:900}
+.fm .fnum{position:absolute;top:-7px;left:-6px;background:#fff;color:#1A1140;border:2px solid #1A1140;
+  border-radius:9px;min-width:19px;height:19px;font-size:11px;font-weight:900;display:flex;
+  align-items:center;justify-content:center;padding:0 2px}
+.fnote{margin-top:9px;font-size:13px;font-weight:700;color:var(--muted)}
+.upnext{direction:ltr}
+.chip{direction:rtl}
+.chip.lbl{background:rgba(0,166,81,.85)}
+.fletters{margin-top:8px;font-size:15px;font-weight:700;color:var(--muted);direction:ltr;text-align:left;letter-spacing:1px}
+.fname{font-weight:900;font-size:18px;margin-top:14px}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.pad button{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.18);border-radius:16px;
+  padding:9px 2px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:#fff}
+.pad button:active{transform:translateY(2px);background:rgba(255,255,255,.2)}
+.pad .sq{width:22px;height:22px;border-radius:6px}
+.pad svg{width:24px;height:24px}
+.good{background:#E6F8EE;color:#0A6B3D;border-radius:18px;padding:14px;font-weight:800;font-size:17px;text-align:center;margin-bottom:12px}
+.cap{text-align:center;color:#C8BFF2;font-weight:700;font-size:16px;margin:0 0 10px}
+.cap small{display:block;font-size:13px;font-weight:600;color:#9C93CC;margin-top:4px}
+.chipdot{display:inline-block;width:15px;height:15px;border-radius:5px;vertical-align:-2px;margin:0 2px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.opt{display:block;width:100%;font-family:inherit;font-size:18px;font-weight:800;padding:15px 12px;
+  border-radius:18px;border:3px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;
+  margin-bottom:10px;cursor:pointer;text-align:right}
+.opt:active{transform:translateY(2px)}
+.opt.right{background:#00A651;border-color:#00A651}
+.opt.wrong{background:#D3132F;border-color:#D3132F}
+.opt:disabled{cursor:default}
+#sheet{background:#fff;color:var(--ink);border-radius:22px;padding:18px 16px;margin-bottom:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.35)}
+#sheet h1{font-size:24px;font-weight:900;color:var(--ink);margin:0 0 8px}
+#sheet .pintro{font-size:15px;line-height:1.5;color:#4a4370;margin:0 0 12px}
+#sheet .plegend{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+#sheet .plegend td{border:1px solid #DBD6EF;padding:6px 8px;color:#3a3363}
+#sheet .pstep{border-top:2px solid #E4E0F5;padding:14px 0 4px}
+#sheet .pstep h2{font-size:18px;font-weight:900;color:var(--ink);margin:0 0 4px}
+#sheet .pstep p{font-size:14.5px;line-height:1.5;color:#4a4370;margin:0}
+#sheet ul{font-size:14px;line-height:1.6;color:#4a4370;margin:8px 0 0;padding-inline-start:20px}
+#sheet .pfname{font-weight:900;font-size:16px;margin-top:10px;color:var(--ink)}
+#sheet .fnote{color:#8079ab}
+.printnote{color:#9C93CC;font-size:13px;line-height:1.5;text-align:center;margin:0 0 12px}
+@media print{
+  body,#app{background:#fff !important;padding:0;max-width:none}
+  #app{background-image:none !important}
+  .screen{display:none !important}
+  #scr-print{display:block !important}
+  #scr-print h2,#scr-print .printnote,#doPrint,#printBack,.modal,.topbar{display:none !important}
+  #sheet{box-shadow:none;border-radius:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #sheet .pstep{break-inside:avoid}
+  #sheet .fm{border:1.5px solid #333}
+  #sheet .fm .fnum{border-color:#000;background:#fff;color:#000}
+  #sheet .fstart{background:#111 !important;color:#fff !important}
+}
+.topbar{display:flex;justify-content:flex-end;margin-bottom:-6px}
+.gear{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:14px;
+  width:44px;height:44px;font-size:20px;cursor:pointer;color:#fff;line-height:1}
+.gear:active{transform:translateY(2px)}
+.modal{position:fixed;inset:0;background:rgba(8,5,22,.72);display:none;align-items:center;
+  justify-content:center;padding:18px;z-index:200}
+.modal.on{display:flex}
+.sheet{background:#fff;border-radius:26px;padding:20px;width:100%;max-width:380px;
+  box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.sheet h3{margin:0 0 14px;font-size:22px;font-weight:900}
+.sheet label{display:block;font-size:15px;font-weight:700;color:var(--muted);margin:14px 0 6px}
+.sheet input{width:100%;font-family:inherit;font-size:22px;font-weight:800;color:var(--ink);
+  border:3px solid #E4E0F5;border-radius:16px;padding:12px 14px;background:#F8F7FD}
+.sheet input:focus{outline:none;border-color:var(--y)}
+.pick{display:flex;gap:8px}
+.pick button{flex:1;font-family:inherit;font-size:14px;font-weight:800;padding:11px 4px;border-radius:14px;
+  border:3px solid #E4E0F5;background:#fff;color:var(--ink);cursor:pointer}
+.pick button.on{border-color:var(--g);background:#E6F8EE}
+.viewtag{display:inline-block;background:rgba(255,213,0,.16);color:var(--y);border-radius:12px;
+  padding:4px 10px;font-size:13px;font-weight:800;margin-bottom:8px}
 .confetti{position:fixed;top:-20px;width:11px;height:16px;border-radius:2px;z-index:99;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
 @media (prefers-reduced-motion:reduce){.spin{animation:none}.confetti{display:none}}
@@ -102,11 +192,13 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
 <div id="app">
 
   <section class="screen on" id="scr-home">
+    <div class="topbar"><button class="gear" id="gearBtn" title="הגדרות">⚙️</button></div>
     <div class="stage"><div id="heroCube" class="holder spin"></div></div>
-    <h1>הקובייה של גפן</h1>
-    <p class="lead">אני אגיד לך בדיוק מה לסובב, סיבוב אחרי סיבוב, עד שכל צד יהיה בצבע אחד. בדרך כלל זה לוקח בערך 20 סיבובים.</p>
-    <button class="btn" id="goScramble">🎲 בואי נערבב ביחד</button>
-    <button class="btn ghost" id="goInput">🎨 הקובייה שלי כבר מעורבבת</button>
+    <h1 id="homeTitle">הקובייה של גפן</h1>
+    <p class="lead">אפשר לצבוע את הקובייה שלך ואני אפתור אותה בערך ב־20 סיבובים, או ללמוד שלב־שלב איך לפתור לבד.</p>
+    <button class="btn" id="goInput">🎨 לפתור את הקובייה שלי</button>
+    <button class="btn ghost" id="goLearn">🎓 ללמוד לפתור לבד</button>
+    <button class="btn ghost" id="goQuiz">🔎 משחק הזיהוי</button>
     <p class="note">טיפ להורה: המדריך בנוי לקובייה בצבעים הרגילים — צהוב מול לבן, ירוק מול כחול, כתום מול אדום.</p>
   </section>
 
@@ -170,13 +262,66 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
     <div class="upnext" id="upnext"></div>
   </section>
 
+  <section class="screen" id="scr-learn">
+    <h2>ללמוד לפתור לבד</h2>
+    <p class="lead">שבעה שלבים. בכל שלב לומדים תרגיל קטן אחד, רואים אותו רץ לאט, ואז מתרגלים לבד על קובייה שעל המסך.</p>
+    <div id="lessonList"></div>
+    <button class="btn ghost" id="printBtn">🖨 דף נוסחאות להדפסה</button>
+    <button class="btn ghost" id="learnBack">חזרה</button>
+  </section>
+
+  <section class="screen" id="scr-print">
+    <h2>🖨 דף הנוסחאות</h2>
+    <p class="printnote">אפשר לקרוא כאן, או להדפיס ולתלות ליד השולחן.</p>
+    <div id="sheet"></div>
+    <button class="btn green" id="doPrint">🖨 להדפיס / לשמור PDF</button>
+    <p class="printnote">אם חלון ההדפסה לא נפתח, אפשר להדפיס דרך התפריט של הדפדפן ← הדפסה (בנייד: שיתוף ← הדפסה).</p>
+    <button class="btn ghost" id="printBack">חזרה</button>
+  </section>
+
+  <section class="screen" id="scr-quizmenu">
+    <h2>🔎 משחק הזיהוי</h2>
+    <p class="lead">בפתירת קובייה החלק הקשה הוא לא לבצע את הנוסחה — אלא להסתכל ולהבין איזה מצב זה. כאן מתאמנים בדיוק על זה: מסתכלים על הקובייה, בוחרים תשובה, ורואים מיד מה היה צריך לעשות.</p>
+    <div id="quizList"></div>
+    <button class="btn ghost" id="quizMenuBack">חזרה</button>
+  </section>
+
+  <section class="screen" id="scr-quiz">
+    <div class="headline" id="quizHead"></div>
+    <div class="stage"><div id="qcube" class="holder"></div></div>
+    <div id="quizPane"></div>
+    <button class="btn ghost" id="quizBack">→ יציאה</button>
+  </section>
+
+  <section class="screen" id="scr-lesson">
+    <div class="headline" id="lessonTitle"></div>
+    <div class="stage"><div id="lcube" class="holder"></div></div>
+    <div id="lessonPane"></div>
+    <button class="btn ghost" id="lessonBack">→ חזרה לשלבים</button>
+  </section>
+
   <section class="screen" id="scr-done">
     <div class="stage"><div id="doneCube" class="holder spin"></div></div>
-    <h1>כל הכבוד גפן! 🎉</h1>
+    <h1 id="doneTitle">כל הכבוד גפן! 🎉</h1>
     <p class="lead">פתרת את הקובייה ההונגרית. רוצה עוד סיבוב?</p>
     <button class="btn" id="againAll">🎲 עוד פעם</button>
   </section>
 
+<div class="modal" id="settings">
+  <div class="sheet">
+    <h3>⚙️ הגדרות</h3>
+    <label for="nameInput">איך קוראים לך?</label>
+    <input id="nameInput" maxlength="14" autocomplete="off">
+    <label>מהירות הסיבובים</label>
+    <div class="pick" id="speedPick"></div>
+    <div style="height:18px"></div>
+    <button class="btn green" id="saveSet">שמירה</button>
+    <div class="row small">
+      <button class="btn ghost" id="resetStars">לאפס כוכבים</button>
+      <button class="btn ghost" id="closeSet">סגירה</button>
+    </div>
+    <p class="note" id="setNote" style="color:#7a72a6"></p>
+  </div>
 </div>
 
 <script>
@@ -771,6 +916,187 @@ function solveFast(cube, budgetMs, target){
 
 return {solveFast, buildTables, toCoords, ready: () => !!T};
 })();
+/* ===== teaching solver: always the same named formulas, split into chunks ===== */
+const TEACH = (function(){
+
+const SLOT_XZ = [[1,1],[-1,1],[-1,-1],[1,-1]];   // k -> (x,z) matching rotAlg(alg,k)
+const WHITE = CENTER.D, YEL = CENTER.U;
+
+function slotOf(x, z){ for (let k=0;k<4;k++) if (SLOT_XZ[k][0]===x && SLOT_XZ[k][1]===z) return k; return -1; }
+function uMove(u){ return u===1 ? ['U'] : u===2 ? ['U2'] : ["U'"]; }
+
+const GOAL = {
+  0: function(){ return true; },
+  1: function(st){ return CROSS_EDGES.every(function(e){ return pieceSolved(st,e); }); },
+  2: function(st){ return GOAL[1](st) && WHITE_CORNERS.every(function(c){ return pieceSolved(st,c); }); },
+  3: function(st){ return GOAL[2](st) && MID_EDGES.every(function(e){ return pieceSolved(st,e); }); },
+  4: function(st){ return GOAL[3](st) && YELLOW_EDGES.every(function(e){ return findPiece(st,e).c.U === YEL; }); },
+  5: function(st){ return GOAL[4](st) && YELLOW_CORNERS.every(function(c){ return findPiece(st,c).c.U === YEL; }); },
+  6: function(st){ return GOAL[5](st) && YELLOW_CORNERS.every(function(c){ return pieceSolved(st,c); }); },
+  7: function(st){ return st.every(function(cu){ return Object.keys(cu.c).every(function(d){ return cu.c[d]===CENTER[d]; }); }); }
+};
+
+/* macro search that reports WHICH macros it used */
+function searchSeq(cube, macros, goal, maxDepth){
+  const path = [];
+  function dfs(state, depth){
+    if (goal(state)) return true;
+    if (depth === 0) return false;
+    for (let i=0;i<macros.length;i++){
+      const s = cloneCube(state);
+      applyMoves(s, macros[i].moves);
+      path.push(macros[i]);
+      if (dfs(s, depth-1)) return true;
+      path.pop();
+    }
+    return false;
+  }
+  for (let d=0; d<=maxDepth; d++){
+    path.length = 0;
+    if (dfs(cloneCube(cube), d)) return path.slice();
+  }
+  return null;
+}
+
+/* turn a macro sequence into display chunks (setups merged, repeats counted) */
+function toChunks(seq){
+  const out = [];
+  for (const m of seq){
+    const last = out[out.length-1];
+    if (m.tag === 'setup'){
+      if (last && last.kind === 'setup'){ last.moves = simplify(last.moves.concat(m.moves)); if(!last.moves.length) out.pop(); }
+      else out.push({kind:'setup', moves: m.moves.slice()});
+    } else {
+      if (last && last.kind === 'alg' && last.alg === m.tag){
+        last.times++; last.moves = last.moves.concat(m.moves);
+      } else out.push({kind:'alg', alg:m.tag, times:1, moves:m.moves.slice(), slot:m.slot});
+    }
+  }
+  return out.filter(function(c){ return c.moves.length; });
+}
+function setups(){ return [
+  {tag:'setup', moves:['U']}, {tag:'setup', moves:["U'"]}, {tag:'setup', moves:['U2']}
+]; }
+function rots(alg, tag){
+  const out = [];
+  for (let k=0;k<4;k++) out.push({tag:tag, moves:rotAlg(alg,k), slot:k});
+  return out;
+}
+
+/* ---- stage 1: white cross (no formula, one edge at a time) ---- */
+function stage1(st){
+  const chunks = [], done = [];
+  for (const e of CROSS_EDGES){
+    done.push(e.slice());
+    if (allSolved(done)(st)) continue;
+    const goal = allSolved(done.map(function(x){ return x.slice(); }));
+    let mv = searchBasic(st, goal, 5);
+    if (!mv) mv = searchBasic(st, goal, 7);
+    if (!mv) return null;
+    applyMoves(st, mv);
+    chunks.push({kind:'free', moves:mv, edge:e.slice()});
+  }
+  return chunks;
+}
+
+/* ---- stage 2: white corners, always R U R' U' ---- */
+function stage2(st){
+  const chunks = [];
+  for (let k=0;k<4;k++){
+    const tx = SLOT_XZ[k][0], tz = SLOT_XZ[k][1];
+    const cols = [WHITE, CENTER[tx===1?'R':'L'], CENTER[tz===1?'F':'B']];
+    let guard = 0;
+    while (!pieceSolved(st, cols) && guard++ < 10){
+      const cu = findPiece(st, cols);
+      if (cu.p[1] === -1){
+        const kk = slotOf(cu.p[0], cu.p[2]);
+        if (kk !== k){
+          const mv = rotAlg(SEXY, kk);
+          applyMoves(st, mv);
+          chunks.push({kind:'alg', alg:'sexy', times:1, moves:mv.slice(), slot:kk, pop:true});
+          continue;
+        }
+      } else {
+        let u = 0, x = cu.p[0], z = cu.p[2];
+        while (!(x===tx && z===tz) && u < 4){ const nx = -z, nz = x; x = nx; z = nz; u++; }
+        if (u === 4) return null;
+        if (u){ const mv = uMove(u); applyMoves(st, mv); chunks.push({kind:'setup', moves:mv}); }
+      }
+      const alg = rotAlg(SEXY, k);
+      let times = 0, acc = [];
+      while (!pieceSolved(st, cols) && times < 6){ applyMoves(st, alg); acc = acc.concat(alg); times++; }
+      if (times) chunks.push({kind:'alg', alg:'sexy', times:times, moves:acc, slot:k});
+    }
+    if (!pieceSolved(st, cols)) return null;
+  }
+  return chunks;
+}
+
+/* ---- stages 3..7: fixed formula sets ---- */
+function byMacros(st, macros, goal, depth){
+  const seq = searchSeq(st, macros, goal, depth);
+  if (!seq) return null;
+  for (const m of seq) applyMoves(st, m.moves);
+  return toChunks(seq);
+}
+function stage3(st){
+  const macros = rots(MID_R,'midR').concat(rots(MID_L,'midL'), setups());
+  let seq = [];
+  const done = [];
+  for (const e of MID_EDGES){
+    done.push(e);
+    const list = done.slice();
+    const goal = function(s){ return GOAL[2](s) && list.every(function(x){ return pieceSolved(s,x); }); };
+    if (goal(st)) continue;
+    let sub = searchSeq(st, macros, goal, 3);
+    if (!sub) sub = searchSeq(st, macros, goal, 4);
+    if (!sub) return null;
+    for (const m of sub) applyMoves(st, m.moves);
+    seq = seq.concat(sub);
+  }
+  return toChunks(seq);
+}
+function stage4(st){ return byMacros(st, [{tag:'dag', moves:OLL_EDGE}].concat(setups()), GOAL[4], 7); }
+function stage5(st){ return byMacros(st, [{tag:'sune', moves:SUNE}].concat(setups()), GOAL[5], 8); }
+function stage6(st){ return byMacros(st, [{tag:'aperm', moves:APERM}].concat(setups()), GOAL[6], 5); }
+function stage7(st){ return byMacros(st, [{tag:'uperm', moves:UPERM}].concat(setups()), GOAL[7], 6); }
+
+const STAGE_FN = {1:stage1, 2:stage2, 3:stage3, 4:stage4, 5:stage5, 6:stage6, 7:stage7};
+
+/* plan for stages 1..upto; does not touch the input cube */
+function plan(cube, upto){
+  const st = cloneCube(cube), out = [];
+  for (let n=1; n<=upto; n++){
+    if (GOAL[n](st)) continue;
+    const chunks = STAGE_FN[n](st);
+    if (!chunks) return null;
+    if (chunks.length) out.push({stage:n, chunks:chunks});
+  }
+  return out;
+}
+function movesOf(p){
+  let mv = [];
+  for (const s of p) for (const c of s.chunks) mv = mv.concat(c.moves);
+  return mv;
+}
+/* a cube with stages 1..stage-1 already done and stage `stage` still open */
+function practiceCube(stage){
+  for (let t=0;t<60;t++){
+    const c = solvedCube();
+    applyMoves(c, randomScramble(25));
+    if (stage === 1){ if (!GOAL[1](c)) return c; continue; }
+    const p = plan(c, stage-1);
+    if (!p) continue;
+    const st = cloneCube(c);
+    applyMoves(st, movesOf(p));
+    if (!GOAL[stage-1](st)) continue;
+    if (GOAL[stage](st)) continue;
+    return st;
+  }
+  return null;
+}
+return {plan:plan, movesOf:movesOf, practiceCube:practiceCube, GOAL:GOAL};
+})();
 
 /* =================== UI =================== */
 const HEX = {Y:'#FFD500', W:'#FCFCFC', G:'#00A651', L:'#0051BA', O:'#FF5800', R:'#D3132F'};
@@ -993,7 +1319,7 @@ function paintStep(){
   $('bar').style.width = (100*idx/Math.max(queue.length,1)) + '%';
   if (idx >= queue.length){ finish(); return; }
   const left = queue.length - idx;
-  $('headline').textContent = (mode === 'scramble' ? 'מערבבים · ' : '') + (left === 1 ? 'הסיבוב האחרון!' : 'עוד ' + left + ' סיבובים');
+  $('headline').textContent = (left === 1 ? 'הסיבוב האחרון!' : 'עוד ' + left + ' סיבובים');
   const d = describe(queue[idx]);
   setGlyph(d.color, (queue[idx][0] === 'U' || queue[idx][0] === 'D') ? '#1A1140' : '#fff', d.kind, d.dbl);
   $('moveText').textContent = d.title;
@@ -1002,6 +1328,12 @@ function paintStep(){
   highlight($('cube'), queue[idx][0]);
   showPreview($('cube'), queue[idx]);
   const up = $('upnext'); up.innerHTML = '';
+  if (idx + 1 < queue.length){
+    const lbl = document.createElement('span');
+    lbl.className = 'chip lbl';
+    lbl.textContent = 'הבאים ▶';
+    up.appendChild(lbl);
+  }
   for (let i = idx+1; i < Math.min(idx+4, queue.length); i++){
     const c = document.createElement('span');
     c.className = 'chip';
@@ -1023,16 +1355,6 @@ function doStep(){
 function finish(){
   clearPreview($('cube'));
   highlight($('cube'), null);
-  if (mode === 'scramble'){
-    $('headline').textContent = 'הקובייה מעורבבת!';
-    $('glyph').innerHTML = '✓'; $('glyph').style.background = '#00A651'; $('glyph').style.color = '#fff';
-    $('moveText').textContent = 'עכשיו נפתור אותה';
-    $('moveSub').textContent = 'בכמה שפחות סיבובים';
-    $('counter').textContent = ''; $('upnext').innerHTML = '';
-    $('nextBtn').textContent = 'בואי נפתור! ✨';
-    $('nextBtn').onclick = solveNow;
-    return;
-  }
   show('scr-done'); confetti();
 }
 function confetti(){
@@ -1152,21 +1474,14 @@ const ERR = {
   center: 'האמצעים לא תואמים — צריך להחזיק צהוב למעלה וירוק מולך.'
 };
 
-let pendingAfterHold = 'scramble';
 function warmUp(){ setTimeout(function(){ try { KC.buildTables(); } catch(e){} }, 500); }
-$('goScramble').onclick = function(){ pendingAfterHold = 'scramble'; show('scr-hold'); warmUp(); };
-$('goInput').onclick = function(){ pendingAfterHold = 'input'; show('scr-hold'); warmUp(); };
+$('goInput').onclick = function(){ show('scr-hold'); warmUp(); };
 $('holdBack').onclick = function(){ show('scr-home'); };
 $('holdNext').onclick = function(){
-  if (pendingAfterHold === 'scramble'){
-    state = solvedCube();
-    startQueue(randomScramble(18), 'scramble');
-  } else {
-    newPaint(); buildPalette(); buildPaint();
-    $('inputAlert').innerHTML = '';
-    setView($('paintCube'), -32, -22, false);
-    show('scr-input');
-  }
+  newPaint(); buildPalette(); buildPaint();
+  $('inputAlert').innerHTML = '';
+  setView($('paintCube'), -32, -22, false);
+  show('scr-input');
 };
 $('inputBack').onclick = function(){ show('scr-home'); };
 $('clearBtn').onclick = function(){ newPaint(); buildPaint(); $('inputAlert').innerHTML = ''; };
@@ -1219,6 +1534,7 @@ $('demoBtn').onclick = function(){
 $('speedBtn').onclick = function(){
   speedIdx = (speedIdx + 1) % SPEEDS.length;
   $('speedBtn').textContent = SPEEDS[speedIdx].label;
+  settings.speed = speedIdx; saveSettings();
 };
 $('autoBtn').onclick = function(){
   auto = !auto;
@@ -1252,6 +1568,667 @@ $('paintCube').addEventListener('click', function(e){
   t.classList.remove('empty', 'pulse');
   updateHint();
 });
+
+/* =================== מצב לימוד =================== */
+const ALG_NAME = {sexy:'הנדנדה', midR:'ההכנסה ימינה', midL:'ההכנסה שמאלה',
+                  dag:'הדג', sune:'הפטיש', aperm:'סיבוב הפינות', uperm:'הסחרחרה'};
+
+const LESSONS = [
+{n:1, name:'הצלב הלבן', icon:'✚', below:true,
+ what:'הלבן נמצא למטה, ולכן בשלב הזה מסתכלים על הקובייה מלמטה. שם בונים פלוס לבן: ארבע צלעות לבנות סביב האמצע הלבן.',
+ how:['צלע היא משבצת עם שני צבעים. אנחנו מחפשים צלעות שיש בהן לבן.',
+      'מסובבים את הצלע עד שהיא מגיעה לשכבה העליונה, הצהובה. שם קל להזיז אותה.',
+      'מסובבים את השכבה הצהובה עד שהצבע השני של הצלע יושב בדיוק מעל האמצע באותו צבע.',
+      'עכשיו מסובבים את הצד הזה פעמיים — הצלע צוללת בול למקום שלה ליד הלבן.',
+      'חוזרים על זה לארבע הצלעות הלבנות.'],
+ formulas:[]},
+{n:2, name:'הפינות הלבנות', icon:'🔲', below:true,
+ what:'גם כאן מסתכלים מלמטה. מכניסים את ארבע הפינות הלבנות, וכל הצד הלבן נסגר. יש רק נוסחה אחת.',
+ how:['מחפשים פינה עם לבן שנמצאת בשכבה העליונה.','מסובבים את הצהוב עד שהיא נמצאת בדיוק מעל החור שלה.',
+      'עושים את הנדנדה שוב ושוב עד שהיא נכנסת — לפעמים פעם אחת, לפעמים שש.',
+      'פינה שתקועה במקום הלא נכון למטה? נדנדה אחת מוציאה אותה למעלה.'],
+ formulas:[{key:'sexy', moves:SEXY}]},
+{n:3, name:'השכבה האמצעית', icon:'➡️',
+ what:'ממלאים את הטבעת האמצעית. הצלעות ששייכות לשם הן בדיוק אלה שאין בהן צהוב.',
+ how:['מחפשים בשכבה העליונה צלע בלי צהוב.','מסובבים את הצהוב עד שהצבע הקדמי שלה מתאים לאמצע שמולו.',
+      'עכשיו מסתכלים לאן הצבע השני מצביע: ימינה או שמאלה — ובוחרים את הנוסחה המתאימה.'],
+ formulas:[{key:'midR', moves:MID_R},{key:'midL', moves:MID_L}]},
+{n:4, name:'הצלב הצהוב', icon:'➕',
+ what:'עושים פלוס צהוב למעלה. בשלב הזה לא אכפת לנו מהצדדים של הצלעות — רק שהצהוב יסתכל למעלה.',
+ how:['מסתכלים על הצד הצהוב. רואים נקודה, קו, או צורה של ר.','מסובבים את הצהוב לפי הצורה ומריצים את הנוסחה.',
+      'נקודה הופכת לר, ר הופכת לקו, קו הופך לפלוס.'],
+ formulas:[{key:'dag', moves:OLL_EDGE}]},
+{n:5, name:'כל הצהוב למעלה', icon:'🌞',
+ what:'הופכים את כל הצד העליון לצהוב לגמרי — גם הפינות.',
+ how:['מסובבים את הצהוב, מריצים את הנוסחה, ומסתכלים שוב.','חוזרים עד שכל תשע המשבצות למעלה צהובות.',
+      'באמצע הקובייה נראית מבולגנת — זה נורמלי, זה מסתדר בסוף.'],
+ formulas:[{key:'sune', moves:SUNE}]},
+{n:6, name:'הפינות למקום', icon:'🧩',
+ what:'מזיזים את הפינות הצהובות לפינות הנכונות שלהן, בלי לקלקל את הצהוב שלמעלה.',
+ how:['מחפשים פינה ששני הצבעים שלה בצדדים כבר מתאימים לאמצעים.','שמים אותה מאחור ומריצים את הנוסחה.',
+      'אם אין אף פינה נכונה — מריצים פעם אחת ומסתכלים שוב.'],
+ formulas:[{key:'aperm', moves:APERM}]},
+{n:7, name:'הצעדים האחרונים', icon:'🏁',
+ what:'מחליפים את הצלעות האחרונות — וזהו, הקובייה פתורה!',
+ how:['מחפשים צד שכבר מסודר לגמרי.','שמים אותו מאחור ומריצים את הנוסחה.','אם עוד לא נסגר — עוד פעם.'],
+ formulas:[{key:'uperm', moves:UPERM}]}
+];
+
+let stars = {};
+try { stars = JSON.parse(localStorage.getItem('gefen-cube-stars') || '{}'); } catch(e){ stars = {}; }
+function saveStars(){ try { localStorage.setItem('gefen-cube-stars', JSON.stringify(stars)); } catch(e){} }
+
+const L = {n:1, phase:'teach', cube:null, queue:[], idx:0, hist:[], busyHint:false};
+
+function formulaStrip(moves, letters){
+  let h = '<div class="fstrip"><span class="fstart">התחלה ▶</span>';
+  moves.forEach(function(m, i){
+    const d = describe(m);
+    const ink = (m[0] === 'U' || m[0] === 'D') ? '#1A1140' : '#fff';
+    h += '<span class="fm" style="background:' + d.color + ';color:' + ink + '">' +
+         '<i class="fnum">' + (i+1) + '</i>' + arrowSVG(d.kind) + (d.dbl ? '<b>×2</b>' : '') + '</span>';
+  });
+  h += '</div>';
+  if (letters) h += '<div class="fletters">' + moves.join(' ') + '</div>';
+  h += '<div class="fnote">מבצעים לפי המספרים — מהריבוע שכתוב עליו 1, משמאל לימין.</div>';
+  return h;
+}
+
+/* which stickers are already "done" at the end of a stage */
+function goalColorAt(stage){
+  const solved = solvedCube();
+  return function(f, r, c){
+    const p = faceletPos(f, r, c);
+    const zeros = (p[0]===0?1:0) + (p[1]===0?1:0) + (p[2]===0?1:0);
+    const on = (function(){
+      if (zeros === 2) return true;                 // centre
+      if (p[1] === -1) return zeros === 1 ? stage >= 1 : stage >= 2;
+      if (p[1] === 0) return stage >= 3;
+      if (zeros === 1) return f === 'U' ? stage >= 4 : stage >= 7;   // top edges
+      return f === 'U' ? stage >= 5 : stage >= 6;                    // top corners
+    })();
+    return on ? getFacelet(solved, f, r, c) : null;
+  };
+}
+
+function drawLcube(colorAt){
+  renderCubeEl($('lcube'), colorAt);
+}
+function lessonView(n){ return lookingDown(n) ? {yaw:-35, pitch:58} : {yaw:-32, pitch:-22}; }
+function lookingDown(n){ return !!LESSONS[n-1].below; }
+function applyLessonView(smooth){
+  const v = lessonView(L.n);
+  setView($('lcube'), v.yaw, v.pitch, !!smooth);
+}
+function flipLcube(){
+  const v = $('lcube')._view;
+  setView($('lcube'), v.yaw, v.pitch > 0 ? -22 : 58, true);
+  const b = $('lflip');
+  if (b) b.textContent = v.pitch > 0 ? '🔃 להסתכל מלמטה' : '🔃 להסתכל מלמעלה';
+}
+function flipBtnLabel(){ return lookingDown(L.n) ? '🔃 להסתכל מלמעלה' : '🔃 להסתכל מלמטה'; }
+function colorChip(k){ return '<span class="chipdot" style="background:' + HEX[k] + '"></span>'; }
+function openLearn(){
+  const list = $('lessonList');
+  list.innerHTML = '';
+  for (const L2 of LESSONS){
+    const got = Math.min(stars[L2.n] || 0, 3);
+    const b = document.createElement('button');
+    b.className = 'lesson';
+    b.innerHTML = '<span class="num">' + L2.n + '</span><span class="nm">' + L2.icon + ' ' + L2.name +
+      '</span><span class="st">' + '★'.repeat(got) + '☆'.repeat(3 - got) + '</span>';
+    b.onclick = function(){ openLesson(L2.n); };
+    list.appendChild(b);
+  }
+  show('scr-learn');
+}
+function lesson(){ return LESSONS[L.n - 1]; }
+
+function openLesson(n){
+  L.n = n; L.phase = 'teach';
+  show('scr-lesson');
+  renderLesson();
+}
+function renderLesson(){
+  const ls = lesson();
+  $('lessonTitle').textContent = 'שלב ' + ls.n + ' · ' + ls.name;
+  if (L.phase === 'teach') return phaseTeach();
+  if (L.phase === 'demo') return phaseDemo();
+  return phasePractice();
+}
+
+function phaseTeach(){
+  const ls = lesson();
+  clearPreview($('lcube'));
+  drawLcube(goalColorAt(ls.n));
+  applyLessonView(false);
+  let h = '<div class="card"><div class="lwhat">' + ls.what + '</div><ol class="steps">';
+  for (const st of ls.how) h += '<li>' + st + '</li>';
+  h += '</ol>';
+  for (const f of ls.formulas){
+    h += '<div class="fname">נוסחת ' + ALG_NAME[f.key] + '</div>' + formulaStrip(f.moves, ls.n >= 3);
+  }
+  h += '</div>';
+  $('lessonPane').innerHTML =
+    '<p class="cap">' + (lookingDown(ls.n) ? '<span class="viewtag">מסתכלים מלמטה, על הצד הלבן</span><br>' : '') +
+    'ככה הקובייה תיראה בסוף השלב' +
+    '<small>צבוע רק מה שמסתדר בשלב הזה. בתרגול שאר הצבעים עדיין מבולגנים — וזה בסדר.</small></p>' +
+    h +
+    '<button class="btn green" id="pDemo">👀 הראי לי איך</button>' +
+    '<div class="row small"><button class="btn ghost" id="pTry">💪 לתרגל לבד</button>' +
+    '<button class="btn ghost" id="lflip">' + flipBtnLabel() + '</button></div>';
+  $('pDemo').onclick = function(){ L.phase = 'demo'; startDemo(); };
+  $('pTry').onclick = function(){ L.phase = 'practice'; startPractice(); };
+  $('lflip').onclick = flipLcube;
+}
+
+/* ---------- demo ---------- */
+function chunkText(ch){
+  if (ch.kind === 'free') return 'מכניסים את הצלע ' + colorChip(ch.edge[0]) + colorChip(ch.edge[1]) +
+    ' (לבן־' + CNAME[ch.edge[1]] + ')';
+  if (ch.kind === 'setup') return 'מסובבים את הצד הצהוב למקום הנכון';
+  return 'נוסחת ' + ALG_NAME[ch.alg] + (ch.times > 1 ? ' — ' + ch.times + ' פעמים' : '');
+}
+function startDemo(){
+  const ls = lesson();
+  const cube = TEACH.practiceCube(ls.n);
+  if (!cube){ L.phase = 'teach'; renderLesson(); return; }
+  L.cube = cube;
+  const plan = TEACH.plan(cube, ls.n);
+  L.queue = [];
+  if (plan) for (const s of plan) for (const ch of s.chunks){
+    const per = ch.kind === 'alg' ? ch.moves.length / ch.times : ch.moves.length;
+    for (let i=0;i<ch.moves.length;i++){
+      L.queue.push({move: ch.moves[i], text: chunkText(ch),
+        rep: ch.kind === 'alg' && ch.times > 1 ? ('פעם ' + (Math.floor(i/per)+1) + ' מתוך ' + ch.times) : ''});
+    }
+  }
+  L.idx = 0;
+  drawLcube(function(f,r,c){ return getFacelet(L.cube,f,r,c); });
+  applyLessonView(false);
+  $('lessonPane').innerHTML =
+    '<p class="cap" id="lcap"></p>' +
+    '<div class="card"><div class="move"><div class="glyph" id="lglyph"></div>' +
+    '<div><div class="movetext" id="ltext"></div><div class="movesub" id="lsub"></div></div></div></div>' +
+    '<div class="counter" id="lcount"></div>' +
+    '<button class="btn green" id="lnext">הבא ➜</button>' +
+    '<div class="row small"><button class="btn ghost" id="lplay">▶︎ נגן הכול</button>' +
+    '<button class="btn ghost" id="lflip">' + flipBtnLabel() + '</button>' +
+    '<button class="btn ghost" id="lteach">↩ להסבר</button></div>';
+  $('lflip').onclick = flipLcube;
+  $('lnext').onclick = demoStep;
+  $('lplay').onclick = function(){ L.auto = !L.auto; $('lplay').textContent = L.auto ? '❚❚ עצרי' : '▶︎ נגן הכול'; if (L.auto) demoStep(); };
+  $('lteach').onclick = function(){ L.auto = false; L.phase = 'teach'; renderLesson(); };
+  L.auto = false;
+  paintDemo();
+}
+function paintDemo(){
+  if (L.idx >= L.queue.length){
+    clearPreview($('lcube'));
+    highlight($('lcube'), null);
+    applyLessonView(true);
+    $('lcap').innerHTML = 'סיימנו את השלב 🎉' +
+      (lookingDown(L.n) ? '<small>הסתכלי על הצד הלבן שלמטה — הפלוס מוכן</small>' : '');
+    $('lglyph').innerHTML = '✓'; $('lglyph').style.background = '#00A651'; $('lglyph').style.color = '#fff';
+    $('ltext').textContent = 'ככה זה נראה בסוף';
+    $('lsub').textContent = 'עכשיו תורך לנסות';
+    $('lcount').textContent = '';
+    $('lnext').textContent = '💪 עכשיו תורך';
+    $('lnext').onclick = function(){ L.phase = 'practice'; startPractice(); };
+    return;
+  }
+  const q = L.queue[L.idx];
+  const d = describe(q.move);
+  $('lcap').innerHTML = q.text + (q.rep ? ' · ' + q.rep : '');
+  $('lglyph').style.background = d.color;
+  $('lglyph').style.color = (q.move[0] === 'U' || q.move[0] === 'D') ? '#1A1140' : '#fff';
+  $('lglyph').innerHTML = arrowSVG(d.kind) + (d.dbl ? '<span class="x2">×2</span>' : '');
+  $('ltext').textContent = d.title;
+  $('lsub').textContent = d.sub;
+  $('lcount').textContent = 'צעד ' + (L.idx+1) + ' מתוך ' + L.queue.length;
+  highlight($('lcube'), q.move[0]);
+  showPreview($('lcube'), q.move);
+}
+function demoStep(){
+  if (busy || L.idx >= L.queue.length) return;
+  const pm = parseMove(L.queue[L.idx].move);
+  highlight($('lcube'), null);
+  animateTurn($('lcube'), L.cube, pm[0], pm[1], turnMs(), function(){
+    L.idx++; paintDemo();
+    if (L.auto && L.idx < L.queue.length) setTimeout(demoStep, 500);
+    else L.auto = false;
+  });
+}
+
+/* ---------- practice ---------- */
+const PAD = ['R',"R'",'L',"L'",'U',"U'",'D',"D'",'F',"F'",'B',"B'"];
+function startPractice(){
+  const ls = lesson();
+  const cube = TEACH.practiceCube(ls.n);
+  if (!cube){ L.phase = 'teach'; renderLesson(); return; }
+  L.cube = cube; L.hist = [];
+  clearPreview($('lcube'));
+  drawLcube(function(f,r,c){ return getFacelet(L.cube,f,r,c); });
+  applyLessonView(false);
+  let pad = '<div class="pad">';
+  for (const m of PAD){
+    const d = describe(m);
+    const ink = (m[0] === 'U' || m[0] === 'D') ? '#1A1140' : '#fff';
+    pad += '<button data-m="' + m + '"><span class="sq" style="background:' + d.color + '"></span>' +
+           '<span style="color:' + (m[0]==='U'||m[0]==='D' ? '#FFD500' : d.color) + '">' + arrowSVG(d.kind) + '</span></button>';
+  }
+  pad += '</div>';
+  $('lessonPane').innerHTML =
+    '<p class="cap" id="lcap">' + (lookingDown(ls.n) ? '<span class="viewtag">מסתכלים מלמטה, על הצד הלבן</span><br>' : '') +
+    'סובבי את הקובייה עד שהשלב יסתדר</p>' +
+    '<div id="lmsg"></div>' + pad +
+    '<div class="row small"><button class="btn ghost" id="lhint">💡 רמז</button>' +
+    '<button class="btn ghost" id="lundo">↺ אחורה</button>' +
+    '<button class="btn ghost" id="lnew">🎲 תרגיל חדש</button></div>' +
+    '<div class="row small"><button class="btn ghost" id="lflip">' + flipBtnLabel() + '</button>' +
+    '<button class="btn ghost" id="lteach2">↩ להסבר ולנוסחה</button></div>';
+  $('lflip').onclick = flipLcube;
+  for (const b of $('lessonPane').querySelectorAll('.pad button')){
+    b.onclick = function(){ practiceMove(b.getAttribute('data-m')); };
+  }
+  $('lhint').onclick = practiceHint;
+  $('lundo').onclick = practiceUndo;
+  $('lnew').onclick = startPractice;
+  $('lteach2').onclick = function(){ L.phase = 'teach'; renderLesson(); };
+}
+function practiceMove(m){
+  if (busy) return;
+  clearPreview($('lcube'));
+  highlight($('lcube'), null);
+  const pm = parseMove(m);
+  L.hist.push(m);
+  animateTurn($('lcube'), L.cube, pm[0], pm[1], Math.min(turnMs(), 700), checkPractice);
+}
+function practiceUndo(){
+  if (busy || !L.hist.length) return;
+  const m = L.hist.pop();
+  const pm = parseMove(m);
+  clearPreview($('lcube'));
+  animateTurn($('lcube'), L.cube, pm[0], (4-pm[1])%4, Math.min(turnMs(), 700), function(){});
+}
+function practiceHint(){
+  if (busy) return;
+  const p = TEACH.plan(L.cube, lesson().n);
+  if (!p || !p.length){ checkPractice(); return; }
+  const mv = TEACH.movesOf(p)[0];
+  const d = describe(mv);
+  $('lcap').innerHTML = 'רמז: ' + d.title + (d.dbl ? ' (פעמיים)' : '') +
+    '<small>השכבה המודגשת מתנדנדת לכיוון הנכון</small>';
+  highlight($('lcube'), mv[0]);
+  showPreview($('lcube'), mv);
+}
+function checkPractice(){
+  const n = lesson().n;
+  if (!TEACH.GOAL[n](L.cube)) return;
+  stars[n] = (stars[n] || 0) + 1;
+  saveStars();
+  confetti();
+  const got = Math.min(stars[n], 3);
+  $('lmsg').innerHTML = '<div class="good">כל הכבוד ' + ((settings.name||'').trim() || 'גפן') +
+    '! סיימת את השלב ' + '★'.repeat(got) + '</div>';
+  applyLessonView(true);
+  $('lcap').innerHTML = (got >= 3 ? 'שלטת בשלב הזה!' : 'עוד ' + (3-got) + ' פעמים ומקבלים שלושה כוכבים') +
+    (lookingDown(L.n) ? '<small>תראי — הצד הלבן מסודר</small>' : '');
+  const pane = $('lessonPane');
+  const next = document.createElement('button');
+  next.className = 'btn green';
+  next.textContent = n < 7 ? 'לשלב הבא ➜' : '🏆 סיימת הכול!';
+  next.onclick = function(){ if (n < 7) openLesson(n+1); else openLearn(); };
+  pane.insertBefore(next, pane.querySelector('.pad'));
+}
+
+/* ---------- settings ---------- */
+let settings = {name:'גפן', speed:1};
+try {
+  const j = JSON.parse(localStorage.getItem('gefen-cube-settings') || 'null');
+  if (j && typeof j === 'object') settings = Object.assign(settings, j);
+} catch(e){}
+function saveSettings(){ try { localStorage.setItem('gefen-cube-settings', JSON.stringify(settings)); } catch(e){} }
+function applySettings(){
+  const nm = (settings.name || '').trim() || 'גפן';
+  $('homeTitle').textContent = 'הקובייה של ' + nm;
+  $('doneTitle').textContent = 'כל הכבוד ' + nm + '! 🎉';
+  document.title = 'הקובייה של ' + nm;
+  speedIdx = Math.max(0, Math.min(SPEEDS.length-1, settings.speed|0));
+  $('speedBtn').textContent = SPEEDS[speedIdx].label;
+}
+function drawSpeedPick(){
+  const p = $('speedPick'); p.innerHTML = '';
+  SPEEDS.forEach(function(sp, i){
+    const b = document.createElement('button');
+    b.textContent = sp.label;
+    if (i === speedIdx) b.className = 'on';
+    b.onclick = function(){ speedIdx = i; drawSpeedPick(); };
+    p.appendChild(b);
+  });
+}
+function openSettings(){
+  $('nameInput').value = settings.name || '';
+  $('setNote').textContent = '';
+  drawSpeedPick();
+  $('settings').classList.add('on');
+}
+$('gearBtn').onclick = openSettings;
+$('closeSet').onclick = function(){ $('settings').classList.remove('on'); applySettings(); };
+$('saveSet').onclick = function(){
+  const v = $('nameInput').value.trim();
+  settings.name = v || settings.name;
+  settings.speed = speedIdx;
+  saveSettings(); applySettings();
+  $('settings').classList.remove('on');
+};
+$('resetStars').onclick = function(){
+  stars = {}; saveStars();
+  $('setNote').textContent = 'הכוכבים אופסו. אפשר להתחיל מהתחלה.';
+};
+$('settings').onclick = function(e){ if (e.target === $('settings')) { $('settings').classList.remove('on'); applySettings(); } };
+
+$('goLearn').onclick = openLearn;
+$('learnBack').onclick = function(){ show('scr-home'); };
+$('lessonBack').onclick = function(){ L.auto = false; openLearn(); };
+makeDraggable($('lcube'));
+setView($('lcube'), -32, -22, false);
+applySettings();
+
+
+/* =================== משחק הזיהוי =================== */
+const SIDE_ORDER = ['F','R','B','L'];
+function rightOf(f){ return SIDE_ORDER[(SIDE_ORDER.indexOf(f)+1) % 4]; }
+function faceOfColor(col){ for (const f of FACES) if (CENTER[f] === col) return f; return null; }
+
+/* the four U-face edge stickers, with the side facelet that goes with each */
+const U_EDGES = [ {u:[0,1], side:['B',0,1]}, {u:[1,0], side:['L',0,1]},
+                  {u:[1,2], side:['R',0,1]}, {u:[2,1], side:['F',0,1]} ];
+
+function countYellowUpEdges(st){
+  let n = 0;
+  for (const e of U_EDGES) if (getFacelet(st,'U',e.u[0],e.u[1]) === CENTER.U) n++;
+  return n;
+}
+function crossShape(st){
+  const up = U_EDGES.map(function(e){ return getFacelet(st,'U',e.u[0],e.u[1]) === CENTER.U; });
+  const n = up.filter(Boolean).length;
+  if (n === 0) return 'dot';
+  if (n === 4) return 'cross';
+  if (n === 2) return ((up[0] && up[3]) || (up[1] && up[2])) ? 'line' : 'ell';
+  return 'other';
+}
+function countYellowUpCorners(st){
+  let n = 0;
+  for (const rc of [[0,0],[0,2],[2,0],[2,2]]) if (getFacelet(st,'U',rc[0],rc[1]) === CENTER.U) n++;
+  return n;
+}
+function countCornersPlaced(st){ return YELLOW_CORNERS.filter(function(c){ return pieceSolved(st,c); }).length; }
+function countSidesDone(st){
+  let n = 0;
+  for (const f of SIDE_ORDER){
+    const a = getFacelet(st,f,0,0), b = getFacelet(st,f,0,1), c = getFacelet(st,f,0,2);
+    if (a === b && b === c && a === CENTER[f]) n++;
+  }
+  return n;
+}
+/* stage 3: which way does the lone non-yellow top edge go? */
+function midDirection(st){
+  for (const e of U_EDGES){
+    const a = getFacelet(st,'U',e.u[0],e.u[1]);
+    const b = getFacelet(st, e.side[0], e.side[1], e.side[2]);
+    if (a === CENTER.U || b === CENTER.U) continue;
+    const bf = faceOfColor(b), af = faceOfColor(a);
+    if (!bf || !af) continue;
+    return (af === rightOf(bf)) ? 'right' : 'left';
+  }
+  return null;
+}
+const U_FACELET = {F:[2,1], R:[1,2], B:[0,1], L:[1,0]};
+const FRONT_K = {F:0, L:1, B:2, R:3};
+function uArr(t){ return t===1 ? ['U'] : t===2 ? ['U2'] : ["U'"]; }
+function midPlanChunks(st){
+  let tgt = null;
+  for (const e of U_EDGES){
+    const a = getFacelet(st,'U',e.u[0],e.u[1]);
+    const b = getFacelet(st, e.side[0], e.side[1], e.side[2]);
+    if (a === CENTER.U || b === CENTER.U) continue;
+    tgt = {a:a, b:b}; break;
+  }
+  if (!tgt) return null;
+  const bf = faceOfColor(tgt.b), af = faceOfColor(tgt.a);
+  if (!bf || !af || bf === 'U' || bf === 'D' || af === 'U' || af === 'D') return null;
+  const right = (af === rightOf(bf));
+  const k = FRONT_K[bf];
+  let u = -1;
+  for (let t=0;t<4;t++){
+    const c = cloneCube(st);
+    if (t) applyMoves(c, uArr(t));
+    const up = U_FACELET[bf];
+    if (getFacelet(c, bf, 0, 1) === tgt.b && getFacelet(c,'U',up[0],up[1]) === tgt.a){ u = t; break; }
+  }
+  if (u < 0) return null;
+  const chunks = [];
+  if (u) chunks.push({kind:'setup', moves:uArr(u)});
+  chunks.push({kind:'alg', alg: right ? 'midR' : 'midL', times:1,
+               moves: rotAlg(right ? MID_R : MID_L, k), slot:k});
+  return chunks;
+}
+function genMidState(){
+  const uu = ['U',"U'",'U2'], mixers = [SUNE, OLL_EDGE, APERM, UPERM];
+  for (let t=0;t<40;t++){
+    const st = solvedCube();
+    const k = (Math.random()*4)|0;
+    applyMoves(st, inv(rotAlg(Math.random() < 0.5 ? MID_R : MID_L, k)));
+    for (let i=0;i<2;i++){
+      applyMoves(st, [uu[(Math.random()*3)|0]]);
+      applyMoves(st, mixers[(Math.random()*mixers.length)|0]);
+    }
+    applyMoves(st, [uu[(Math.random()*3)|0]]);
+    const dir = midDirection(st);
+    if (dir) return {cube:st, ans:dir};
+  }
+  return null;
+}
+function genStage(stage, answerFn, tries){
+  for (let t=0;t<(tries||30);t++){
+    const c = TEACH.practiceCube(stage);
+    if (!c) continue;
+    const a = answerFn(c);
+    if (a !== null && a !== undefined && a !== 'cross' && a !== 'other') return {cube:c, ans:a};
+  }
+  return null;
+}
+
+const QUIZZES = [
+{id:'shape', stage:4, icon:'➕', name:'איזו צורה צהובה?',
+ q:'איזו צורה צהובה רואים למעלה?',
+ opts:[{v:'dot', t:'נקודה — אין אף צלע צהובה'},
+       {v:'ell', t:'ר — שתי צלעות שנוגעות בפינה'},
+       {v:'line', t:'קו — שתי צלעות אחת מול השנייה'}],
+ why:{dot:'אף צלע לא צהובה למעלה. אחרי הדג נקבל קו או ר.',
+      ell:'שתי הצלעות הצהובות נפגשות בפינה — זו צורת ר.',
+      line:'שתי הצלעות הצהובות זו מול זו — זה קו.'},
+ gen:function(){ return genStage(4, crossShape); }},
+
+{id:'mid', stage:3, icon:'➡️', name:'ימינה או שמאלה?',
+ q:'יש למעלה צלע אחת בלי צהוב. לאן היא צריכה להיכנס?',
+ opts:[{v:'right', t:'ימינה ➡️'}, {v:'left', t:'שמאלה ⬅️'}],
+ why:{right:'הצבע שלמעלה שייך לאמצע שנמצא מימין לצבע הקדמי — הכנסה ימינה.',
+      left:'הצבע שלמעלה שייך לאמצע שנמצא משמאל לצבע הקדמי — הכנסה שמאלה.'},
+ gen:genMidState, chunks:midPlanChunks},
+
+{id:'corners', stage:5, icon:'🌞', name:'כמה פינות צהובות?',
+ q:'כמה פינות צהובות כבר מסתכלות למעלה?',
+ opts:[{v:0, t:'אף אחת'}, {v:1, t:'אחת'}, {v:2, t:'שתיים'}],
+ why:{0:'אף פינה עוד לא צהובה למעלה.', 1:'פינה אחת צהובה — שמים אותה לפי הכלל ומריצים את הפטיש.',
+      2:'שתי פינות צהובות למעלה.'},
+ gen:function(){ return genStage(5, countYellowUpCorners); }},
+
+{id:'place', stage:6, icon:'🧩', name:'כמה פינות במקום?',
+ q:'כמה פינות כבר נמצאות בפינה הנכונה שלהן?',
+ opts:[{v:0, t:'אף אחת'}, {v:1, t:'אחת'}, {v:2, t:'שתיים'}, {v:4, t:'כולן'}],
+ why:{0:'אין אף פינה נכונה — מריצים את הנוסחה פעם אחת ומסתכלים שוב.',
+      1:'יש פינה אחת נכונה — שמים אותה מאחור ומריצים.',
+      2:'שתי פינות כבר נכונות. מריצים את הנוסחה פעם אחת ומסתכלים שוב — נוצר מצב עם פינה אחת נכונה.',
+      4:'הפינות כבר מסודרות.'},
+ gen:function(){ return genStage(6, countCornersPlaced); }},
+
+{id:'sides', stage:7, icon:'🏁', name:'כמה צדדים מוכנים?',
+ q:'בכמה צדדים השורה העליונה כבר בצבע אחד?',
+ opts:[{v:0, t:'אף אחד'}, {v:1, t:'אחד'}, {v:2, t:'שניים'}, {v:4, t:'כולם'}],
+ why:{0:'אף צד לא מסודר — מריצים את הסחרחרה פעם אחת ומסתכלים שוב.',
+      1:'יש צד אחד מוכן — שמים אותו מאחור ומריצים.',
+      2:'זה בכלל לא יכול לקרות בקובייה אמיתית.', 4:'הכול מסודר.'},
+ gen:function(){ return genStage(7, countSidesDone); }}
+];
+
+const Q = {type:null, i:0, score:0, cur:null, n:8};
+
+function openQuizMenu(){
+  const list = $('quizList');
+  list.innerHTML = '';
+  QUIZZES.forEach(function(qz, i){
+    const b = document.createElement('button');
+    b.className = 'lesson';
+    b.innerHTML = '<span class="num">' + qz.icon + '</span><span class="nm">' + qz.name +
+                  '</span><span class="st">שלב ' + qz.stage + '</span>';
+    b.onclick = function(){ startQuiz(qz); };
+    list.appendChild(b);
+  });
+  const mix = document.createElement('button');
+  mix.className = 'lesson';
+  mix.innerHTML = '<span class="num">🎲</span><span class="nm">הכול מעורבב</span><span class="st">קשה</span>';
+  mix.onclick = function(){ startQuiz(null); };
+  list.appendChild(mix);
+  show('scr-quizmenu');
+}
+function startQuiz(qz){
+  Q.type = qz; Q.i = 0; Q.score = 0;
+  show('scr-quiz');
+  nextQuestion();
+}
+function nextQuestion(){
+  if (Q.i >= Q.n) return quizEnd();
+  const qz = Q.type || QUIZZES[(Math.random()*QUIZZES.length)|0];
+  let g = null, guard = 0;
+  while (!g && guard++ < 6) g = qz.gen();
+  if (!g){ Q.i++; return nextQuestion(); }
+  Q.cur = {qz:qz, cube:g.cube, ans:g.ans};
+  clearPreview($('qcube'));
+  renderCubeEl($('qcube'), function(f,r,c){ return getFacelet(g.cube,f,r,c); });
+  setView($('qcube'), -32, -28, false);
+  $('quizHead').textContent = 'שאלה ' + (Q.i+1) + ' מתוך ' + Q.n + ' · נכון ' + Q.score;
+  let h = '<p class="cap">' + qz.q + '</p>';
+  for (const o of qz.opts) h += '<button class="opt" data-v="' + o.v + '">' + o.t + '</button>';
+  h += '<div id="qfeed"></div>';
+  $('quizPane').innerHTML = h;
+  for (const b of $('quizPane').querySelectorAll('.opt')){
+    b.onclick = function(){ answerQuiz(b); };
+  }
+}
+function answerQuiz(btn){
+  const cur = Q.cur;
+  const picked = btn.getAttribute('data-v');
+  const right = String(cur.ans);
+  const ok = picked === right;
+  if (ok) Q.score++;
+  for (const b of $('quizPane').querySelectorAll('.opt')){
+    b.disabled = true;
+    if (b.getAttribute('data-v') === right) b.classList.add('right');
+    else if (b === btn) b.classList.add('wrong');
+  }
+  let h = '<div class="' + (ok ? 'good' : 'alert') + '">' +
+          (ok ? 'נכון! ' : 'לא נורא — התשובה היא: ') + (cur.qz.why[cur.ans] || '') + '</div>';
+  h += planExplainHTML(cur.cube, cur.qz.stage, cur.qz.chunks ? cur.qz.chunks(cur.cube) : null);
+  h += '<button class="btn green" id="qnext">' + (Q.i + 1 >= Q.n ? 'לסיכום ➜' : 'שאלה הבאה ➜') + '</button>';
+  $('qfeed').innerHTML = h;
+  $('quizHead').textContent = 'שאלה ' + (Q.i+1) + ' מתוך ' + Q.n + ' · נכון ' + Q.score;
+  $('qnext').onclick = function(){ Q.i++; nextQuestion(); };
+  if (ok) confetti0();
+}
+function confetti0(){
+  const cols = ['#FFD500','#00A651','#0051BA'];
+  for (let i=0;i<12;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (30 + Math.random()*40) + 'vw';
+    c.style.background = cols[i % cols.length];
+    c.style.animationDuration = (1.1 + Math.random()) + 's';
+    document.body.appendChild(c);
+    setTimeout(function(){ c.remove(); }, 2600);
+  }
+}
+function planExplainHTML(cube, stage, given){
+  let list = given;
+  if (!list){
+    let p = null;
+    try { p = TEACH.plan(cube, stage); } catch(e){ p = null; }
+    if (!p || !p.length) return '';
+    list = p[0].chunks;
+  }
+  let h = '<div class="card"><div class="lwhat">מה עושים עכשיו</div>';
+  const chunks = list.slice(0, 3);
+  for (const ch of chunks){
+    const once = ch.kind === 'alg' ? ch.moves.slice(0, ch.moves.length / ch.times) : ch.moves;
+    h += '<div class="fname">' + chunkText(ch) + '</div>' + formulaStrip(once, stage >= 3);
+  }
+  h += '</div>';
+  return h;
+}
+function quizEnd(){
+  clearPreview($('qcube'));
+  renderCubeEl($('qcube'), function(f,r,c){ return getFacelet(solvedCube(),f,r,c); });
+  $('quizHead').textContent = 'סיימנו!';
+  const pct = Math.round(100 * Q.score / Q.n);
+  const msg = pct >= 88 ? 'מדהים! את מזהה כמו מקצוענית 🏆' : pct >= 60 ? 'יפה מאוד! עוד קצת תרגול וזה בכיס 💪' : 'התחלה טובה. כדאי לחזור להסבר של השלב ואז לנסות שוב.';
+  $('quizPane').innerHTML =
+    '<div class="good">ענית נכון על ' + Q.score + ' מתוך ' + Q.n + '<br>' + msg + '</div>' +
+    '<button class="btn green" id="qagain">🔁 עוד סיבוב</button>' +
+    '<button class="btn ghost" id="qmenu">לרשימת המשחקים</button>';
+  $('qagain').onclick = function(){ startQuiz(Q.type); };
+  $('qmenu').onclick = openQuizMenu;
+  if (Q.score >= Q.n - 1) confetti();
+}
+$('goQuiz').onclick = openQuizMenu;
+$('quizMenuBack').onclick = function(){ show('scr-home'); };
+$('quizBack').onclick = openQuizMenu;
+makeDraggable($('qcube'));
+setView($('qcube'), -32, -28, false);
+
+/* =================== דף נוסחאות להדפסה =================== */
+function buildPrintSheet(){
+  const nm = (settings.name || '').trim() || 'גפן';
+  let h = '<h1>דף הנוסחאות של ' + nm + '</h1>' +
+    '<p class="pintro">מחזיקים את הקובייה עם הצהוב למעלה, הלבן למטה והירוק מולך — ולא מסובבים אותה באמצע נוסחה.</p>' +
+    '<table class="plegend"><tr>' +
+    '<td><b>R</b> הצד הימני</td><td><b>L</b> הצד השמאלי</td><td><b>U</b> השכבה העליונה</td>' +
+    '<td><b>F</b> הצד שמולך</td><td><b>B</b> הצד האחורי</td><td><b>D</b> השכבה התחתונה</td></tr>' +
+    '<tr><td colspan="6">אות לבד = סיבוב אחד לכיוון החץ · גרש (\u0027) = לכיוון ההפוך · 2 = פעמיים</td></tr>' +
+    '<tr><td colspan="6"><b>כל נוסחה מבצעים לפי המספרים שעל הריבועים — משמאל לימין.</b></td></tr></table>';
+  for (const ls of LESSONS){
+    h += '<div class="pstep"><h2>' + ls.n + '. ' + ls.name + '</h2><p>' + ls.what + '</p>';
+    for (const f of ls.formulas){
+      h += '<div class="pfname">' + ALG_NAME[f.key] + '</div>' + formulaStrip(f.moves, true);
+    }
+    h += '<ul>';
+    for (const st of ls.how) h += '<li>' + st + '</li>';
+    h += '</ul></div>';
+  }
+  $('sheet').innerHTML = h;
+}
+function openPrintSheet(){
+  buildPrintSheet();
+  show('scr-print');
+}
+$('doPrint').onclick = function(){
+  let ok = true;
+  try { window.print(); } catch(e){ ok = false; }
+  if (!ok) $('doPrint').textContent = 'ההדפסה חסומה כאן — פתחי את התפריט של הדפדפן ← הדפסה';
+};
+$('printBack').onclick = openLearn;
+
+$('printBtn').onclick = openPrintSheet;
 addEventListener('resize', function(){ sizeCube(); boot(); });
 </script>
 </body>
