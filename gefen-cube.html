@@ -131,6 +131,17 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
 .cap small{display:block;font-size:13px;font-weight:600;color:#9C93CC;margin-top:4px}
 .chipdot{display:inline-block;width:15px;height:15px;border-radius:5px;vertical-align:-2px;margin:0 2px;
   box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.camwrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:24px;overflow:hidden;
+  background:#000;margin-bottom:12px}
+.camwrap video{width:100%;height:100%;object-fit:cover;display:block}
+.camgrid{position:absolute;left:12%;top:12%;width:76%;height:76%;display:grid;
+  grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);pointer-events:none}
+.camgrid span{border:2px solid rgba(255,255,255,.9);border-radius:7px;margin:2px;
+  box-shadow:0 0 0 2px rgba(0,0,0,.3)}
+.sdot{width:24px;height:24px;border-radius:8px;display:inline-block;margin:0 3px;
+  box-shadow:0 0 0 2px rgba(0,0,0,.3)}
+.sdot.now{outline:3px solid #fff;outline-offset:2px}
+.filein{width:100%;color:#fff;font-family:inherit;font-size:15px;margin-bottom:10px}
 .opt{display:block;width:100%;font-family:inherit;font-size:18px;font-weight:800;padding:15px 12px;
   border-radius:18px;border:3px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;
   margin-bottom:10px;cursor:pointer;text-align:right}
@@ -212,7 +223,25 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
     </div>
     <p class="lead">תחזיקי ככה כל הזמן. את הקובייה שעל המסך אפשר לסובב עם האצבע — היא רק מראה, לא זזה באמת.</p>
     <button class="btn green" id="holdNext">הבנתי, ממשיכים</button>
+    <button class="btn ghost" id="tryCam">📷 לנסות עם מצלמה</button>
     <button class="btn ghost" id="holdBack">חזרה</button>
+  </section>
+
+  <section class="screen" id="scr-scan">
+    <div class="headline" id="scanHead"></div>
+    <div class="dots" id="scanDots"></div>
+    <p class="cap" id="scanHold"></p>
+    <div id="scanErr"></div>
+    <div class="camwrap" id="camWrap">
+      <video id="cam" playsinline muted autoplay></video>
+      <div class="camgrid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <button class="btn green" id="shootBtn">📸 לצלם את הפאה</button>
+    <div class="row small">
+      <button class="btn ghost" id="scanBack">↺ פאה קודמת</button>
+      <button class="btn ghost" id="scanQuit">🎨 לצבוע ביד</button>
+    </div>
+    <p class="note">מלאו את המסגרת בקובייה, בלי ברק חזק של מנורה. הצבעים ייקבעו רק בסוף, אחרי כל שש הפאות.</p>
   </section>
 
   <section class="screen" id="scr-input">
@@ -229,6 +258,7 @@ p.lead{color:#C8BFF2;font-size:16px;line-height:1.55;margin:0 0 18px}
     <button class="btn green" id="solveBtn">✨ תפתרי לי!</button>
     <div class="row small">
       <button class="btn ghost" id="clearBtn">🧽 לנקות הכול</button>
+      <button class="btn ghost" id="paintCam">📷 מצלמה</button>
       <button class="btn ghost" id="inputBack">חזרה</button>
     </div>
     <p class="note">גררי את הקובייה כדי להגיע לצדדים האחרים. אפשר לצבוע רק את מה שרואים.</p>
@@ -1292,6 +1322,7 @@ let state = solvedCube();
 let queue = [], idx = 0, auto = false, mode = 'solve';
 
 function show(id){
+  if (id !== 'scr-scan'){ try { stopCamera(); } catch(e){} }
   const all = document.querySelectorAll('.screen');
   for (const s of all) s.classList.remove('on');
   $(id).classList.add('on');
@@ -1477,12 +1508,7 @@ const ERR = {
 function warmUp(){ setTimeout(function(){ try { KC.buildTables(); } catch(e){} }, 500); }
 $('goInput').onclick = function(){ show('scr-hold'); warmUp(); };
 $('holdBack').onclick = function(){ show('scr-home'); };
-$('holdNext').onclick = function(){
-  newPaint(); buildPalette(); buildPaint();
-  $('inputAlert').innerHTML = '';
-  setView($('paintCube'), -32, -22, false);
-  show('scr-input');
-};
+$('holdNext').onclick = function(){ scanQuitToPaint(); };
 $('inputBack').onclick = function(){ show('scr-home'); };
 $('clearBtn').onclick = function(){ newPaint(); buildPaint(); $('inputAlert').innerHTML = ''; };
 $('rotL').onclick = function(){ setView($('paintCube'), $('paintCube')._view.yaw + 90, $('paintCube')._view.pitch, true); };
@@ -2229,6 +2255,253 @@ $('doPrint').onclick = function(){
 $('printBack').onclick = openLearn;
 
 $('printBtn').onclick = openPrintSheet;
+$('tryCam').onclick = openScan;
+$('paintCam').onclick = openScan;
+$('shootBtn').onclick = shootFace;
+$('scanQuit').onclick = scanQuitToPaint;
+$('scanBack').onclick = function(){ if (scanStep){ scanStep--; paintScanUI(); } };
+
+/* =================== סריקת מצלמה =================== */
+const SCAN_ORDER = [
+  {f:'F', color:'G', hold:'הירוק מול המצלמה, הצהוב למעלה'},
+  {f:'R', color:'O', hold:'סובבי שמאלה: הכתום מול המצלמה, הצהוב למעלה'},
+  {f:'B', color:'L', hold:'עוד סיבוב שמאלה: הכחול מול המצלמה'},
+  {f:'L', color:'R', hold:'עוד סיבוב שמאלה: האדום מול המצלמה'},
+  {f:'U', color:'Y', hold:'חזרה לירוק מולך, ואז הטי קדימה — הצהוב מול המצלמה, הירוק למטה'},
+  {f:'D', color:'W', hold:'הטי אחורה — הלבן מול המצלמה, הירוק למעלה'}
+];
+const COLOR_KEYS = ['Y','W','G','L','O','R'];
+
+function rgbFeat(c){
+  const r = c[0]/255, g = c[1]/255, b = c[2]/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const v = max, d = max - min;
+  const s = max ? d/max : 0;
+  let h = 0;
+  if (d){
+    if (max === r) h = ((g-b)/d + 6) % 6;
+    else if (max === g) h = (b-r)/d + 2;
+    else h = (r-g)/d + 4;
+    h *= 60;
+  }
+  const rad = h * Math.PI / 180;
+  return [s*Math.cos(rad), s*Math.sin(rad), v*0.35];
+}
+function fdist(a,b){
+  const x=a[0]-b[0], y=a[1]-b[1], z=a[2]-b[2];
+  return x*x + y*y + z*z;
+}
+
+/* 54 samples -> 54 colours.
+   First an adaptive k-means seeded from the six centres (whose true colour we know).
+   If the counts do not come out nine-of-each, redo it as a balanced assignment so the
+   result is at least countable-valid. Also reports the least certain stickers. */
+function prepare(samples){
+  const feats=[], fixed=[], idx=[];
+  for (const f of FACES) for (let r=0;r<3;r++) for (let c=0;c<3;c++){
+    idx.push([f,r,c]);
+    feats.push(rgbFeat(samples[f][r][c]));
+    fixed.push((r===1 && c===1) ? COLOR_KEYS.indexOf(CENTER[f]) : -1);
+  }
+  const means=[];
+  for (let k=0;k<6;k++) means.push(feats[fixed.indexOf(k)].slice());
+  return {feats:feats, fixed:fixed, idx:idx, means:means};
+}
+function recenter(feats, label, means){
+  const sum=[], cnt=new Array(6).fill(0);
+  for (let k=0;k<6;k++) sum.push([0,0,0]);
+  for (let i=0;i<feats.length;i++){
+    const k=label[i];
+    sum[k][0]+=feats[i][0]; sum[k][1]+=feats[i][1]; sum[k][2]+=feats[i][2]; cnt[k]++;
+  }
+  const out=[];
+  for (let k=0;k<6;k++) out.push(cnt[k] ? [sum[k][0]/cnt[k], sum[k][1]/cnt[k], sum[k][2]/cnt[k]] : means[k]);
+  return out;
+}
+function freeAssign(P){
+  let means = P.means.map(function(m){ return m.slice(); });
+  let label = new Array(P.feats.length).fill(0);
+  for (let it=0; it<8; it++){
+    for (let i=0;i<P.feats.length;i++){
+      if (P.fixed[i] >= 0){ label[i] = P.fixed[i]; continue; }
+      let bk=0, bd=Infinity;
+      for (let k=0;k<6;k++){ const d = fdist(P.feats[i], means[k]); if (d < bd){ bd = d; bk = k; } }
+      label[i] = bk;
+    }
+    means = recenter(P.feats, label, means);
+  }
+  return {label:label, means:means};
+}
+function balancedAssign(P){
+  let means = P.means.map(function(m){ return m.slice(); });
+  let label = null;
+  for (let round=0; round<5; round++){
+    label = new Array(P.feats.length).fill(-1);
+    const count = new Array(6).fill(0);
+    for (let i=0;i<P.feats.length;i++) if (P.fixed[i] >= 0){ label[i] = P.fixed[i]; count[P.fixed[i]]++; }
+    const pairs = [];
+    for (let i=0;i<P.feats.length;i++){
+      if (label[i] >= 0) continue;
+      for (let k=0;k<6;k++) pairs.push([fdist(P.feats[i], means[k]), i, k]);
+    }
+    pairs.sort(function(a,b){ return a[0]-b[0]; });
+    for (const p of pairs){
+      if (label[p[1]] >= 0 || count[p[2]] >= 9) continue;
+      label[p[1]] = p[2]; count[p[2]]++;
+    }
+    for (let it=0; it<8; it++){
+      let improved = false;
+      for (let i=0;i<P.feats.length;i++){
+        if (P.fixed[i] >= 0) continue;
+        for (let j=i+1;j<P.feats.length;j++){
+          if (P.fixed[j] >= 0) continue;
+          const a = label[i], b = label[j];
+          if (a === b) continue;
+          const cur = fdist(P.feats[i],means[a]) + fdist(P.feats[j],means[b]);
+          const alt = fdist(P.feats[i],means[b]) + fdist(P.feats[j],means[a]);
+          if (alt < cur - 1e-12){ label[i] = b; label[j] = a; improved = true; }
+        }
+      }
+      if (!improved) break;
+    }
+    means = recenter(P.feats, label, means);
+  }
+  return {label:label, means:means};
+}
+function classifyCube(samples){
+  const P = prepare(samples);
+  let res = freeAssign(P);
+  const cnt = new Array(6).fill(0);
+  for (const l of res.label) cnt[l]++;
+  const balanced = cnt.every(function(x){ return x === 9; });
+  if (!balanced) res = balancedAssign(P);
+  const colors = {};
+  for (const f of FACES) colors[f] = [[null,null,null],[null,null,null],[null,null,null]];
+  const weak = [];
+  for (let i=0;i<P.feats.length;i++){
+    colors[P.idx[i][0]][P.idx[i][1]][P.idx[i][2]] = COLOR_KEYS[res.label[i]];
+    if (P.fixed[i] >= 0) continue;
+    const ds = [];
+    for (let k=0;k<6;k++) ds.push(fdist(P.feats[i], res.means[k]));
+    const best = ds[res.label[i]];
+    let second = Infinity;
+    for (let k=0;k<6;k++) if (k !== res.label[i] && ds[k] < second) second = ds[k];
+    if (second > 0) weak.push({at:P.idx[i], ratio: best/second});
+  }
+  weak.sort(function(a,b){ return b.ratio - a.ratio; });
+  return {colors: colors, weak: weak.filter(function(x){ return x.ratio > 0.45; }).slice(0,6).map(function(x){ return x.at; }),
+          repaired: !balanced};
+}
+/* --- UI --- */
+
+let scanStep = 0, scanData = {}, scanStream = null, lastWeak = [];
+
+function openScan(){
+  scanStep = 0; scanData = {};
+  show('scr-scan');
+  paintScanUI();
+  startCamera();
+}
+function startCamera(){
+  const v = $('cam');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return scanFallback('הדפדפן הזה לא נותן גישה למצלמה.');
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:1280}}, audio:false})
+    .then(function(st){
+      scanStream = st; v.srcObject = st;
+      v.play().catch(function(){});
+      $('camWrap').style.display = 'block';
+      $('scanErr').innerHTML = '';
+    })
+    .catch(function(){ scanFallback('אין הרשאה למצלמה, או שהיא תפוסה.'); });
+}
+function stopCamera(){
+  if (scanStream){ scanStream.getTracks().forEach(function(t){ t.stop(); }); scanStream = null; }
+  const v = $('cam'); if (v) v.srcObject = null;
+}
+function scanFallback(msg){
+  $('camWrap').style.display = 'none';
+  $('scanErr').innerHTML = '<div class="alert">' + msg + ' אפשר להעלות תמונה של הפאה, או לצבוע ביד.</div>' +
+    '<input type="file" accept="image/*" capture="environment" id="scanFile" class="filein">';
+  $('scanFile').onchange = function(e){
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = function(){ takeSample(img, img.naturalWidth, img.naturalHeight); };
+    img.src = URL.createObjectURL(file);
+  };
+}
+function medianRGB(data){
+  const rs = [], gs = [], bs = [];
+  for (let i=0;i<data.length;i+=4){ rs.push(data[i]); gs.push(data[i+1]); bs.push(data[i+2]); }
+  const med = function(a){ a.sort(function(x,y){ return x-y; }); return a[a.length>>1]; };
+  return [med(rs), med(gs), med(bs)];
+}
+function takeSample(src, w, h){
+  const side = Math.min(w, h);
+  const x0 = (w - side)/2, y0 = (h - side)/2;
+  const fs = side * 0.76;
+  const fx = x0 + (side - fs)/2, fy = y0 + (side - fs)/2;
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', {willReadFrequently:true});
+  ctx.drawImage(src, 0, 0, w, h);
+  const grid = [];
+  for (let r=0;r<3;r++){
+    const row = [];
+    for (let c=0;c<3;c++){
+      const cx = fx + fs*(c+0.5)/3, cy = fy + fs*(r+0.5)/3, half = Math.max(3, (fs/3)*0.22);
+      const box = ctx.getImageData(Math.round(cx-half), Math.round(cy-half), Math.round(half*2), Math.round(half*2));
+      row.push(medianRGB(box.data));
+    }
+    grid.push(row);
+  }
+  scanData[SCAN_ORDER[scanStep].f] = grid;
+  scanStep++;
+  if (scanStep >= SCAN_ORDER.length) finishScan();
+  else paintScanUI();
+}
+function shootFace(){
+  const v = $('cam');
+  if (!v || !v.videoWidth) return;
+  takeSample(v, v.videoWidth, v.videoHeight);
+}
+function paintScanUI(){
+  const st = SCAN_ORDER[scanStep];
+  let dots = '';
+  SCAN_ORDER.forEach(function(o, i){
+    dots += '<span class="sdot' + (i < scanStep ? ' done' : (i === scanStep ? ' now' : '')) +
+            '" style="background:' + (i <= scanStep ? HEX[o.color] : 'rgba(255,255,255,.18)') + '"></span>';
+  });
+  $('scanDots').innerHTML = dots;
+  $('scanHead').textContent = 'פאה ' + (scanStep+1) + ' מתוך 6 · ' + CNAME[st.color];
+  $('scanHold').textContent = st.hold;
+  $('scanBack').style.display = scanStep ? 'flex' : 'none';
+}
+function finishScan(){
+  stopCamera();
+  const res = classifyCube(scanData);
+  paint = res.colors;
+  lastWeak = res.weak || [];
+  buildPalette(); buildPaint();
+  setView($('paintCube'), -32, -22, false);
+  for (const st of $('paintCube').querySelectorAll('.face i')){
+    for (const a of lastWeak) if (a[0] === st._f && a[1] === st._r && a[2] === st._c) st.classList.add('pulse');
+  }
+  const v = validate(paint);
+  let msg = 'סרקתי! סובבי את הקובייה ובדקי שהצבעים נכונים — כל משבצת שלא מתאימה, פשוט לחצי עליה ותקני.';
+  if (lastWeak.length) msg += ' שימי לב במיוחד למשבצות שמהבהבות — בהן לא הייתי בטוחה.';
+  $('inputAlert').innerHTML = '<div class="' + (v.ok ? 'good' : 'alert') + '">' +
+    (v.ok ? msg : 'סרקתי, אבל משהו בצבעים עוד לא מסתדר. תקני את מה שצריך ואז נפתור.') + '</div>';
+  show('scr-input');
+}
+function scanQuitToPaint(){
+  stopCamera();
+  newPaint(); buildPalette(); buildPaint();
+  $('inputAlert').innerHTML = '';
+  setView($('paintCube'), -32, -22, false);
+  show('scr-input');
+}
+
 addEventListener('resize', function(){ sizeCube(); boot(); });
 </script>
 </body>
