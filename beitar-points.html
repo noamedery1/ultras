@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיטת הניקוד של בית"ר – המדריך + מחשבון</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b0c;
+  --bg2:#141416;
+  --card:#1b1b1f;
+  --line:#2e2e34;
+  --yellow:#FFD400;
+  --yellow-dim:#c9a800;
+  --text:#f2f2f4;
+  --muted:#9a9aa4;
+  --green:#38d17a;
+  --red:#ff5d5d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Heebo',system-ui,'Segoe UI',Arial,sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+h1,h2,h3{line-height:1.2;margin:0}
+a{color:var(--yellow)}
+
+/* ---------- HERO ---------- */
+header{
+  background:
+    radial-gradient(900px 380px at 80% -10%, rgba(255,212,0,.18), transparent 70%),
+    linear-gradient(180deg,#000 0%, var(--bg) 100%);
+  border-bottom:3px solid var(--yellow);
+  padding:54px 0 40px;
+  text-align:center;
+}
+.badge{
+  display:inline-block;background:var(--yellow);color:#000;
+  font-weight:900;font-size:13px;letter-spacing:.5px;
+  padding:5px 14px;border-radius:99px;margin-bottom:16px;
+}
+h1{font-size:clamp(30px,6vw,54px);font-weight:900;letter-spacing:-1px}
+h1 span{color:var(--yellow)}
+.sub{color:var(--muted);font-size:clamp(15px,2.4vw,19px);margin-top:14px;max-width:640px;margin-inline:auto}
+.crumbs{margin-top:18px;font-size:13px;color:#6b6b74}
+
+/* ---------- SECTIONS ---------- */
+section{padding:44px 0;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--yellow);font-weight:900;font-size:13px;letter-spacing:1.5px;margin-bottom:8px}
+h2{font-size:clamp(23px,4.2vw,34px);font-weight:900;margin-bottom:6px}
+.lead{color:var(--muted);margin:10px 0 24px;font-size:16px}
+
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;
+}
+.card h3{font-size:18px;font-weight:900;margin-bottom:6px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.big{font-size:38px;font-weight:900;color:var(--yellow);line-height:1;margin-bottom:6px}
+.big.neg{color:var(--red)}
+
+/* ---------- TABLES ---------- */
+.tblcard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tblcard .head{padding:14px 18px;background:#000;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tblcard .head h3{font-size:19px;font-weight:900}
+.tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:#2a2a30;color:var(--muted)}
+.tag.good{background:rgba(56,209,122,.15);color:var(--green)}
+.tag.bad{background:rgba(255,93,93,.15);color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:11px 10px;text-align:center;border-bottom:1px solid var(--line)}
+th{background:#0f0f11;color:var(--muted);font-weight:700;font-size:13px}
+td{font-weight:900;font-size:20px;color:var(--yellow);direction:ltr}
+td.neg{color:var(--red)}
+tr:last-child td{border-bottom:none}
+.teams{padding:14px 18px;font-size:14px;color:var(--muted)}
+.teams b{color:var(--text);display:block;margin-bottom:4px;font-size:13px;letter-spacing:.5px}
+.joke{padding:12px 18px;background:rgba(255,212,0,.07);border-top:1px solid var(--line);font-size:14px;color:#e3d9a8}
+
+/* ---------- RULES ---------- */
+.rule{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--line)}
+.rule:last-child{border-bottom:none}
+.rule .ico{font-size:24px;line-height:1.2;flex:0 0 auto}
+.rule b{display:block;font-size:16px}
+.rule span{color:var(--muted);font-size:15px}
+
+/* ---------- CALCULATOR ---------- */
+#calc{background:var(--bg2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.panel h3{font-size:17px;font-weight:900;margin-bottom:4px}
+.panel .hint{color:var(--muted);font-size:13px;margin-bottom:14px}
+
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opt{
+  flex:1 1 160px;cursor:pointer;border:2px solid var(--line);border-radius:12px;
+  padding:12px 14px;background:#141417;transition:.15s;user-select:none;
+}
+.opt:hover{border-color:#4a4a54}
+.opt input{display:none}
+.opt b{display:block;font-size:15px}
+.opt small{color:var(--muted);font-size:12.5px}
+.opt.on{border-color:var(--yellow);background:rgba(255,212,0,.09)}
+.opt.on b{color:var(--yellow)}
+
+.stepper{display:flex;align-items:center;gap:12px;margin-top:6px}
+.stepper button{
+  width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:#141417;color:var(--text);font-size:22px;font-weight:900;cursor:pointer
+}
+.stepper button:hover{border-color:var(--yellow);color:var(--yellow)}
+.stepper .val{font-size:30px;font-weight:900;color:var(--yellow);min-width:44px;text-align:center}
+.stepper .lbl{color:var(--muted);font-size:14px}
+
+.matchgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:760px){.matchgrid{grid-template-columns:1fr}}
+.match{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#141417;
+  font-size:14.5px;transition:.12s;user-select:none;
+}
+.match:hover{border-color:#4a4a54}
+.match input{display:none}
+.match .pts{font-weight:900;font-size:15px;color:var(--muted);white-space:nowrap;direction:ltr;display:inline-block}
+.match.on{border-color:var(--yellow);background:rgba(255,212,0,.09)}
+.match.on .pts{color:var(--yellow)}
+.match.on.minus{border-color:var(--red);background:rgba(255,93,93,.10)}
+.match.on.minus .pts{color:var(--red)}
+.match .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-h{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;flex-wrap:wrap;gap:8px}
+.sub-h h4{margin:0;font-size:15px;font-weight:900}
+.mini{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.mini:hover{border-color:var(--yellow);color:var(--yellow)}
+
+/* result */
+.result{
+  position:sticky;bottom:0;z-index:20;margin-top:18px;
+  background:linear-gradient(180deg,#17170c,#000);
+  border:2px solid var(--yellow);border-radius:16px;padding:18px;
+  box-shadow:0 -8px 40px rgba(0,0,0,.7);
+}
+.total{display:flex;align-items:baseline;justify-content:center;gap:12px;flex-wrap:wrap}
+.total .num{font-size:clamp(44px,10vw,68px);font-weight:900;color:var(--yellow);line-height:1;direction:ltr}
+.total .unit{font-size:18px;font-weight:900;color:var(--muted)}
+.verdict{text-align:center;margin-top:6px;font-size:16px;font-weight:700}
+.bd{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}
+.chip{background:#000;border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:13px;color:var(--muted)}
+.chip b{color:var(--text);direction:ltr;display:inline-block}
+.chip.pos b{color:var(--green)}
+.chip.neg b{color:var(--red)}
+
+footer{padding:34px 0 60px;color:#6b6b74;font-size:13.5px;text-align:center}
+footer a{color:var(--yellow-dim)}
+.disc{max-width:640px;margin:14px auto 0;line-height:1.7}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="badge">עונת 2026/27 · השיטה החדשה</div>
+    <h1>שיטת הניקוד של <span>בית״ר</span><br>בלי כאב ראש</h1>
+    <p class="sub">פעם היה מספיק להיות אוהד. היום צריך גם להיות רואה חשבון.<br>
+    כאן מסבירים איך צוברים נקודות, איפה מפסידים אותן — ובסוף יש מחשבון שיגיד לך בדיוק כמה יש לך.</p>
+    <div class="crumbs">מבוסס על הפרסום הרשמי של המועדון והתקנון המלא · עודכן 31.8.2026</div>
+  </div>
+</header>
+
+<!-- ================= 30 שניות ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">הכל ב-30 שניות</div>
+    <h2>מה זה בכלל הדבר הזה?</h2>
+    <p class="lead">המועדון החליף את "מי שלחץ F5 הכי מהר" ב"מי שבאמת מגיע". צוברים נקודות לאורך העונה, והנקודות קובעות מי זכאי לכרטיסים למשחקי חוץ (ולהגרלות עליהם).</p>
+    <div class="grid g3">
+      <div class="card">
+        <h3>1. מתחילים עם בונוס</h3>
+        <p>ותק מנוי, מנוי חדש וחברות בבית״רי — נותנים לך נקודות פתיחה עוד לפני שנשרקה שריקה.</p>
+      </div>
+      <div class="card">
+        <h3>2. צוברים בשטח</h3>
+        <p>כל משחק שהגעת אליו <b>וסרקת</b> מוסיף נקודות. לא סרקת? מבחינת המערכת היית בבית עם הפופקורן.</p>
+      </div>
+      <div class="card">
+        <h3>3. מוציאים על החוץ</h3>
+        <p>כרטיס למשחק חוץ גדול עולה לך 40 נקודות מהמאזן. כן, זה כמו סופרמרקט — רק שהמטבע הוא נאמנות.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= נקודות פתיחה ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">קבלת ניקוד ראשונית</div>
+    <h2>הנקודות שקיבלת בלי להזיע</h2>
+    <p class="lead">אלה נקודות חד־פעמיות, על סמך הרישומים של המועדון. אין מה להתווכח איתן — הן פשוט שם.</p>
+    <div class="grid g3">
+      <div class="card">
+        <div class="big">20</div>
+        <h3>לכל שנת ותק מנוי</h3>
+        <p>על כל שנת מנוי החל מעונת 22/23 — 20 נקודות. בתנאי שהמנוי היה על שמך <b>ברציפות</b>. חמש עונות רצופות = 100 נקודות ואגו בריא.</p>
+      </div>
+      <div class="card">
+        <div class="big">20</div>
+        <h3>מנוי חדש</h3>
+        <p>הצטרפת השנה בפעם הראשונה? קח 20 נקודות מתנת היכרות. ברוך הבא, ההתמכרות בחינם.</p>
+      </div>
+      <div class="card">
+        <div class="big">50</div>
+        <h3>חבר בית״רי</h3>
+        <p>חברות במועדון האוהדים מזכה ב-50 נקודות — <b>ובנוסף מכפילה</b> לך את הניקוד בכל משחק. זו הכפתור הכי משתלם בשיטה.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= טבלאות ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">הטבלה המפורטת</div>
+    <h2>כמה שווה כל משחק?</h2>
+    <p class="lead">ארבע קטגוריות, ארבעה סוגי אוהדים. שימו לב לטוויסט: דווקא במשחקים הגדולים בבית מקבלים <b>פחות</b> נקודות — כי שם ממילא לא צריך לשכנע אף אחד להגיע.</p>
+
+    <div class="grid g2">
+
+      <div class="tblcard">
+        <div class="head"><h3>משחקי בית קטנים</h3><span class="tag good">הכי משתלם</span></div>
+        <table>
+          <tr><th>מנוי + בית״רי</th><th>מנוי</th><th>בית״רי</th><th>אורח</th></tr>
+          <tr><td>30</td><td>15</td><td>15</td><td>10</td></tr>
+        </table>
+        <div class="teams"><b>הקבוצות:</b> מכבי נתניה · הפועל חיפה · הפועל פ״ת · מכבי פ״ת · בני סכנין · עירוני טבריה · הפועל ר״ג · עירוני ק״ש</div>
+        <div class="joke">🥱 יום שני, 20:30, גשם, מול טבריה. זה בדיוק המשחק ששווה הכי הרבה. במקרה? ממש לא.</div>
+      </div>
+
+      <div class="tblcard">
+        <div class="head"><h3>משחקי בית גדולים</h3><span class="tag">חצי מחיר</span></div>
+        <table>
+          <tr><th>מנוי + בית״רי</th><th>מנוי</th><th>בית״רי</th><th>אורח</th></tr>
+          <tr><td>20</td><td>10</td><td>10</td><td>5</td></tr>
+        </table>
+        <div class="teams"><b>הקבוצות:</b> מכבי ת״א · הפועל ת״א · מכבי חיפה · הפועל ב״ש · הפועל ירושלים</div>
+        <div class="joke">😎 באת לדרבי? יפה מאוד, אבל בוא נודה — לא היית מפספס אותו גם בלי נקודות.</div>
+      </div>
+
+      <div class="tblcard">
+        <div class="head"><h3>משחקי חוץ קטנים</h3><span class="tag good">צוברים</span></div>
+        <table>
+          <tr><th>מנוי + בית״רי</th><th>מנוי</th><th>בית״רי</th><th>אורח</th></tr>
+          <tr><td>30</td><td>15</td><td>15</td><td>10</td></tr>
+        </table>
+        <div class="teams"><b>הקבוצות:</b> הפועל ירושלים · מכבי נתניה · הפועל חיפה · הפועל פ״ת · מכבי פ״ת · בני סכנין · עירוני טבריה · הפועל ר״ג · עירוני ק״ש</div>
+        <div class="joke">🚌 נסיעה לקריית שמונה ביום חמישי היא לא טיול — היא השקעה פיננסית.</div>
+      </div>
+
+      <div class="tblcard">
+        <div class="head"><h3>משחקי חוץ גדולים</h3><span class="tag bad">מנכה 40</span></div>
+        <table>
+          <tr><th>מנוי + בית״רי</th><th>מנוי</th><th>בית״רי</th><th>אורח</th></tr>
+          <tr><td class="neg">-40</td><td class="neg">-40</td><td class="neg">-40</td><td class="neg">-40</td></tr>
+        </table>
+        <div class="teams"><b>הקבוצות:</b> מכבי ת״א · הפועל ת״א · מכבי חיפה · הפועל ב״ש<br><br>ההפחתה מתבצעת <b>בעת רכישת הכרטיס</b>, לא בסריקה. וגם אם קיבלת זכאות ולא הגעת — ה-40 יורדות בכל מקרה.</div>
+        <div class="joke">💸 כאן הנקודות מפסיקות להיות ציון ומתחילות להיות ארנק. בזבזת — תחזור לצבור.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= כללי ברזל ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">האותיות הקטנות</div>
+    <h2>איפה אנשים מפסידים נקודות בטיפשות</h2>
+    <p class="lead">רוב ה"למה לא קיבלתי נקודות?!" מגיע מאחת מהשורות הבאות. תקראו, זה חוסך עצבים.</p>
+
+    <div class="card">
+      <div class="rule"><div class="ico">📲</div><div><b>לא סרקת — לא קיים</b><span>נקודות על משחקי בית נכנסות אוטומטית עד יומיים אחרי הכניסה — אבל רק אחרי סריקת המנוי בשער. נכנסת "עם חבר" בלי לסרוק? אין ניקוד.</span></div></div>
+
+      <div class="rule"><div class="ico">🛒</div><div><b>משחקי חוץ — רק דרך "לאן", ורק דרך החשבון שלך</b><span>קופות, טלפון, "אח של מישהו שמסדר" — לא מזכים בנקודות. הכרטיס חייב להירכש דרך המנוי בחשבון שלך, ולהיסרק במגרש.</span></div></div>
+
+      <div class="rule"><div class="ico">🎟️</div><div><b>קנית חמישה כרטיסים? קיבלת ניקוד על אחד</b><span>אין כפל נקודות. הצבירה היא לפי הכרטיס/המוצר הגבוה ביותר בלבד לכל משחק — מנוי שקנה גם כרטיס נוסף על שמו, יקבל רק על המנוי.</span></div></div>
+
+      <div class="rule"><div class="ico">🙅</div><div><b>העברת כרטיס = אפס נקודות</b><span>העברת את הזכאות או את הכרטיס למישהו אחר? הנקודות לא נצברות. לא לך ולא לו.</span></div></div>
+
+      <div class="rule"><div class="ico">👻</div><div><b>קנית ולא הגעת</b><span>כרטיס שלא מומש לא מזכה בניקוד. ובמשחק חוץ גדול, ה-40 נקודות יורדות בכל מקרה — הגעת או לא.</span></div></div>
+
+      <div class="rule"><div class="ico">⏳</div><div><b>לנקודות יש תאריך תפוגה</b><span>כל נקודה בתוקף 24 חודשים (המניין מתחיל ב-30.9.2026, ואחר כך מיום הצבירה). לצבור ולשבת עליהן זה לא רעיון טוב.</span></div></div>
+
+      <div class="rule"><div class="ico">🔥</div><div><b>אלימות מאפסת הכל</b><span>הפרת סדר, זריקת חפצים או כל אירוע שפוגע במועדון — והמועדון רשאי לבטל את כל הניקוד שצברת. שנתיים של נסיעות לסכנין, פוף.</span></div></div>
+
+      <div class="rule"><div class="ico">🗓️</div><div><b>הסיבוב הראשון הוא חימום</b><span>בסיבוב הראשון רק צוברים; השימוש בנקודות מתחיל מהסיבוב השני. עד אז — הגרלות או הרשמה מראש לפי הניקוד ההתחלתי.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= מחשבון ================= -->
+<section id="calc">
+  <div class="wrap">
+    <div class="eyebrow">המחשבון</div>
+    <h2>כמה נקודות יש לך?</h2>
+    <p class="lead">בחר את הסטטוס שלך, את שנות הוותק, וסמן את המשחקים שהיית בהם. המספר למטה מתעדכן לבד.</p>
+
+    <!-- סטטוס -->
+    <div class="panel">
+      <h3>מי אתה במערכת?</h3>
+      <div class="hint">זה קובע את העמודה שלך בטבלה — ההבדל בין 10 ל-30 נקודות למשחק.</div>
+      <div class="opts">
+        <label class="opt on" id="opt-sub"><input type="radio" name="status" value="sub" checked>
+          <b>בעל מנוי עונתי</b><small>נכנס עם המנוי, סורק בשער</small></label>
+        <label class="opt" id="opt-guest"><input type="radio" name="status" value="guest">
+          <b>כרטיס אורח</b><small>קונה כרטיס בודד למשחק</small></label>
+      </div>
+      <div class="opts" style="margin-top:10px">
+        <label class="opt" id="opt-beitari"><input type="checkbox" id="beitari">
+          <b>חבר מועדון בית״רי</b><small>מוסיף 50 נקודות, ומכפיל את הניקוד בכל משחק</small></label>
+      </div>
+    </div>
+
+    <!-- ותק -->
+    <div class="panel">
+      <h3>שנות ותק מנוי</h3>
+      <div class="hint">20 נקודות לכל שנה, החל מעונת 22/23, ובתנאי שהמנוי היה על שמך ברציפות. מקסימום 5 עונות.</div>
+      <div class="stepper">
+        <button type="button" id="yminus">−</button>
+        <div class="val" id="yval">3</div>
+        <button type="button" id="yplus">+</button>
+        <div class="lbl">עונות רצופות · <span id="ypts">60</span> נק׳</div>
+      </div>
+      <div class="opts" style="margin-top:16px">
+        <label class="opt" id="opt-new"><input type="checkbox" id="isnew">
+          <b>רכשתי מנוי חדש העונה</b><small>מוסיף 20 נקודות למצטרפים חדשים</small></label>
+      </div>
+    </div>
+
+    <!-- משחקים -->
+    <div class="panel">
+      <h3>באילו משחקים היית?</h3>
+      <div class="hint">סיבוב שלם — 13 בית ו-13 חוץ. סמן רק מה שסרקת בפועל.</div>
+
+      <div class="sub-h">
+        <h4>🏠 משחקי בית</h4>
+        <div>
+          <button class="mini" data-all="home">סמן הכל</button>
+          <button class="mini" data-none="home">נקה</button>
+        </div>
+      </div>
+      <div class="matchgrid" id="home-list"></div>
+
+      <div class="sub-h">
+        <h4>✈️ משחקי חוץ</h4>
+        <div>
+          <button class="mini" data-all="away">סמן הכל</button>
+          <button class="mini" data-none="away">נקה</button>
+        </div>
+      </div>
+      <div class="matchgrid" id="away-list"></div>
+    </div>
+
+    <!-- תוצאה -->
+    <div class="result">
+      <div class="total"><div class="num" id="total">0</div><div class="unit">נקודות</div></div>
+      <div class="verdict" id="verdict"></div>
+      <div class="bd" id="breakdown"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    כל הנתונים נלקחו מהפרסום הרשמי של בית״ר ירושלים ומהתקנון המלא.<br>
+    <a href="https://www.beitarfc.co.il/news/points2627/" target="_blank" rel="noopener">הכתבה המקורית</a> ·
+    <a href="https://www.beitarfc.co.il/points/" target="_blank" rel="noopener">תקנון שיטת הניקוד</a>
+    <div class="disc">
+      * הדף הזה הוא הסבר לא רשמי ולא מחייב. במקרה של סתירה — התקנון של המועדון גובר, והמועדון רשאי לשנות את השיטה, להכפיל ניקוד באירועים מסוימים ולקבוע ספי זכאות לכל משחק.<br>
+      ** בטבלה שפרסם המועדון, הפועל ירושלים מופיעה כ"משחק בית גדול", בעוד שבתקנון "קבוצה גדולה" מוגדרת כמכבי ת״א, הפועל ת״א, מכבי חיפה והפועל ב״ש בלבד. המחשבון פועל לפי הטבלה המפורסמת.
+    </div>
+  </div>
+</footer>
+
+<script>
+const BIG_HOME = ['מכבי תל אביב','הפועל תל אביב','מכבי חיפה','הפועל באר שבע','הפועל ירושלים'];
+const SMALL_HOME = ['מכבי נתניה','הפועל חיפה','הפועל פתח תקווה','מכבי פתח תקווה','בני סכנין','עירוני טבריה','הפועל רמת גן','עירוני קריית שמונה'];
+const BIG_AWAY = ['מכבי תל אביב','הפועל תל אביב','מכבי חיפה','הפועל באר שבע'];
+const SMALL_AWAY = ['הפועל ירושלים','מכבי נתניה','הפועל חיפה','הפועל פתח תקווה','מכבי פתח תקווה','בני סכנין','עירוני טבריה','הפועל רמת גן','עירוני קריית שמונה'];
+
+// [אורח, בית"רי-אורח, מנוי, מנוי+בית"רי]
+const TABLE = {
+  homeSmall: {guest:10, guestB:15, sub:15, subB:30},
+  homeBig:   {guest:5,  guestB:10, sub:10, subB:20},
+  awaySmall: {guest:10, guestB:15, sub:15, subB:30},
+  awayBig:   {guest:-40,guestB:-40,sub:-40,subB:-40}
+};
+
+const matches = [];
+BIG_HOME.forEach(t => matches.push({venue:'home', cat:'homeBig', team:t}));
+SMALL_HOME.forEach(t => matches.push({venue:'home', cat:'homeSmall', team:t}));
+BIG_AWAY.forEach(t => matches.push({venue:'away', cat:'awayBig', team:t}));
+SMALL_AWAY.forEach(t => matches.push({venue:'away', cat:'awaySmall', team:t}));
+
+const state = { status:'sub', beitari:false, years:3, isNew:false, picked:new Set() };
+
+function key(){ return state.status === 'sub' ? (state.beitari?'subB':'sub') : (state.beitari?'guestB':'guest'); }
+function ptsFor(m){ return TABLE[m.cat][key()]; }
+
+function buildLists(){
+  const h = document.getElementById('home-list');
+  const a = document.getElementById('away-list');
+  h.innerHTML = ''; a.innerHTML = '';
+  matches.forEach((m, i) => {
+    const el = document.createElement('label');
+    el.className = 'match';
+    el.dataset.i = i;
+    el.innerHTML = `<span class="nm">${m.venue==='home'?'':''}${m.team}</span><span class="pts"></span>`;
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      if (state.picked.has(i)) state.picked.delete(i); else state.picked.add(i);
+      render();
+    });
+    (m.venue === 'home' ? h : a).appendChild(el);
+  });
+}
+
+function render(){
+  // matches
+  document.querySelectorAll('.match').forEach(el => {
+    const i = +el.dataset.i, m = matches[i], p = ptsFor(m);
+    el.classList.toggle('on', state.picked.has(i));
+    el.classList.toggle('minus', p < 0);
+    el.querySelector('.pts').textContent = (p > 0 ? '+' : '') + p;
+  });
+
+  // base
+  const yearPts = state.years * 20;
+  const newPts = state.isNew ? 20 : 0;
+  const beitPts = state.beitari ? 50 : 0;
+
+  let gained = 0, spent = 0;
+  state.picked.forEach(i => {
+    const p = ptsFor(matches[i]);
+    if (p >= 0) gained += p; else spent += p;
+  });
+
+  const total = yearPts + newPts + beitPts + gained + spent;
+
+  document.getElementById('yval').textContent = state.years;
+  document.getElementById('ypts').textContent = yearPts;
+  document.getElementById('total').textContent = total;
+
+  const bd = [];
+  if (yearPts) bd.push(`<span class="chip pos">ותק ${state.years} עונות <b>+${yearPts}</b></span>`);
+  if (newPts)  bd.push(`<span class="chip pos">מנוי חדש <b>+20</b></span>`);
+  if (beitPts) bd.push(`<span class="chip pos">בית״רי <b>+50</b></span>`);
+  if (gained)  bd.push(`<span class="chip pos">נוכחות במשחקים <b>+${gained}</b></span>`);
+  if (spent)   bd.push(`<span class="chip neg">משחקי חוץ גדולים <b>${spent}</b></span>`);
+  const cnt = state.picked.size;
+  if (cnt) bd.push(`<span class="chip">${cnt} משחקים מסומנים</span>`);
+  document.getElementById('breakdown').innerHTML = bd.join('');
+
+  document.getElementById('verdict').textContent = verdict(total);
+}
+
+function verdict(t){
+  if (t < 0)   return '😬 אתה באוברדראפט. חייב לצבור לפני שאתה חולם על חוץ גדול.';
+  if (t < 60)  return '🌱 מתחיל דרכו. הכל לפניך, כולל קריית שמונה בחמישי.';
+  if (t < 140) return '🙂 אוהד סביר. עוד כמה משחקי חול ואתה בעניינים.';
+  if (t < 250) return '🔥 בכיוון הנכון. אתה כבר בשיחה על הגרלות.';
+  if (t < 400) return '💪 ליגה טובה. בלומפילד? כנראה שיש לך מקום.';
+  if (t < 600) return '👑 אוהד עילית. במועדון כבר מזהים אותך לפי הברקוד.';
+  return '🏆 אגדה. שקול להגיש מועמדות להנהלה.';
+}
+
+// events
+document.querySelectorAll('input[name="status"]').forEach(r => {
+  r.addEventListener('change', () => {
+    state.status = r.value;
+    document.getElementById('opt-sub').classList.toggle('on', state.status==='sub');
+    document.getElementById('opt-guest').classList.toggle('on', state.status==='guest');
+    render();
+  });
+});
+document.getElementById('beitari').addEventListener('change', e => {
+  state.beitari = e.target.checked;
+  document.getElementById('opt-beitari').classList.toggle('on', state.beitari);
+  render();
+});
+document.getElementById('isnew').addEventListener('change', e => {
+  state.isNew = e.target.checked;
+  document.getElementById('opt-new').classList.toggle('on', state.isNew);
+  render();
+});
+document.getElementById('yplus').addEventListener('click', () => { if(state.years<5){state.years++; render();} });
+document.getElementById('yminus').addEventListener('click', () => { if(state.years>0){state.years--; render();} });
+
+document.querySelectorAll('.mini').forEach(b => {
+  b.addEventListener('click', () => {
+    const all = b.dataset.all, none = b.dataset.none;
+    matches.forEach((m,i) => {
+      if (all && m.venue === all) state.picked.add(i);
+      if (none && m.venue === none) state.picked.delete(i);
+    });
+    render();
+  });
+});
+
+buildLists();
+render();
+</script>
+</body>
+</html>
