@@ -25,6 +25,9 @@ CURSE = re.compile(r'(שרמוט|זונה|מניאק|מפגר|כוסאמ|כוס 
 # content rule: no politics, no racism (search vocab + any displayed text)
 BLOCK = re.compile(r'(ביבי|נתניהו|בחירות|חמאס|חטופ|ממשל|ליכוד|גביר|סמוטריץ|לפיד|גנץ|בנט|שמאלנ|ערבי|ערבים|ערביה|כושי|כושים|מחבל|טרור|עזה|חיזבאללה|מלחמה|נאצ|היטלר|מוות ל|קואליצ|כנסת|הפגנ|דרוז|אחמד|טיבי|מוסלמ|יהודים|עבודה ערבית)')
 def blocked(t): return bool(BLOCK.search(t))
+# search tab is open to everything except racism (user decision 26.10)
+RACISM = re.compile(r'(ערבי|ערבים|ערביה|כושי|כושים|מוות לערבים|נאצ|היטלר|דרוז|מוסלמ|עבודה ערבית|קוקסינל)')
+def racist(t): return bool(RACISM.search(t))
 def readable(t):
     if not t or is_media(t) or 'http' in t or is_laugh(t): return False
     return len(re.findall(r'[א-ת]', t)) >= 8 and len(t) <= 260
@@ -55,7 +58,7 @@ NB = bin_of(END) + 1
 BIN_LABELS = [f"{'א' if b % 2 == 0 else 'ב'}׳ {2021 + b // 2}" for b in range(NB)]
 
 # ---------- funny pool ----------
-pool_ids = [i for i in range(N) if score[i] >= 1 and not MS[i][1].startswith('+') and not blocked(MS[i][2])]
+pool_ids = [i for i in range(N) if score[i] >= 1 and not MS[i][1].startswith('+') and not racist(MS[i][2])]
 pool_ids.sort(key=lambda i: -score[i])
 pool_ids = sorted(pool_ids[:9000])
 pool = [[MS[i][0].strftime('%d.%m.%y'), pid(MS[i][1]), MS[i][2][:220], score[i]] for i in pool_ids]
@@ -71,14 +74,14 @@ for i, (dt, who, t) in enumerate(MS):
         if p >= 0: per[w][p] += 1
         bins[w][bin_of(dt)] += 1
         if w not in first and p >= 0: first[w] = i
-vocab = [w for w, c in tot.items() if c >= 30 and not BLOCK.search(w)]
+vocab = [w for w, c in tot.items() if c >= 30 and not RACISM.search(w)]
 index = {}
 for w in vocab:
     f = first.get(w)
     ft = None
     if f is not None:
         txt = MS[f][2]
-        ft = [MS[f][0].strftime('%d.%m.%y'), pid(MS[f][1]), '' if tot[w] < 80 or blocked(txt) or not readable(txt) else txt[:100]]
+        ft = [MS[f][0].strftime('%d.%m.%y'), pid(MS[f][1]), '' if tot[w] < 80 or racist(txt) or not readable(txt) else txt[:100]]
     bl = [bins[w].get(b, 0) for b in range(NB)]
     index[w] = [tot[w], [x for p, c in per[w].most_common(6) for x in (p, c)], bl, ft]
 

@@ -218,7 +218,7 @@ const fmt = n => n.toLocaleString('he-IL');
 const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }, set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} } };
 
 $('#sub').textContent = `${fmt(D.total)} הודעות · 24.5.2021 – ${D.end}`;
-$('#foot').textContent = `נבנה מהצ'אט עד ${D.end}. אין פה פוליטיקה, בכוונה.`;
+$('#foot').textContent = `נבנה מהצ'אט עד ${D.end}.`;
 
 /* ---------- tabs ---------- */
 const TABS = [['search','🔎 חיפוש'],['proph','🔮 נבואות'],['flip','🦎 זיקית'],['leave','🚪 עזיבות'],['roast','🎤 רוסט'],['pers','🔬 אישיות'],['psych','🧠 אבחון'],['fifa','🃏 כרטיסים'],['match','💘 מאצ\'ים']];
@@ -245,7 +245,8 @@ function doSearch(){
   const q = raw.split(/\s+/)[0] || '';
   const out = $('#sres');
   if(q.length < 2){ out.innerHTML = ''; return; }
-  const ks = KEYS.filter(k => k.includes(q)).sort((a,b) => D.index[b][0] - D.index[a][0]).slice(0, 60);
+  // allow only Hebrew prefix letters before the word (so ביבי won't match חביבי)
+  const ks = KEYS.filter(k => { const i = k.indexOf(q); return i >= 0 && /^[והשבלמכ]{0,3}$/.test(k.slice(0, i)); }).sort((a,b) => D.index[b][0] - D.index[a][0]).slice(0, 60);
   if(!ks.length){ out.innerHTML = `<div class="box muted">אף אחד לא כתב את זה מספיק פעמים. כנראה מילה נקייה מדי לקבוצה הזאת.</div>`; return; }
   let tot = 0; const per = {}; const bins = D.bins.map(() => 0); let first = null;
   for(const k of ks){
