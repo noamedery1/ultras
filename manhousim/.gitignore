@@ -1,0 +1,8 @@
+*.zip
+build/raw/
+build/*.pkl
+build/*.txt
+build/data_auto.json
+build/__pycache__/
+names.json
+build/*.csv

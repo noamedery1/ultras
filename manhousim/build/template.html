@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>המנחוסים · הארכיון</title>
+<meta name="description" content="חיפוש, נבואות, זיקיות, עזיבות, אבחונים, כרטיסים ומאצ'ים — הכל מהצ'אט של המנחוסים">
+<style>
+:root{--y:#ffd200;--yd:#c9a400;--bk:#0e0e0e;--card:#1a1a1a;--card2:#232323;--line:#333;--tx:#f2f2f2;--mut:#a3a3a3;
+  --red:#ff5a5a;--grn:#3ddc84;--blu:#5ab4ff;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--bk);color:var(--tx);min-height:100vh;
+  background-image:radial-gradient(circle at 50% -10%,#2b2600 0%,var(--bk) 45%)}
+.app{max-width:720px;margin:0 auto;padding:0 14px 60px}
+header{text-align:center;padding:22px 0 10px}
+header .logo{font-size:34px}
+header h1{color:var(--y);font-size:28px;letter-spacing:.5px}
+header .sub{color:var(--mut);font-size:13px;margin-top:4px}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,14,14,.94);backdrop-filter:blur(6px);
+  display:flex;gap:6px;overflow-x:auto;padding:10px 2px;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0 -14px;padding-inline:14px}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:999px;
+  padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+nav button.on{background:var(--y);color:#000;border-color:var(--y)}
+section{display:none;padding-top:16px;animation:f .2s}
+section.on{display:block}
+@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+h2{font-size:22px;color:var(--y);margin-bottom:4px}
+.lead{color:var(--mut);font-size:14px;margin-bottom:14px;line-height:1.5}
+.box{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.box h3{font-size:15px;color:var(--y);margin-bottom:10px}
+.muted{color:var(--mut);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.chip:hover,.chip.on{border-color:var(--y);color:var(--y)}
+input[type=search],select{width:100%;background:#000;color:var(--tx);border:2px solid var(--yd);border-radius:12px;
+  padding:12px 14px;font-size:17px;font-family:inherit;outline:none}
+input[type=search]:focus,select:focus{border-color:var(--y)}
+.bars .row{display:grid;grid-template-columns:96px 1fr 52px;align-items:center;gap:8px;margin:5px 0;font-size:14px}
+.bars .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars .tr{background:#000;border-radius:6px;height:16px;overflow:hidden}
+.bars .fl{height:100%;background:linear-gradient(90deg,var(--yd),var(--y));border-radius:6px}
+.bars .v{font-size:12px;color:var(--mut);text-align:left;direction:ltr}
+.tl{display:flex;align-items:flex-end;gap:3px;height:130px;padding-top:8px;direction:ltr}
+.tl .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.tl .b{width:100%;background:var(--y);border-radius:4px 4px 0 0;min-height:1px}
+.tl .l{font-size:9px;color:var(--mut);margin-top:4px;white-space:nowrap;direction:rtl}
+.big{font-size:40px;font-weight:800;color:var(--y);line-height:1}
+.msg{background:var(--card2);border-radius:12px 12px 12px 4px;padding:10px 12px;margin:8px 0;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.msg .meta{display:block;font-size:12px;color:var(--y);margin-bottom:3px;font-weight:600}
+.msg .meta i{color:var(--mut);font-style:normal;font-weight:400}
+mark{background:var(--y);color:#000;border-radius:3px;padding:0 2px}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat3 div{background:var(--card2);border-radius:12px;padding:10px 4px}
+.stat3 b{display:block;font-size:22px;color:var(--y)}
+.stat3 span{font-size:12px;color:var(--mut)}
+/* prophecy */
+.proph{position:relative;overflow:hidden}
+.stamp{float:left;margin:2px 0 6px 6px;transform:rotate(-8deg);border:3px solid;border-radius:8px;padding:2px 8px;font-weight:900;font-size:15px;opacity:.9}
+.stamp.miss{color:var(--red);border-color:var(--red)}.stamp.hit{color:var(--grn);border-color:var(--grn)}.stamp.unclear{color:var(--mut);border-color:var(--mut)}
+.out{font-size:14px;margin-top:6px}.out b{color:var(--y)}
+.judge{margin-top:8px;font-size:14px;background:#000;border-right:3px solid var(--y);padding:8px 10px;border-radius:6px}
+/* flips */
+.flip .two{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}
+.flip .msg{margin:0;font-size:14px}
+.flip .msg.pos{border:1px solid var(--grn)}.flip .msg.neg{border:1px solid var(--red)}
+.flip .arrow{text-align:center;color:var(--y);font-weight:800;font-size:13px;line-height:1.2}
+.flip .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.quip{margin-top:8px;color:var(--y);font-weight:600;font-size:14px}
+@media(max-width:520px){.flip .two{grid-template-columns:1fr}.flip .arrow{padding:2px 0}}
+/* psych */
+.paper{background:#f4f1e8;color:#222;border-radius:6px;padding:22px 20px;font-family:Georgia,'David',serif;box-shadow:0 8px 30px rgba(0,0,0,.5);position:relative}
+.paper .clinic{display:flex;justify-content:space-between;font-size:12px;color:#666;border-bottom:2px solid #222;padding-bottom:8px;margin-bottom:12px;font-family:'Segoe UI',Arial,sans-serif}
+.paper h3{font-size:20px;color:#111;margin-bottom:2px}
+.paper .dx{display:inline-block;background:#222;color:var(--y);padding:4px 10px;border-radius:4px;font-size:15px;margin:8px 0 12px;font-family:'Segoe UI',Arial,sans-serif;font-weight:700}
+.paper p{font-size:16px;line-height:1.6}
+.paper ul{margin:10px 22px 10px 0;font-size:15px;line-height:1.6}
+.paper .lbl{font-weight:700;font-size:13px;color:#8a6d00;margin-top:12px;font-family:'Segoe UI',Arial,sans-serif}
+.paper .sig{text-align:left;margin-top:16px;font-style:italic;color:#444}
+.paper .facts{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#555;margin-top:12px;border-top:1px dashed #999;padding-top:8px}
+/* fifa */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.fc{position:relative;border-radius:14px 14px 40px 40px;padding:12px 10px 16px;text-align:center;cursor:pointer;color:#2a2000;
+  background:linear-gradient(160deg,#fff3b0,#e8c34a 45%,#b8901c);box-shadow:0 4px 14px rgba(0,0,0,.5);transition:transform .15s}
+.fc:hover{transform:translateY(-3px)}
+.fc.special{background:linear-gradient(160deg,#2b2b2b,#000 60%);color:var(--y);border:2px solid var(--y)}
+.fc.silver{background:linear-gradient(160deg,#f5f5f5,#c4c4c4 50%,#8d8d8d);color:#222}
+.fc.bronze{background:linear-gradient(160deg,#f3cfa8,#c8875a 50%,#8a5530);color:#2b1606}
+.fc .ovr{position:absolute;top:10px;right:12px;font-size:28px;font-weight:900;line-height:1}
+.fc .pos{position:absolute;top:40px;right:10px;font-size:10px;font-weight:700;max-width:60px;line-height:1.1}
+.fc .av{width:62px;height:62px;border-radius:50%;margin:4px auto 6px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;
+  background:rgba(0,0,0,.15)}
+.fc.special .av{background:var(--y);color:#000}
+.fc .nm{font-weight:800;font-size:15px;border-bottom:1px solid currentColor;padding-bottom:4px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc .st{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:12px;text-align:right}
+.fc .st b{font-size:14px;font-weight:900;margin-left:3px}
+.fc.sel{outline:3px solid var(--y);outline-offset:3px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.on{display:flex}
+.modal .in{background:var(--card);border:1px solid var(--y);border-radius:var(--r);padding:18px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.modal .fc{max-width:220px;margin:0 auto 14px;cursor:default}
+.modal .fc:hover{transform:none}
+.xbtn{display:block;margin:12px auto 0;background:var(--y);color:#000;border:0;border-radius:999px;padding:8px 22px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+/* matches */
+.rel{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.rel:last-child{border:0}
+.rel .e{font-size:30px;text-align:center}
+.rel .t{font-size:13px;color:var(--mut)}
+.rel .n{font-size:18px;font-weight:800;color:var(--y)}
+.rel .d{font-size:14px;margin-top:2px}
+.couple{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.couple:last-child{border:0}
+.picker{margin-bottom:14px}
+.roast .nick{font-size:26px;font-weight:900;color:var(--y);text-align:center;margin:4px 0 2px}
+.roast .mic{text-align:center;font-size:40px}
+.bit{background:var(--card2);border-right:4px solid var(--y);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:16px;line-height:1.5}
+.exhibit{border:2px dashed var(--red);border-radius:12px;padding:10px 12px;margin-top:14px}
+.exhibit .lbl{color:var(--red);font-weight:800;font-size:13px;margin-bottom:4px}
+.pers .arch{text-align:center;padding:6px 0 12px}
+.pers .arch .em{font-size:46px}
+.pers .arch h3{font-size:24px;color:var(--y);margin:4px 0}
+.traits{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trait{background:var(--card2);border-radius:12px;padding:12px}
+.trait .v{font-size:24px;font-weight:900;color:var(--y);line-height:1.1}
+.trait .t{font-weight:700;font-size:14px;margin:4px 0}
+.trait .d{font-size:13px;color:var(--mut);line-height:1.4}
+.surprise{margin-top:12px;background:#000;border:1px solid var(--y);border-radius:12px;padding:12px;font-size:15px;line-height:1.5}
+@media(max-width:420px){.traits{grid-template-columns:1fr}}
+footer{text-align:center;color:#555;font-size:12px;margin-top:30px}
+.kick{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kick:last-child{border:0}
+.kick .dt{color:var(--mut);font-size:12px;min-width:62px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">🧿🟡⚫🧿</div>
+  <h1>הארכיון של המנחוסים</h1>
+  <div class="sub" id="sub"></div>
+</header>
+<nav id="nav"></nav>
+
+<section id="search">
+  <h2>🔎 גוגל המנחוסים</h2>
+  <p class="lead">מקלידים מילה, כינוי או שחקן, ומגלים מי אמר את זה הכי הרבה, מתי זה נאמר לראשונה ואיך זה השתנה עם השנים.</p>
+  <input type="search" id="q" placeholder="למשל: אלמוג, תמחק, מנוי..." autocomplete="off">
+  <div class="chips" id="sugg" style="margin:10px 0 14px"></div>
+  <div id="sres"></div>
+</section>
+
+<section id="proph">
+  <h2>🔮 בית הדין לנבואות</h2>
+  <p class="lead">"אני אומר לכם", "תשמרו את ההודעה", "תזכרו מה אמרתי". הנבואות של הקבוצה, ומה קרה באמת.</p>
+  <div id="pres"></div>
+</section>
+
+<section id="flip">
+  <h2>🦎 מד הזיקית</h2>
+  <p class="lead">גאון ביום ראשון, פח ביום שלישי. מי החליף דעה על שחקן או מאמן הכי מהר.</p>
+  <div id="fres"></div>
+</section>
+
+<section id="leave">
+  <h2>🚪 מונה העזיבות</h2>
+  <p class="lead">"זהו, אני יוצא מהקבוצה". כל האיומים, וכמה זמן לקח עד שחזרו לכתוב.</p>
+  <div id="lres"></div>
+</section>
+
+<section id="psych">
+  <h2>🧠 האבחון הפסיכולוגי</h2>
+  <p class="lead">מרפאת המנחוסים לבריאות הנפש. אבחון מקצועי לגמרי, מבוסס על שנה של הודעות.</p>
+  <div class="picker"><select class="pp"></select></div>
+  <div id="psres"></div>
+</section>
+
+<section id="roast">
+  <h2>🎤 הרוסט</h2>
+  <p class="lead">ערב סטנדאפ, וכל אחד מקבל את שלו. כל בדיחה מבוססת על דברים שהוא באמת כתב בצ'אט.</p>
+  <div class="picker"><select class="pp"></select></div>
+  <div id="rres"></div>
+</section>
+
+<section id="pers">
+  <h2>🔬 ניתוח אישיות</h2>
+  <p class="lead">מה הנתונים מגלים עליך: מספרים, הרגלים ודברים שאפילו אתה לא ידעת.</p>
+  <div class="picker"><select class="pp"></select></div>
+  <div id="peres"></div>
+</section>
+
+<section id="fifa">
+  <h2>🃏 כרטיסי FIFA</h2>
+  <p class="lead">הדירוג הרשמי של שנה אחרונה. לחצו על כרטיס כדי לראות מאיפה הגיעו המספרים.</p>
+  <div class="picker"><select class="pp"></select></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section id="match">
+  <h2>💘 המאצ'ים</h2>
+  <p class="lead">מי עונה למי, מי רב עם מי ומי מאוהב בלי תמורה. לפי מי שעונה למי תוך 3 דקות, בשנה האחרונה.</p>
+  <div class="picker"><select class="pp"></select></div>
+  <div id="mres"></div>
+</section>
+
+<footer id="foot"></footer>
+</div>
+<div class="modal" id="modal"><div class="in" id="modalIn"></div></div>
+
+<script>
+const D = /*DATA*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const P = D.people;
+const fmt = n => n.toLocaleString('he-IL');
+const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }, set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} } };
+
+$('#sub').textContent = `${fmt(D.total)} הודעות · 24.5.2021 – ${D.end}`;
+$('#foot').textContent = `נבנה מהצ'אט עד ${D.end}. אין פה פוליטיקה, בכוונה.`;
+
+/* ---------- tabs ---------- */
+const TABS = [['search','🔎 חיפוש'],['proph','🔮 נבואות'],['flip','🦎 זיקית'],['leave','🚪 עזיבות'],['roast','🎤 רוסט'],['pers','🔬 אישיות'],['psych','🧠 אבחון'],['fifa','🃏 כרטיסים'],['match','💘 מאצ\'ים']];
+$('#nav').innerHTML = TABS.map(([id,l]) => `<button data-t="${id}">${l}</button>`).join('');
+function show(id){
+  if(!TABS.some(t => t[0]===id)) id = 'search';
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id===id));
+  document.querySelectorAll('nav button').forEach(b => { const on = b.dataset.t===id; b.classList.toggle('on', on); if(on) b.scrollIntoView({inline:'center',block:'nearest'}); });
+  if(location.hash.slice(1) !== id) history.replaceState(null,'','#'+id);
+}
+$('#nav').onclick = e => { const b = e.target.closest('button'); if(b){ show(b.dataset.t); window.scrollTo({top:0}); } };
+window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+
+/* ---------- search ---------- */
+const KEYS = Object.keys(D.index);
+const dnum = s => { const [d,m,y] = s.split('.'); return +('20'+y) * 10000 + +m * 100 + +d; };
+const SUGG = ['אלמוג','תמחק','קאלו','אברמוב','מנוי','שופט','אליפות','גביע','טדי','וואר','פנדל','מכבי','הפועל','בירה','שווארמה','חחחחחחחחחח','נגר','מנחוס','צדקתי','בושה'];
+$('#sugg').innerHTML = SUGG.filter(w => KEYS.some(k => k.includes(w))).map(w => `<button class="chip">${w}</button>`).join('');
+$('#sugg').onclick = e => { const b = e.target.closest('.chip'); if(b){ $('#q').value = b.textContent; doSearch(); } };
+let st;
+$('#q').addEventListener('input', () => { clearTimeout(st); st = setTimeout(doSearch, 220); });
+function doSearch(){
+  const raw = $('#q').value.trim().toLowerCase();
+  const q = raw.split(/\s+/)[0] || '';
+  const out = $('#sres');
+  if(q.length < 2){ out.innerHTML = ''; return; }
+  const ks = KEYS.filter(k => k.includes(q)).sort((a,b) => D.index[b][0] - D.index[a][0]).slice(0, 60);
+  if(!ks.length){ out.innerHTML = `<div class="box muted">אף אחד לא כתב את זה מספיק פעמים. כנראה מילה נקייה מדי לקבוצה הזאת.</div>`; return; }
+  let tot = 0; const per = {}; const bins = D.bins.map(() => 0); let first = null;
+  for(const k of ks){
+    const [t, pc, bl, ft] = D.index[k];
+    tot += t;
+    for(let i = 0; i < pc.length; i += 2) per[pc[i]] = (per[pc[i]] || 0) + pc[i+1];
+    bl.forEach((v,i) => bins[i] += v);
+    if(ft && (!first || dnum(ft[0]) < dnum(first[0]))) first = ft;
+  }
+  const top = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const mx = top.length ? top[0][1] : 1, bmx = Math.max(...bins, 1);
+  const peakBin = bins.indexOf(Math.max(...bins));
+  const ex = D.pool.filter(m => m[2].toLowerCase().includes(raw)).sort((a,b) => b[3]-a[3]).slice(0, 6);
+  const hl = s => esc(s).replace(new RegExp(raw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), m => `<mark>${m}</mark>`);
+  out.innerHTML = `
+  <div class="box"><div class="stat3">
+    <div><b>${fmt(tot)}</b><span>הודעות</span></div>
+    <div><b>${top.length ? esc(P[top[0][0]]) : '—'}</b><span>האלוף</span></div>
+    <div><b>${esc(D.bins[peakBin])}</b><span>שיא השימוש</span></div>
+  </div>${ks.length > 1 ? `<p class="muted" style="margin-top:10px">כולל גם: ${ks.slice(0,10).map(esc).join(' · ')}${ks.length>10?' ועוד':''}</p>` : ''}</div>
+  <div class="box"><h3>🏆 מי אמר את זה הכי הרבה</h3><div class="bars">${top.map(([p,c]) =>
+    `<div class="row"><span class="nm">${esc(P[p])}</span><div class="tr"><div class="fl" style="width:${100*c/mx}%"></div></div><span class="v">${fmt(c)}</span></div>`).join('')}</div></div>
+  <div class="box"><h3>📈 לאורך השנים</h3><div class="tl">${bins.map((v,i) =>
+    `<div class="c" title="${esc(D.bins[i])}: ${v}"><div class="b" style="height:${100*v/bmx}%"></div><div class="l">${esc(D.bins[i])}</div></div>`).join('')}</div></div>
+  ${first ? `<div class="box"><h3>🥇 הפעם הראשונה בהיסטוריה</h3>${first[2]
+      ? `<div class="msg"><span class="meta">${esc(P[first[1]])} <i>· ${first[0]}</i></span>${hl(first[2])}</div>`
+      : `<p>${esc(P[first[1]])} היה הראשון, ב־${first[0]}.</p>`}</div>` : ''}
+  ${ex.length ? `<div class="box"><h3>😂 ההודעות הכי מצחיקות עם המילה</h3>${ex.map(m =>
+      `<div class="msg"><span class="meta">${esc(P[m[1]])} <i>· ${m[0]} · ${m[3]} צחקו</i></span>${hl(m[2])}</div>`).join('')}</div>` : ''}`;
+}
+
+/* ---------- prophecies ---------- */
+(function(){
+  const C = D.cur.proph || [];
+  const misses = {}; C.forEach(p => { if(p.verdict === 'miss') misses[p.who] = (misses[p.who] || 0) + 1; });
+  const VL = {miss:'התנפצה', hit:'התגשמה!', unclear:'בבירור'};
+  const told = D.told.slice(0, 8), tmx = told.length ? told[0][1] : 1;
+  $('#pres').innerHTML = `
+  <div class="box"><h3>🗣️ "אמרתי לכם": מי הכי אוהב להזכיר שצדק</h3><div class="bars">${told.map(([n,c]) =>
+    `<div class="row"><span class="nm">${esc(n)}</span><div class="tr"><div class="fl" style="width:${100*c/tmx}%"></div></div><span class="v">${c}</span></div>`).join('')}</div></div>
+  ${C.map(p => `<div class="box proph"><span class="stamp ${p.verdict}">${VL[p.verdict] || ''}</span>
+    <div class="msg" style="clear:both"><span class="meta">${esc(p.who)} <i>· ${esc(p.date)}</i></span>${esc(p.text)}</div>
+    <div class="out"><b>מה קרה בפועל:</b> ${esc(p.outcome)}</div>
+    <div class="judge">⚖️ ${esc(p.judge)}</div></div>`).join('')}`;
+})();
+
+/* ---------- flips ---------- */
+(function(){
+  const C = D.cur.flips || [];
+  const cnt = {}; C.forEach(f => cnt[f.who] = (cnt[f.who] || 0) + 1);
+  const avg = n => { const L = C.filter(f => f.who === n); return L.reduce((s,f) => s + f.days, 0) / L.length; };
+  const NOT_CHAMP = ['נועם'];  // ביקש לצאת מהתחרות
+  const champ = Object.entries(cnt).filter(([n]) => !NOT_CHAMP.includes(n)).sort((a,b) => b[1]-a[1] || avg(a[0]) - avg(b[0]))[0];
+  const fastest = C.slice().sort((a,b) => a.days - b.days)[0];
+  const dl = d => { const h = Math.round(d*24), m = Math.round(d*1440);
+    return m < 60 ? (m <= 1 ? 'אותה דקה' : `${m} דקות`) : h < 2 ? 'שעה' : d < 1 ? `${h} שעות` : Math.round(d) === 1 ? 'יום' : `${Math.round(d)} ימים`; };
+  const isPosFirst = f => !/(פלופ|אפס|זבל|גרוע|שיעוף|לפטר|חרא|מביך|בושה|אסון|פח|חלש|מעפן|נכה|עלוב)/.test(f.a.text);
+  $('#fres').innerHTML = (champ ? `<div class="box"><div class="stat3">
+      <div><b>${esc(champ[0])}</b><span>🦎 זיקית העונה</span></div>
+      <div><b>${C.length}</b><span>היפוכים מתועדים</span></div>
+      <div><b>${fastest ? dl(fastest.days) : '—'}</b><span>ההיפוך הכי מהיר</span></div></div></div>` : '') +
+    C.map(f => { const pf = isPosFirst(f); return `<div class="box flip"><div class="hd"><b>${esc(f.who)} <span class="muted">על</span> ${esc(f.figure)}</b><span class="muted">${dl(f.days)}</span></div>
+      <div class="two"><div class="msg ${pf?'pos':'neg'}"><span class="meta"><i>${esc(f.a.date)}</i></span>${esc(f.a.text)}</div>
+      <div class="arrow">⬅️<br>${dl(f.days)}<br>אחרי</div>
+      <div class="msg ${pf?'neg':'pos'}"><span class="meta"><i>${esc(f.b.date)}</i></span>${esc(f.b.text)}</div></div>
+      <div class="quip">🦎 ${esc(f.quip)}</div></div>`; }).join('');
+})();
+
+/* ---------- leaves ---------- */
+(function(){
+  const T = D.cur.threats || [];
+  const cnt = {}; T.forEach(t => cnt[t[1]] = (cnt[t[1]] || 0) + 1);
+  const top = Object.entries(cnt).sort((a,b) => b[1]-a[1]).slice(0, 8), mx = top.length ? top[0][1] : 1;
+  const back = m => m == null ? 'לא חזר (עדיין)' : m < 1 ? 'המשיך לכתוב באותה דקה' : m < 60 ? `חזר לכתוב אחרי ${m} דק׳` : m < 1440 ? `חזר אחרי ${Math.round(m/60)} שעות` : `חזר אחרי ${Math.round(m/1440)} ימים`;
+  const kc = {}; D.kicks.forEach(k => kc[k[2]] = (kc[k[2]] || 0) + 1);
+  $('#lres').innerHTML = `
+  <div class="box"><div class="stat3">
+    <div><b>${T.length}</b><span>איומי עזיבה</span></div>
+    <div><b>${T.filter(t => t[3] != null && t[3] < 5).length}</b><span>חזרו תוך 5 דקות</span></div>
+    <div><b>${D.kicks.length}</b><span>הועפו באמת</span></div></div></div>
+  <div class="box"><h3>🏆 אלופי האיום</h3><div class="bars">${top.map(([n,c]) =>
+    `<div class="row"><span class="nm">${esc(n)}</span><div class="tr"><div class="fl" style="width:${100*c/mx}%"></div></div><span class="v">${c}</span></div>`).join('')}</div></div>
+  <div class="box"><h3>🥾 הועפו מהקבוצה (על אמת)</h3>${D.kicks.slice().reverse().map(k =>
+    `<div class="kick"><span class="dt">${esc(k[0])}</span><span><b>${esc(k[1])}</b> העיף את <b>${esc(k[2])}</b>${kc[k[2]] > 1 ? ` <span class="muted">(פעם ${kc[k[2]]})</span>` : ''}</span></div>`).join('')}</div>
+  <div class="box"><h3>📜 כל האיומים</h3>${T.slice().reverse().map(t =>
+    `<div class="msg"><span class="meta">${esc(t[1])} <i>· ${esc(t[0])}</i></span>${esc(t[2])}
+     <span class="meta" style="margin-top:6px;color:var(--grn)">↩️ ${back(t[3])}${t[4] ? `: <i>"${esc(t[4])}"</i>` : ''}</span></div>`).join('')}</div>`;
+})();
+
+/* ---------- person picker (shared) ---------- */
+const ACTIVE = D.fifa.map(f => f.name).sort((a,b) => a.localeCompare(b,'he'));
+let cur = store.get('mn_person'); if(!ACTIVE.includes(cur)) cur = D.fifa[0].name;
+document.querySelectorAll('.pp').forEach(s => {
+  s.innerHTML = ACTIVE.map(n => `<option>${esc(n)}</option>`).join('');
+  s.onchange = () => setPerson(s.value);
+});
+function setPerson(n){
+  cur = n; store.set('mn_person', n);
+  document.querySelectorAll('.pp').forEach(s => s.value = n);
+  renderPsych(); renderMatch(); renderRoast(); renderPers();
+  document.querySelectorAll('.fc[data-n]').forEach(c => c.classList.toggle('sel', c.dataset.n === n));
+}
+
+/* ---------- psych ---------- */
+const FIFA = Object.fromEntries(D.fifa.map(f => [f.name, f]));
+function renderPsych(){
+  const p = (D.cur.psych || {})[cur], f = FIFA[cur], i = ACTIVE.indexOf(cur) + 1;
+  if(!p){ $('#psres').innerHTML = `<div class="box muted">התיק של ${esc(cur)} עדיין בבדיקה אצל הד"ר.</div>`; return; }
+  $('#psres').innerHTML = `<div class="paper">
+    <div class="clinic"><span>מרפאת המנחוסים לבריאות הנפש</span><span>תיק מס׳ ${1000 + i * 7}</span></div>
+    <h3>המטופל: ${esc(cur)}</h3>
+    <div class="dx">אבחנה: ${esc(p.dx)}</div>
+    <p>${esc(p.report)}</p>
+    <div class="lbl">תסמינים עיקריים</div>
+    <ul>${(p.symptoms || []).map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+    <div class="lbl">המלצה טיפולית</div><p>${esc(p.rx)}</p>
+    <div class="lbl">פרוגנוזה</div><p>${esc(p.prognosis)}</p>
+    ${f ? `<div class="facts">ממצאי מעבדה: ${fmt(f.msgs)} הודעות בשנה · שעת שיא ${f.real.peak}:00 · ${f.real.night}% בלילה · ${f.real.curse}% קללות · ${f.real.laugh} צחוקים ל־100 הודעות</div>` : ''}
+    <div class="sig">ד"ר מ. נחוס, פסיכולוג קליני (לא מוסמך)</div></div>`;
+}
+
+/* ---------- roast / persona ---------- */
+function renderRoast(){
+  const r = (D.cur.roast || {})[cur];
+  $('#rres').innerHTML = !r ? `<div class="box muted">${esc(cur)} עוד לא עלה לבמה.</div>` : `<div class="box roast">
+    <div class="mic">🎤</div><div class="nick">"${esc(r.nickname)}"</div><p class="muted" style="text-align:center">${esc(cur)}</p>
+    ${r.bits.map(b => `<div class="bit">${esc(b)}</div>`).join('')}
+    ${r.exhibit && r.exhibit.text ? `<div class="exhibit"><div class="lbl">🧾 מוצג א׳ (ציטוט אמיתי)</div><div class="msg" style="margin:0"><span class="meta">${esc(cur)} <i>· ${esc(r.exhibit.date)}</i></span>${esc(r.exhibit.text)}</div></div>` : ''}</div>`;
+}
+function renderPers(){
+  const p = (D.cur.persona || {})[cur];
+  $('#peres').innerHTML = !p ? `<div class="box muted">הניתוח של ${esc(cur)} עוד בעבודה.</div>` : `<div class="box pers">
+    <div class="arch"><div class="em">${esc(p.emoji)}</div><h3>${esc(p.archetype)}</h3><p class="muted">${esc(cur)}</p></div>
+    <p style="font-size:15px;line-height:1.6;margin-bottom:14px">${esc(p.summary)}</p>
+    <div class="traits">${p.traits.map(t => `<div class="trait"><div class="v">${esc(t.value)}</div><div class="t">${esc(t.title)}</div><div class="d">${esc(t.detail)}</div></div>`).join('')}</div>
+    <div class="surprise">🤯 <b>הממצא המפתיע:</b> ${esc(p.surprise)}</div></div>`;
+}
+
+/* ---------- fifa ---------- */
+const SL = {pac:['קצב','⚡ קצב תגובה'], sho:['פאנץ׳','🎯 פאנץ׳: כמה צחוקים הוא מוציא'], pas:['מסירה','📤 מסירות: פורוורדים ומדיה'],
+            sta:['לילה','🌙 סיבולת לילה'], phy:['פיזי','🤬 פיזיות: קללות'], vis:['חפירה','📜 חזון: אורך הודעה']};
+const tier = o => o >= 90 ? 'special' : o >= 84 ? '' : o >= 76 ? 'silver' : 'bronze';
+const card = f => `<div class="fc ${tier(f.ovr)}" data-n="${esc(f.name)}"><div class="ovr">${f.ovr}</div><div class="pos">${esc(f.pos)}</div>
+  <div class="av">${esc(f.name[0])}</div><div class="nm">${esc(f.name)}</div>
+  <div class="st">${Object.keys(SL).map(k => `<span><b>${f.stats[k]}</b>${SL[k][0]}</span>`).join('')}</div></div>`;
+$('#cards').innerHTML = D.fifa.map(card).join('');
+$('#cards').onclick = e => { const c = e.target.closest('.fc'); if(!c) return; setPerson(c.dataset.n); openCard(FIFA[c.dataset.n]); };
+function openCard(f){
+  const r = f.real, rank = D.fifa.indexOf(f) + 1;
+  const real = {pac:`${r.lat} שניות בממוצע עד שהוא עונה`, sho:`${r.laugh} צחוקים לכל 100 הודעות`, pas:`${r.media}% מההודעות הן מדיה או פורוורד`,
+                sta:`${r.night}% מההודעות בין 00:00 ל־06:00`, phy:`${r.curse}% מההודעות עם קללה`, vis:`${r.chars} תווים בהודעה בממוצע`};
+  $('#modalIn').innerHTML = card(f) + `<p class="muted" style="text-align:center;margin-bottom:10px">מקום ${rank} מתוך ${D.fifa.length} · ${fmt(f.msgs)} הודעות בשנה</p>
+    <div class="bars">${Object.keys(SL).map(k => `<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:14px"><span>${SL[k][1]}</span><b style="color:var(--y)">${f.stats[k]}</b></div>
+    <div class="muted">${real[k]}</div></div>`).join('')}</div><button class="xbtn" onclick="$('#modal').classList.remove('on')">סגור</button>`;
+  $('#modal').classList.add('on');
+}
+$('#modal').onclick = e => { if(e.target.id === 'modal') e.target.classList.remove('on'); };
+
+/* ---------- matches ---------- */
+function renderMatch(){
+  const m = D.matches[cur]; if(!m){ $('#mres').innerHTML = ''; return; }
+  const [p, a2p, p2a] = m.partner;
+  const ratio = a2p / Math.max(1, p2a);
+  const pStat = ratio > 1.5 ? `${esc(cur)} רודף, ${esc(p)} נותן לו לרדוף` : ratio < 0.67 ? `${esc(p)} רודף, ${esc(cur)} משחק אותה קשה להשגה` : 'אהבה הדדית ובריאה. נדיר בקבוצה הזאת';
+  const mx = m.top5[0][1];
+  const rows = [
+    ['💍','בן/בת הזוג', p, `${esc(cur)} ענה ל${esc(p)} ${fmt(a2p)} פעמים, וקיבל ${fmt(p2a)} תשובות בחזרה. ${pStat}.`],
+    m.ex && ['💔','האקס', m.ex[0], `פעם הם היו בלתי נפרדים. בשנה האחרונה כמעט לא מדברים: עוצמת הקשר צנחה מ־${m.ex[1]} ל־${m.ex[2]}.`],
+    ['⚔️','האויב המושבע', m.nemesis[0], `${m.nemesis[1] + m.nemesis[2]} ויכוחים בשנה (שטויות, "מה אתה מדבר", "אין לך מושג"). ${m.nemesis[1] > m.nemesis[2] ? esc(cur) + ' בדרך כלל זה שמתחיל.' : esc(m.nemesis[0]) + ' בדרך כלל זה שמתחיל.'}`],
+    m.unreq && ['🙈','אהבה נכזבת', m.unreq[0], `${esc(cur)} ענה ל${esc(m.unreq[0])} ${fmt(m.unreq[1])} פעמים, וקיבל רק ${fmt(m.unreq[2])} בחזרה.`],
+    ['😂','המעריץ מספר 1', m.fan[0], `צחק על ההודעות של ${esc(cur)} ${fmt(m.fan[1])} פעמים בשנה.`],
+  ].filter(Boolean);
+  $('#mres').innerHTML = `<div class="box">${rows.map(([e,t,n,d]) => `<div class="rel"><div class="e">${e}</div><div><div class="t">${t}</div><div class="n">${esc(n)}</div><div class="d">${d}</div></div></div>`).join('')}</div>
+  <div class="box"><h3>👥 החמישייה הקרובה</h3><div class="bars">${m.top5.map(([n,c]) =>
+    `<div class="row"><span class="nm">${esc(n)}</span><div class="tr"><div class="fl" style="width:${100*c/mx}%"></div></div><span class="v">${fmt(c)}</span></div>`).join('')}</div></div>`;
+}
+
+setPerson(cur);
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
